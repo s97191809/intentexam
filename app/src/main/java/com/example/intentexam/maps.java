@@ -2,6 +2,7 @@ package com.example.intentexam;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -144,5 +145,5 @@ public void makeMarker(ArrayList<TMapPoint> arrTMapPoint){
         });
 
     }
-
 }
+
