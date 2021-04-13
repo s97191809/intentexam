@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "232202233933",
+    "project_id": "narang-a1a26",
+    "storage_bucket": "narang-a1a26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232202233933:android:82824cb4a5ce4e87ce1404",
+        "android_client_info": {
+          "package_name": "com.example.intentexam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232202233933-e15ab1lcu9b93f1co8k1hc3fojq7bo24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmYUdyXu2nneIM6cnCteK4Sbvl89XgGAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232202233933-e15ab1lcu9b93f1co8k1hc3fojq7bo24.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
