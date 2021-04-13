@@ -4,46 +4,60 @@ import android.os.Bundle;
 
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-    Button button;
-    int cnt = 0;
+public class dbLoad extends AppCompatActivity {
+
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
+    private ChildEventListener mChild;
+
+    private ListView listView;
+    private ArrayAdapter<String> adapter;
+    List<Object> Array = new ArrayList<Object>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_dbload);
 
-        // 데이터베이스 쓰기
-        button = (Button) findViewById(R.id.db_button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        listView = (ListView) findViewById(R.id.listviewmsg);
 
-                Log.d("MainActivity", "Button - onClickListener");
-                FirebaseDatabase.getInstance().getReference().push().setValue("A" + cnt);
+        initDatabase();
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
+        listView.setAdapter(adapter);
 
-                cnt++;
-            }
-        });
-
-        // 데이터베이스 읽기 #1. ValueEventListener
-        FirebaseDatabase.getInstance().getReference().addValueEventListener(new ValueEventListener() {
+        mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
+        mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Log.d("MainActivity", "ValueEventListener : " + snapshot.getValue());
+                adapter.clear();
+
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
+                    String msg2 = messageData.getValue().toString();
+                    Array.add(msg2);
+                    adapter.add(msg2);
+
                 }
+                adapter.notifyDataSetChanged();
+                listView.setSelection(adapter.getCount() - 1);
             }
 
             @Override
@@ -51,48 +65,44 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+    private void initDatabase(){
+        mDatabase = FirebaseDatabase.getInstance();
 
-        // 데이터베이스 읽기 #2. Single ValueEventListener
-        FirebaseDatabase.getInstance().getReference().addListenerForSingleValueEvent(new ValueEventListener() {
+        mReference = mDatabase.getReference("log");
+        mReference.child("log").setValue("check");
+
+        mChild = new ChildEventListener() {
+
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Log.d("MainActivity", "Single ValueEventListener : " + snapshot.getValue());
-                }
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
 
-            }
-        });
-
-        // 데이터베이스 읽기 #3. ChildEventListener
-        FirebaseDatabase.getInstance().getReference().addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("MainActivity", "ChildEventListener - onChildAdded : " + dataSnapshot.getValue());
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d("MainActivity", "ChildEventListener - onChildChanged : " + s);
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.d("MainActivity", "ChildEventListener - onChildRemoved : " + dataSnapshot.getKey());
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.d("MainActivity", "ChildEventListener - onChildMoved" + s);
-            }
+            public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("MainActivity", "ChildEventListener - onCancelled" + databaseError.getMessage());
             }
-        });
+        };
+        mReference.addChildEventListener(mChild);
+    }
+    protected void onDestroy(){
+        super.onDestroy();
+        mReference.removeEventListener(mChild);
     }
 }
