@@ -1,28 +1,44 @@
 package com.example.intentexam;
 
+import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.module.AppGlideModule;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class dbLoad extends AppCompatActivity {
+public class dbLoadHospital extends AppCompatActivity {
 
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
@@ -65,7 +81,22 @@ public class dbLoad extends AppCompatActivity {
 
             }
         });
+        ImageView img_test = findViewById(R.id.img_test);
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://narang-a1a26.appspot.com");
+        StorageReference storageRef = storage.getReference();
+
+        storageRef.child("um.gif").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            public void onSuccess(Uri uri) {
+                Glide.with(getApplicationContext()).load(uri).into(img_test);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "실패",  Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
     private void initDatabase(){
         mDatabase = FirebaseDatabase.getInstance();
 
@@ -101,8 +132,13 @@ public class dbLoad extends AppCompatActivity {
         };
         mReference.addChildEventListener(mChild);
     }
+
+
+
+
     protected void onDestroy(){
         super.onDestroy();
         mReference.removeEventListener(mChild);
     }
+
 }
