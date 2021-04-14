@@ -22,9 +22,9 @@
         android:id="@+id/join_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
         android:ems="10"
         android:hint="이름"
         android:inputType="textPersonName"
@@ -37,18 +37,19 @@
         android:layout_height="50dp"
         android:layout_marginEnd="6dp"
         android:layout_marginRight="6dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="4dp"
         android:ems="10"
         android:hint="아이디"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/join_password"
         app:layout_constraintEnd_toStartOf="@+id/check_button"
         app:layout_constraintStart_toStartOf="@+id/join_name" />
+
     <EditText
         android:id="@+id/join_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="4dp"
         android:ems="10"
         android:hint="비밀번호"
         android:inputType="textPassword"
@@ -65,6 +66,17 @@
         android:inputType="textPassword"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/join_password" />
+
+    <EditText
+        android:id="@+id/join_weight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="220dp"
+        android:ems="3"
+        android:hint="몸무게"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/join_pwck" />
 
     <Button
         android:id="@+id/check_button"
