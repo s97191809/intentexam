@@ -23,7 +23,7 @@ public class introActivity extends Activity {
                 startActivity(intent);
                 finish();//종료와 함께 넘어가짐
             }
-        }, 2000);
+        }, 3000);
     }
 
 }
