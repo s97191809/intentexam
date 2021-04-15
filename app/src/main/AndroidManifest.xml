@@ -15,17 +15,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <activity android:name=".intro"></activity>
+        <activity android:name=".dbLoad">
 
-        <activity android:name=".introActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:label="@string/app_name"
-            >
              <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
              </intent-filter>
+
         </activity>
-        <activity android:name=".loginActivity"></activity>
+
     </application>
 
 </manifest>
