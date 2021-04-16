@@ -100,7 +100,7 @@ public void makeMarker(ArrayList<TMapPoint> arrTMapPoint){
 
     for (int i = 0; i < arrTMapPoint.size(); i++) {
         TMapMarkerItem markerItem = new TMapMarkerItem();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.map_pin_red);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
         markerItem.setVisible(TMapMarkerItem.VISIBLE);
                 Log.d(
                         "point : ", (arrTMapPoint.get(i)).toString()

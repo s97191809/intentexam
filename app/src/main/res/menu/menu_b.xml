@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-
         android:id="@+id/tab1"
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/calendaricon"
-        /> <!--일정-->
+        android:title="일정"
+        />
+         <!--일정-->
 
     <item
         android:id="@+id/tab2"
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/mapicon"
+        android:title="지도"
        /><!--지도-->
 
     <item
@@ -22,6 +25,7 @@
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/hearticon"
+        android:title="커뮤니티"
         /><!--커뮤니티-->
 
     <item
@@ -30,5 +34,6 @@
         app:showAsAction="ifRoom"
         android:enabled="true"
         android:icon="@drawable/usericon"
+        android:title="내정보"
         /><!--내정보-->
 </menu>

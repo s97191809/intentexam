@@ -27,6 +27,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    fragment1 fragment1;
+    fragment2 fragment2;
+    fragment3 fragment3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
         //String[] record = null;
 
        //------------------------------------네비시작
+        fragment1 = new fragment1();
+        fragment2 = new fragment2();
+        fragment3 = new fragment3();
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -65,18 +71,13 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "세 번째 탭", Toast.LENGTH_SHORT).show();
                         getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment3).commit();
                         return true;
-                    case R.id.tab4:
-                        Toast.makeText(MainActivity.this, "네 번째 탭", Toast.LENGTH_SHORT).show();
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment4).commit();
-                        return true;
                 }
                 return false;
             }
+        });
             //------------------------------------네비 끝
 
 // 마커 아이콘
-
-    }
-
 }
 }
+
