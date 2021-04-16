@@ -72,8 +72,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return false;
         }
-
-        //------------------------------------네비끝
+        //------------------------------------네비 끝
 
         TMapMarkerItem markerItem1 = new TMapMarkerItem();
 
