@@ -1,6 +1,15 @@
 package com.example.intentexam;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.opencsv.CSVReader;
 
 import android.graphics.Bitmap;
@@ -21,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
@@ -32,6 +42,38 @@ public class MainActivity extends AppCompatActivity {
         //BufferedReader reader = new BufferedReader(is);
         //CSVReader read = new CSVReader(reader);
         //String[] record = null;
+
+       //------------------------------------네비시작
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            //바텀 네비게이션 버튼에 눌렀을때 화면 바뀌는 기능 추가
+            //item.getItemId() 아이템의 아이디를 바로 가져옴
+            switch (item.getItemId()) {
+                case R.id.tab1:
+                    Toast.makeText(MainActivity.this, "첫 번째 탭", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment1).commit();
+                    return true; //return true 밑으로는 작동이 되지 않는다.
+
+                case R.id.tab2:
+                    Toast.makeText(MainActivity.this, "두 번째 탭", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment2).commit();
+                    return true;
+
+                case R.id.tab3:
+                    Toast.makeText(MainActivity.this, "세 번째 탭", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment3).commit();
+                    return true;
+                case R.id.tab4:
+                    Toast.makeText(MainActivity.this, "네 번째 탭", Toast.LENGTH_SHORT).show();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment4).commit();
+                    return true;
+            }
+            return false;
+        }
+
+        //------------------------------------네비끝
 
         TMapMarkerItem markerItem1 = new TMapMarkerItem();
 
