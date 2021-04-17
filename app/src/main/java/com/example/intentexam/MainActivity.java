@@ -36,16 +36,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        LinearLayout linearLayoutTmap = (LinearLayout) findViewById(R.id.linearLayoutTmap);
-        TMapView tMapView = new TMapView(this);
-        tMapView.setSKTMapApiKey("l7xx5450926a109d4b33a7f3f0b5c89a2f0c");
-        linearLayoutTmap.addView(tMapView);
 
-        //InputStreamReader is = new InputStreamReader(getResources().openRawResource(R.raw.data));
-        //BufferedReader reader = new BufferedReader(is);
-        //CSVReader read = new CSVReader(reader);
-        //String[] record = null;
 
        //------------------------------------네비시작
         mBottomNV = findViewById(R.id.nav_view);

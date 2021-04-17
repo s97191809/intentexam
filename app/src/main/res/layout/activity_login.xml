@@ -43,7 +43,7 @@
         android:ems="10"
         android:hint="비밀번호"
         android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/delete"
+        app:layout_constraintBottom_toTopOf="@+id/join"
         app:layout_constraintStart_toStartOf="@+id/login_id" />
 
     <Button
@@ -56,11 +56,11 @@
         android:onClick="btn_acpt"
         android:text="로그인"
         android:textColor="#FFFFFF"
-        app:layout_constraintBaseline_toBaselineOf="@+id/delete"
+        app:layout_constraintBaseline_toBaselineOf="@+id/join"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/delete"
+        android:id="@+id/join"
         android:layout_width="76dp"
         android:layout_height="37dp"
         android:layout_marginStart="36dp"
