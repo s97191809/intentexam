@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#EAEFF8">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="102dp"
+        android:layout_marginTop="192dp"
         android:text="로그인"
         android:textSize="30sp"
         android:textStyle="bold"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -26,7 +27,7 @@
         android:layout_marginLeft="95dp"
         android:layout_marginEnd="95dp"
         android:layout_marginRight="95dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="12dp"
         android:ems="10"
         android:hint="아이디"
         android:inputType="textEmailAddress"
@@ -38,7 +39,7 @@
         android:id="@+id/login_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="21dp"
+        android:layout_marginBottom="28dp"
         android:ems="10"
         android:hint="비밀번호"
         android:inputType="textPassword"
@@ -46,26 +47,31 @@
         app:layout_constraintStart_toStartOf="@+id/login_id" />
 
     <Button
-        android:id="@+id/delete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginBottom="267dp"
-        android:text="미정"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/login_button" />
-
-    <Button
         android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="104dp"
-        android:layout_marginLeft="104dp"
+        android:layout_width="76dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="108dp"
+        android:layout_marginLeft="108dp"
+        android:background="@drawable/button"
         android:onClick="btn_acpt"
         android:text="로그인"
+        android:textColor="#FFFFFF"
         app:layout_constraintBaseline_toBaselineOf="@+id/delete"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="76dp"
+        android:layout_height="37dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="108dp"
+        android:layout_marginBottom="216dp"
+        android:background="@drawable/button"
+        android:text="회원가입"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/login_button" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
