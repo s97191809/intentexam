@@ -1,7 +1,6 @@
 package com.example.intentexam;
 
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.tabs.TabLayout;
-
-public class fragment2 extends Fragment {
+public class FragmentPage2 extends Fragment {
     //객체 선언
     Button button3;
     TextView textView2;
@@ -25,12 +22,12 @@ public class fragment2 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment2, container, false);
-
-        //객체 초기화
-        textView2 = rootView.findViewById(R.id.textView2);
-        button3 = rootView.findViewById(R.id.button3);
-
-        return rootView;
+        setHasOptionsMenu(true);
+        return inflater.inflate(R.layout.fragment_page_2, container, false);
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
 }

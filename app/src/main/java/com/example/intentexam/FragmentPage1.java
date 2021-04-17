@@ -1,6 +1,5 @@
 package com.example.intentexam;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,22 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.tabs.TabLayout;
-
-public class fragment3 extends Fragment {
+public class FragmentPage1 extends Fragment {
     //객체 선언
-    Button button4;
-    TextView textView3;
+    Button button2;
+    TextView textView1;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment3, container, false);
-
-        //객체 초기화
-        textView3 = rootView.findViewById(R.id.textView3);
-        button4 = rootView.findViewById(R.id.button4);
-
-        return rootView;
+        setHasOptionsMenu(true);
+        return inflater.inflate(R.layout.fragment_page_1, container, false);
     }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
+
 }

@@ -8,6 +8,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.opencsv.CSVReader;
@@ -27,9 +30,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    fragment1 fragment1;
-    fragment2 fragment2;
-    fragment3 fragment3;
+    private BottomNavigationView mBottomNV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,37 +48,60 @@ public class MainActivity extends AppCompatActivity {
         //String[] record = null;
 
        //------------------------------------네비시작
-        fragment1 = new fragment1();
-        fragment2 = new fragment2();
-        fragment3 = new fragment3();
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+        mBottomNV = findViewById(R.id.nav_view);
+        mBottomNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() { //NavigationItemSelecte
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                BottomNavigate(menuItem.getItemId());
 
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                //바텀 네비게이션 버튼에 눌렀을때 화면 바뀌는 기능 추가
-                //item.getItemId() 아이템의 아이디를 바로 가져옴
-                switch (item.getItemId()) {
-                    case R.id.tab1:
-                        Toast.makeText(MainActivity.this, "첫 번째 탭", Toast.LENGTH_SHORT).show();
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment1).commit();
-                        return true; //return true 밑으로는 작동이 되지 않는다.
 
-                    case R.id.tab2:
-                        Toast.makeText(MainActivity.this, "두 번째 탭", Toast.LENGTH_SHORT).show();
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment2).commit();
-                        return true;
-
-                    case R.id.tab3:
-                        Toast.makeText(MainActivity.this, "세 번째 탭", Toast.LENGTH_SHORT).show();
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment3).commit();
-                        return true;
-                }
-                return false;
+                return true;
             }
         });
+        mBottomNV.setSelectedItemId(R.id.navigation_1);
+    }
+    private void BottomNavigate(int id) {  //BottomNavigation 페이지 변경
+        String tag = String.valueOf(id);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        Fragment currentFragment = fragmentManager.getPrimaryNavigationFragment();
+        if (currentFragment != null) {
+            fragmentTransaction.hide(currentFragment);
+        }
+
+        Fragment fragment = fragmentManager.findFragmentByTag(tag);
+        if (fragment == null) {
+            if (id == R.id.navigation_1) {
+                fragment = new FragmentPage1();
+
+            } else if (id == R.id.navigation_2){
+
+                fragment = new FragmentPage2();
+            }
+            else if (id == R.id.navigation_3){
+
+                fragment = new FragmentPage3();
+            }else {
+                fragment = new FragmentPage4();
+            }
+
+            fragmentTransaction.add(R.id.container, fragment, tag);
+        } else {
+            fragmentTransaction.show(fragment);
+        }
+
+        fragmentTransaction.setPrimaryNavigationFragment(fragment);
+        fragmentTransaction.setReorderingAllowed(true);
+        fragmentTransaction.commitNow();
+
+
+    }
+
+
             //------------------------------------네비 끝
 
 // 마커 아이콘
 }
-}
+
 
