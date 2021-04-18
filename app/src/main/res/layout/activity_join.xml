@@ -74,7 +74,7 @@
         android:layout_marginBottom="220dp"
         android:ems="3"
         android:hint="몸무게"
-        android:inputType="textPassword"
+        android:inputType="number"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/join_pwck" />
 
@@ -108,7 +108,6 @@
         android:text="가입"
         app:layout_constraintBaseline_toBaselineOf="@+id/cancel"
         app:layout_constraintStart_toStartOf="parent"
-        android:onClick="btn_acpt"
         />
 
 

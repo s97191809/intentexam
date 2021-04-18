@@ -2,7 +2,10 @@ package com.example.intentexam;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,24 +20,51 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+
 
 public class joinActivity extends AppCompatActivity {
-    private EditText join_id;
-    private EditText join_name;
-    private EditText join_password;
-    private EditText join_weight;
-    private Button button;
 
+
+    Button btn_save;
+    Button check_button;
     private DatabaseReference mDatabase;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
-        writeNewUser();
+        EditText join_id = (EditText) findViewById(R.id.join_id);
+        EditText join_pw = (EditText) findViewById(R.id.join_password);
+        EditText join_name = (EditText) findViewById(R.id.join_name);
+        EditText join_weight = (EditText) findViewById(R.id.join_weight);
+        btn_save = findViewById(R.id.join_button);
+        check_button = findViewById(R.id.check_button);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        check_button.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                String id = join_id.getText().toString();
+
+            }
+        });
+        btn_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String id = join_id.getText().toString();
+                String pw = join_pw.getText().toString();
+                String name = join_name.getText().toString();
+                String weight = join_weight.getText().toString();
+
+                writeNewUser(id, name, pw, weight);
+
+            }
+        });
     }
-    private void writeNewUser(String userId, String name, String password, String kg) {
-        User user = new User(name, password, kg);
+
+    private void writeNewUser(String userId, String name, String password, String weight) {
+        User user = new User(userId, name, password, weight);
 
         mDatabase.child("user").child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -53,20 +83,30 @@ public class joinActivity extends AppCompatActivity {
                 });
 
     }
-    public class User {
 
+    public class User {
+        public String userId;
         public String userName;
         public String password;
-        public String kg;
+        public String weight;
 
         public User() {
             // Default constructor required for calls to DataSnapshot.getValue(User.class)
         }
 
-        public User(String userName, String password, String kg) {
+        public User(String userId, String userName, String password, String weight) {
+            this.userId = userId;
             this.userName = userName;
             this.password = password;
-            this.password = kg;
+            this.weight = weight;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
         }
 
         public String getUserName() {
@@ -77,29 +117,53 @@ public class joinActivity extends AppCompatActivity {
             this.userName = userName;
         }
 
-        public String getEmail() {
+        public String getPassword() {
             return password;
         }
 
-        public void setEmail(String email) {
-            this.password = email;
-        }
-        public String getKg() {
-            return kg;
+        public void setPassword(String password) {
+            this.password = password;
         }
 
-        public void Kg(String email) {
-            this.kg = kg;
+        public String getWeight() {
+            return weight;
+        }
+
+        public void setWeightKg(String weight) {
+            this.weight = weight;
         }
 
         @Override
         public String toString() {
             return "User{" +
-                    "id='" + userName + '\'' +
+                    "id='" + userId + '\'' +
+                    "name='" + userName + '\'' +
                     ", pw='" + password + '\'' +
-                    ", kg='" + kg + '\'' +
+                    ", kg='" + weight + '\'' +
                     '}';
         }
     }
+    private void readUser(String userId, String name, String password, String weight){
+        User user = new User(userId, name, password, weight);
+        mDatabase.child("users").child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {// 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
+                // Get Post object and use the values to update the UI
+                if(dataSnapshot.getValue(User.class) != null){
+                    User post = dataSnapshot.getValue(User.class);
+                    Log.w("FireBaseData", "getData" + post.toString());
+                } else {
+                    Toast.makeText(joinActivity.this, "값이존재???????", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w("FireBaseData", "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+    }
 }
+
 
