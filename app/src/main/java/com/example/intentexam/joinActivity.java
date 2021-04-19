@@ -32,7 +32,7 @@ public class joinActivity extends AppCompatActivity {
 
 
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);//안뒈??
         setContentView(R.layout.activity_join);
         EditText join_id = (EditText) findViewById(R.id.join_id);
         EditText join_pw = (EditText) findViewById(R.id.join_password);
