@@ -150,6 +150,7 @@ public class joinActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {// 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
                 // Get Post object and use the values to update the UI
                 if(dataSnapshot.getValue(User.class) != null){
+
                     User post = dataSnapshot.getValue(User.class);
                     Log.w("FireBaseData", "getData" + post.toString());
                 } else {
