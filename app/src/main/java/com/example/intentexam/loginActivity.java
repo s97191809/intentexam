@@ -61,7 +61,7 @@ login_button.setOnClickListener(new View.OnClickListener() {
         String id = input_id.getText().toString().trim();
         String pw = input_pw.getText().toString().trim();
 
-        checkEmpty(id, pw);
+        //checkEmpty(id, pw);
 
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -76,6 +76,7 @@ login_button.setOnClickListener(new View.OnClickListener() {
                             "db_pw: "+db_pw);
                     //흠 바로 찾는 방법 ㅇ벗나.
                 }
+                startLoading();
             }
 
             @Override
@@ -138,6 +139,17 @@ login_button.setOnClickListener(new View.OnClickListener() {
             Toast.makeText(this, "Password를 입력해 주세요.", Toast.LENGTH_SHORT).show();
         }
 
+    }
+    private void startLoading() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }, 3000);
     }
 
 }// MainActivity Class..
