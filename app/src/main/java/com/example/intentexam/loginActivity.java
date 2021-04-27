@@ -61,23 +61,45 @@ login_button.setOnClickListener(new View.OnClickListener() {
         String id = input_id.getText().toString().trim();
         String pw = input_pw.getText().toString().trim();
 
-        //checkEmpty(id, pw);
-
+        checkEmpty(id, pw);
+        // 둘다 값이 있다면 내려가고 없으면 위로 다시 가라
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
-                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                    String db_id = messageData.child("userId").getValue().toString();
-                    String db_pw = messageData.child("password").getValue().toString();
-                    Log.d("input_id: ", id + ", " +
-                            "input_pw: " + pw + ", " +
-                            "db_id: " + db_id+", "+
-                            "db_pw: "+db_pw);
-                    //흠 바로 찾는 방법 ㅇ벗나.
+                String f_id = "";
+                String f_pw = "";
+                while (true) {
+                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                        String db_id = messageData.child("userId").getValue().toString();
+                        String db_pw = messageData.child("password").getValue().toString();
+                        Log.d("input_id: ", id + ", " +
+                                "input_pw: " + pw + ", " +
+                                "db_id: " + db_id + ", " +
+                                "db_pw: " + db_pw);
+                        //흠 바로 찾는 방법 ㅇ벗나.
+                        if (db_id == id && db_pw == pw) {
+                            f_id = id;
+                            f_pw = pw;
+                            break;
+                        }
+                        else if(id.isEmpty()){
+                            nonId();
+                        }
+                        else if(pw.isEmpty()){
+                            nonPw();
+                        }
+                    }
+                    if(f_id.equals(id) == f_pw.equals(pw)) {
+                     break;
+                    }
+                    else{
+                        continue;
+                    }
                 }
+                loading();
                 startLoading();
             }
+
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -132,13 +154,22 @@ login_button.setOnClickListener(new View.OnClickListener() {
     }
     private void checkEmpty(String id, String pw){
         if(TextUtils.isEmpty(id)){
-            Toast.makeText(this, "Email을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "ID을 입력해 주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
         if(TextUtils.isEmpty(pw)){
             Toast.makeText(this, "Password를 입력해 주세요.", Toast.LENGTH_SHORT).show();
         }
 
+    }
+    private void nonId(){
+            Toast.makeText(this, "없는id입니다.", Toast.LENGTH_SHORT).show();
+    }
+    private void nonPw(){
+        Toast.makeText(this, "비밀번호를 다시 입력해 주세요", Toast.LENGTH_SHORT).show();
+    }
+    private void loading(){
+        Toast.makeText(this, "로그인 중입니다.", Toast.LENGTH_SHORT).show();
     }
     private void startLoading() {
         Handler handler = new Handler();
