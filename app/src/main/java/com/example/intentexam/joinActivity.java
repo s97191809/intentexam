@@ -27,25 +27,50 @@ public class joinActivity extends AppCompatActivity {
 
 
     Button btn_save;
-    Button check_button;
+    Button btn_check;
     private DatabaseReference mDatabase;
 
 
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);//안뒈??
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
         EditText join_id = (EditText) findViewById(R.id.join_id);
         EditText join_pw = (EditText) findViewById(R.id.join_password);
         EditText join_name = (EditText) findViewById(R.id.join_name);
         EditText join_weight = (EditText) findViewById(R.id.join_weight);
         btn_save = findViewById(R.id.join_button);
-        check_button = findViewById(R.id.check_button);
+        btn_check = findViewById(R.id.check_button);
         mDatabase = FirebaseDatabase.getInstance().getReference();
-        check_button.setOnClickListener(new View.OnClickListener() {
-
+        btn_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String id = join_id.getText().toString();
+                mDatabase.child("users").child(id).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        // 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
+                        // Get Post object and use the values to update the UI
+
+                        if(id != null){
+                            String db_id = dataSnapshot.child(id).getValue().toString();
+                            if(id != db_id) {
+                                Toast.makeText(joinActivity.this, "없는 ID 입니다.", Toast.LENGTH_SHORT).show();
+                                Log.d("입력 id", id.toString());
+                            }
+                            else{
+                                Toast.makeText(joinActivity.this, "존재하는 ID 입니다.", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(joinActivity.this, "ID를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Getting Post failed, log a message
+                        Log.w("FireBaseData", "loadPost:onCancelled", databaseError.toException());
+                    }
+                });
 
             }
         });
@@ -72,6 +97,9 @@ public class joinActivity extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         // Write was successful!
                         Toast.makeText(joinActivity.this, "회원가입을 완료했습니다.", Toast.LENGTH_SHORT).show();
+                        // 로그인 화면으로 이동
+                        user.toString();
+                        finish();//종료와 함께 넘어가짐
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -147,7 +175,8 @@ public class joinActivity extends AppCompatActivity {
         User user = new User(userId, name, password, weight);
         mDatabase.child("users").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {// 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
                 // Get Post object and use the values to update the UI
                 if(dataSnapshot.getValue(User.class) != null){
 
