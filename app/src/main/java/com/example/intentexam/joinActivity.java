@@ -177,7 +177,7 @@ public class joinActivity extends AppCompatActivity {
         mReference.child("users").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
+
                 if (dataSnapshot.getValue(User.class) != null) {
 
                     User post = dataSnapshot.getValue(User.class);
