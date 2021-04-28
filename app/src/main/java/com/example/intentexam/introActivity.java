@@ -14,6 +14,7 @@ public class introActivity extends Activity {
         setContentView(R.layout.activity_intro);
         startLoading();//인트로 로딩
     }
+
     private void startLoading() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

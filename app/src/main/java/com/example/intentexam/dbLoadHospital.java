@@ -92,12 +92,12 @@ public class dbLoadHospital extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "실패",  Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "실패", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void initDatabase(){
+    private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
 
         mReference = mDatabase.getReference("log");
@@ -134,9 +134,7 @@ public class dbLoadHospital extends AppCompatActivity {
     }
 
 
-
-
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         mReference.removeEventListener(mChild);
     }

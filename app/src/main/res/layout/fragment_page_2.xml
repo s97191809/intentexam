@@ -6,13 +6,12 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
+
     <LinearLayout
         android:id="@+id/tmap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"></LinearLayout>
-
-
 
 
 </LinearLayout>

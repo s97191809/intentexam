@@ -39,13 +39,14 @@ public class maps extends AppCompatActivity implements TMapGpsManager.onLocation
     TMapView tmap;
 
     @Override
-    public void onLocationChange(Location location){
+    public void onLocationChange(Location location) {
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         //TMapPoint point = new TMapPoint(lat, lon);
         TMapPoint point = tmapgps.getLocation();
 
     }
+
     private final LocationListener mLocationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
 
@@ -92,29 +93,29 @@ public class maps extends AppCompatActivity implements TMapGpsManager.onLocation
         final ArrayList<String> arrAddress = new ArrayList<>();
 
 
-
-
-        }
-public void makeMarker(ArrayList<TMapPoint> arrTMapPoint){
-
-
-    for (int i = 0; i < arrTMapPoint.size(); i++) {
-        TMapMarkerItem markerItem = new TMapMarkerItem();
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
-        markerItem.setVisible(TMapMarkerItem.VISIBLE);
-                Log.d(
-                        "point : ", (arrTMapPoint.get(i)).toString()
-                );
-
-                // 마커 아이콘 지정
-                markerItem.setIcon(bitmap);
-                // 마커의 좌표 지정
-                markerItem.setTMapPoint(arrTMapPoint.get(i));
-
-                //지도에 마커 추가
-                tmap.addMarkerItem("markerItem" + i, markerItem);
-            }
     }
+
+    public void makeMarker(ArrayList<TMapPoint> arrTMapPoint) {
+
+
+        for (int i = 0; i < arrTMapPoint.size(); i++) {
+            TMapMarkerItem markerItem = new TMapMarkerItem();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
+            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+            Log.d(
+                    "point : ", (arrTMapPoint.get(i)).toString()
+            );
+
+            // 마커 아이콘 지정
+            markerItem.setIcon(bitmap);
+            // 마커의 좌표 지정
+            markerItem.setTMapPoint(arrTMapPoint.get(i));
+
+            //지도에 마커 추가
+            tmap.addMarkerItem("markerItem" + i, markerItem);
+        }
+    }
+
     public void setGps() {
         final LocationManager lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -125,7 +126,8 @@ public void makeMarker(ArrayList<TMapPoint> arrTMapPoint){
                 1, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
-    public void searchPOI(ArrayList<TMapPoint> arrTMapPoint,ArrayList<String> arrTitle, ArrayList<String> arrAddress){
+
+    public void searchPOI(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrTitle, ArrayList<String> arrAddress) {
         TMapData tmapdata = new TMapData();
         tmapdata.findAllPOI("관광지, 공원, 청주, 흥덕구", new TMapData.FindAllPOIListenerCallback() {
             @Override

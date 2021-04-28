@@ -1,6 +1,7 @@
 package com.example.intentexam;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,7 +30,9 @@ public class joinActivity extends AppCompatActivity {
 
     Button btn_save;
     Button btn_check;
-    private DatabaseReference mDatabase;
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
+    private ChildEventListener mChild;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,40 +42,36 @@ public class joinActivity extends AppCompatActivity {
         EditText join_pw = (EditText) findViewById(R.id.join_password);
         EditText join_name = (EditText) findViewById(R.id.join_name);
         EditText join_weight = (EditText) findViewById(R.id.join_weight);
+
         btn_save = findViewById(R.id.join_button);
         btn_check = findViewById(R.id.check_button);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        initDatabase();
+        mReference = mDatabase.getReference("user");
         btn_check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String id = join_id.getText().toString();
-                mDatabase.child("users").child(id).addValueEventListener(new ValueEventListener() {
+                mReference.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        // 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
-                        // Get Post object and use the values to update the UI
-
-                        if(id != null){
-                            String db_id = dataSnapshot.child(id).getValue().toString();
-                            if(id != db_id) {
-                                Toast.makeText(joinActivity.this, "없는 ID 입니다.", Toast.LENGTH_SHORT).show();
-                                Log.d("입력 id", id.toString());
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_id = messageData.child("userId").getValue().toString().trim();
+                            Log.d("input_id: ", db_id + ", " +
+                                    "input_pw: " + id);
+                            if (db_id.equals(id)) {
+                                overlapId();
+                                break;
+                            } else {
+                                useId();
                             }
-                            else{
-                                Toast.makeText(joinActivity.this, "존재하는 ID 입니다.", Toast.LENGTH_SHORT).show();
-                            }
-                        } else {
-                            Toast.makeText(joinActivity.this, "ID를 입력해 주세요.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        // Getting Post failed, log a message
-                        Log.w("FireBaseData", "loadPost:onCancelled", databaseError.toException());
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
-
             }
         });
         btn_save.setOnClickListener(new View.OnClickListener() {
@@ -91,7 +91,7 @@ public class joinActivity extends AppCompatActivity {
     private void writeNewUser(String userId, String name, String password, String weight) {
         User user = new User(userId, name, password, weight);
 
-        mDatabase.child("user").child(userId).setValue(user)
+        mReference.child("user").child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -171,19 +171,19 @@ public class joinActivity extends AppCompatActivity {
                     '}';
         }
     }
-    private void readUser(String userId, String name, String password, String weight){
+
+    private void readUser(String userId, String name, String password, String weight) {
         User user = new User(userId, name, password, weight);
-        mDatabase.child("users").child(userId).addValueEventListener(new ValueEventListener() {
+        mReference.child("users").child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // 동일한 값이 바뀌면 갱신이 되어버림 이건 가입시에 데이터있는지 확인
-                // Get Post object and use the values to update the UI
-                if(dataSnapshot.getValue(User.class) != null){
+                if (dataSnapshot.getValue(User.class) != null) {
 
                     User post = dataSnapshot.getValue(User.class);
                     Log.w("FireBaseData", "getData" + post.toString());
                 } else {
-                    Toast.makeText(joinActivity.this, "값이존재???????", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(joinActivity.this, "값이존재", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -193,6 +193,50 @@ public class joinActivity extends AppCompatActivity {
                 Log.w("FireBaseData", "loadPost:onCancelled", databaseError.toException());
             }
         });
+    }
+
+    private void initDatabase() {
+        mDatabase = FirebaseDatabase.getInstance();
+
+        mReference = mDatabase.getReference("log");
+        mReference.child("log").setValue("check");
+
+        mChild = new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        mReference.addChildEventListener(mChild);
+    }
+
+    private void overlapId() {
+        Toast.makeText(this, "같은 ID가 존재합니다.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void useId() {
+        Toast.makeText(this, "사용 가능한 ID입니다.", Toast.LENGTH_SHORT).show();
     }
 }
 

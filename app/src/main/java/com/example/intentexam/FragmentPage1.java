@@ -68,9 +68,6 @@ public class FragmentPage1 extends Fragment {
 
     // 일기 저장하는 메소드
 
-
-
-
 }
 
 

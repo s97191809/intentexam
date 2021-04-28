@@ -32,6 +32,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     TMapView tmap;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,10 +53,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         //
         return v;
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
     }
+
     private final LocationListener mLocationListener = new LocationListener() {
         public void onLocationChanged(Location location) {
 
@@ -77,13 +80,15 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     };
-    public void onLocationChange(Location location){
+
+    public void onLocationChange(Location location) {
         double lat = location.getLatitude();
         double lon = location.getLongitude();
         //TMapPoint point = new TMapPoint(lat, lon);
         TMapPoint point = tmapgps.getLocation();
 
     }
+
     public void setGps() {
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&

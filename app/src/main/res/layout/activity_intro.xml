@@ -7,13 +7,12 @@
     android:background="#EAEFF8">
 
 
+    <ImageView
 
-        <ImageView
-
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:src="@drawable/intro"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:src="@drawable/intro" />
 
 
 </LinearLayout>

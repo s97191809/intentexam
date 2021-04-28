@@ -57,14 +57,6 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
-    // 일기 파일 읽기
-
-
-
-
-// --------------------------갤린더끝
        //------------------------------------네비시작
         BottomNavigationView mBottomNV = findViewById(R.id.nav_view);
         mBottomNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() { //NavigationItemSelecte
@@ -113,10 +105,7 @@ public class MainActivity extends FragmentActivity {
 
 
     }
-
             //------------------------------------네비 끝
-
-// 마커 아이콘
 }
 
 

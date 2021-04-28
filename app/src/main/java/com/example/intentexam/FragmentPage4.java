@@ -22,6 +22,7 @@ public class FragmentPage4 extends Fragment {
         setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_page_4, container, false);
     }
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

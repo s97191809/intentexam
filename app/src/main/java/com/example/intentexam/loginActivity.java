@@ -33,7 +33,6 @@ public class loginActivity extends AppCompatActivity {
     EditText input_pw;
 
 
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -41,75 +40,63 @@ public class loginActivity extends AppCompatActivity {
         input_id = (EditText) findViewById(R.id.login_id);
         input_pw = (EditText) findViewById(R.id.login_password);
 
+        Button joinButton = (Button) findViewById(R.id.join);
 
-
-        // id pw 받아서 디비에 있는지 보고 없으면 x 있으면 메인으로 가게
-        Button imageButton = (Button) findViewById(R.id.join);
-
-        imageButton.setOnClickListener(new View.OnClickListener() {
+        joinButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), joinActivity.class);
                 startActivity(intent);
             }
         });
-login_button.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        initDatabase();
-        mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
-        String id = input_id.getText().toString().trim();
-        String pw = input_pw.getText().toString().trim();
-
-        checkEmpty(id, pw);
-        // 둘다 값이 있다면 내려가고 없으면 위로 다시 가라
-        mReference.addValueEventListener(new ValueEventListener() {
+        login_button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String f_id = "";
-                String f_pw = "";
-                while (true) {
-                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                        String db_id = messageData.child("userId").getValue().toString();
-                        String db_pw = messageData.child("password").getValue().toString();
-                        Log.d("input_id: ", id + ", " +
-                                "input_pw: " + pw + ", " +
-                                "db_id: " + db_id + ", " +
-                                "db_pw: " + db_pw);
-                        //흠 바로 찾는 방법 ㅇ벗나.
-                        if (db_id == id && db_pw == pw) {
-                            f_id = id;
-                            f_pw = pw;
-                            break;
-                        }
-                        else if(id.isEmpty()){
-                            nonId();
-                        }
-                        else if(pw.isEmpty()){
-                            nonPw();
-                        }
-                    }
-                    if(f_id.equals(id) == f_pw.equals(pw)) {
-                     break;
-                    }
-                    else{
-                        continue;
-                    }
-                }
-                loading();
-                startLoading();
-            }
+            public void onClick(View v) {
+                initDatabase();
+                mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
+                String id = input_id.getText().toString().trim();
+                String pw = input_pw.getText().toString().trim();
 
+                checkEmpty(id, pw);
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String f_id = "";
+                        String f_pw = "";
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_id = messageData.child("userId").getValue().toString().trim();
+                            String db_pw = messageData.child("password").getValue().toString().trim();
+                            Log.d("input_id: ", id + ", " +
+                                    "input_pw: " + pw + ", " +
+                                    "db_id: " + db_id + ", " +
+                                    "db_pw: " + db_pw);
+                            if (db_id.equals(id) && db_pw.equals(pw)) {
+                                f_id = id;
+                                f_pw = pw;
+                                break;
+                            }
+                        }
+                        if (f_id.equals(id) && f_pw.equals(pw)) {
+                            if (f_id != "" && f_pw != "") {
+                                startLoading();
+                                loading();
+                            }
+                        } else {
+                            nonInfo();
+                        }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
     }
-});
-    }
-    private void initDatabase(){
+
+    private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
 
         mReference = mDatabase.getReference("log");
@@ -146,31 +133,30 @@ login_button.setOnClickListener(new View.OnClickListener() {
     }
 
 
-
-
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         mReference.removeEventListener(mChild);
     }
-    private void checkEmpty(String id, String pw){
-        if(TextUtils.isEmpty(id)){
+
+    private void checkEmpty(String id, String pw) {
+        if (TextUtils.isEmpty(id)) {
             Toast.makeText(this, "ID을 입력해 주세요.", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(TextUtils.isEmpty(pw)){
+        if (TextUtils.isEmpty(pw)) {
             Toast.makeText(this, "Password를 입력해 주세요.", Toast.LENGTH_SHORT).show();
         }
 
     }
-    private void nonId(){
-            Toast.makeText(this, "없는id입니다.", Toast.LENGTH_SHORT).show();
+
+    private void nonInfo() {
+        Toast.makeText(this, "입력 정보를 확인해 주세요.", Toast.LENGTH_SHORT).show();
     }
-    private void nonPw(){
-        Toast.makeText(this, "비밀번호를 다시 입력해 주세요", Toast.LENGTH_SHORT).show();
-    }
-    private void loading(){
+
+    private void loading() {
         Toast.makeText(this, "로그인 중입니다.", Toast.LENGTH_SHORT).show();
     }
+
     private void startLoading() {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -183,5 +169,5 @@ login_button.setOnClickListener(new View.OnClickListener() {
         }, 3000);
     }
 
-}// MainActivity Class..
+}
 
