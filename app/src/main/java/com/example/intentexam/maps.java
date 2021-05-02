@@ -91,6 +91,7 @@ public class maps extends AppCompatActivity implements TMapGpsManager.onLocation
         final ArrayList<TMapPoint> arrTMapPoint = new ArrayList<>();
         final ArrayList<String> arrTitle = new ArrayList<>();
         final ArrayList<String> arrAddress = new ArrayList<>();
+        makeMarker(arrTMapPoint);
 
 
     }

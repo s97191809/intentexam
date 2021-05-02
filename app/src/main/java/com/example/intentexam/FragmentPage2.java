@@ -4,15 +4,22 @@ package com.example.intentexam;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,14 +27,42 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapMarkerItem;
+import com.skt.Tmap.TMapPOIItem;
 import com.skt.Tmap.TMapPoint;
+import com.skt.Tmap.TMapPolyLine;
+import com.skt.Tmap.TMapTapi;
 import com.skt.Tmap.TMapView;
+import com.skt.Tmap.TMapMarkerItemLayer;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback {
     //객체 선언
     Button button3;
-    TextView textView2;
+    Button button4;
+    Button button5;
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
+    private ChildEventListener mChild;
+    private ListView listView;
+    List<Object> Array_name = new ArrayList<Object>();
+    List<Object> Array_lat = new ArrayList<Object>();
+    List<Object> Array_lon = new ArrayList<Object>();
+    final ArrayList<TMapPoint> arrTMapPointPark = new ArrayList<>();
+    final ArrayList<TMapPoint> arrTMapPointHospital = new ArrayList<>();
+    final ArrayList<TMapPoint> arrTMapPointShop = new ArrayList<>();
     private TMapGpsManager tmapgps = null;
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
@@ -38,6 +73,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
+
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
 
@@ -47,10 +83,98 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         tmap.setSKTMapApiKey(TMAP_API_KEY);
         linearLayoutTmap.addView(tmap);
-        tmap.setIconVisibility(true);//현재위치로 표시될 아이콘을 표시할지 여부를 설정합니다.
 
-        setGps();//위치 권한 요청
-        //
+        tmap.setIconVisibility(true);//현재위치로 표시될 아이콘을 표시할지 여부를 설정합니다.
+        tmap.setTrackingMode(true);
+        tmap.setSightVisible(true);
+
+        setGps();//위치 권한 요청.
+        listView = (ListView) v.findViewById(R.id.listviewmsg);
+        initDatabase();
+        // 공원위치는 경,위도가 있으니까 어레이 리스트에 저장해서 하나씩 찍고 버튼마다 누르면 이전
+        // 에 찍힌 핀 정보를 다 지워주고 새로 핀을 찍어줌
+        // 병원들은 경, 위도가 없으니까 poi 검색으로 건물 이름으로 찾는다
+
+
+        // 어레이 리스트에 주소를 넣어서 poi 검색하는 방법이랑 경도 위도를 각각 넣어서 표시해주는ㄴ 방법
+        //디비에 접근해서 공원위치들부터 쭉 받아오고 지도에 표시
+        button3 = v.findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Array_lat.clear();
+                Array_lon.clear();
+                Array_name.clear();
+                mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("p_name").getValue().toString();
+                            String db_lat = messageData.child("p_lat").getValue().toString();
+                            String db_lon = messageData.child("p_lon").getValue().toString();
+                            String msg2 = messageData.getValue().toString();
+                            Array_name.add(db_name);
+                            Array_lon.add(db_lon);
+                            Array_lat.add(db_lat);
+
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointPark.add(tMapPoint);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+                makeMarkerPark(arrTMapPointPark);
+                }
+
+        });
+        button5 = v.findViewById(R.id.button5);
+        button5.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Array_lat.clear();
+                Array_lon.clear();
+                Array_name.clear();
+                mReference = mDatabase.getReference("shop"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("s_name").getValue().toString();
+                            String db_lat = messageData.child("s_lat").getValue().toString();
+                            String db_lon = messageData.child("s_lon").getValue().toString();
+                            Array_name.add(db_name);
+                            Array_lon.add(db_lon);
+                            Array_lat.add(db_lat);
+
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointShop.add(tMapPoint);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                makeMarkerShop(arrTMapPointShop);
+            }
+
+
+        });
+
+
+
         return v;
     }
 
@@ -96,9 +220,96 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                1000, // 통지사이의 최소 시간간격 (miliSecond)
+                10, // 통지사이의 최소 시간간격 (miliSecond)
                 1, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
+    }
+    public void setNavi(){
+        TMapPoint tMapPointStart = new TMapPoint(37.570841, 126.985302); // SKT타워(출발지)
+        TMapPoint tMapPointEnd = new TMapPoint(37.551135, 126.988205); // N서울타워(목적지)
+
+        try {
+            TMapPolyLine tMapPolyLine = new TMapData().findPathData(tMapPointStart, tMapPointEnd);
+            tMapPolyLine.setLineColor(Color.BLUE);
+            tMapPolyLine.setLineWidth(2);
+            tmap.addTMapPolyLine("Line1", tMapPolyLine);
+
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint) {
+        tmap.removeAllMarkerItem();
+        for (int i = 0; i < arrTMapPoint.size(); i++) {
+            TMapMarkerItem markerItem = new TMapMarkerItem();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_park);
+            int height=bitmap.getHeight();
+            int width=bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+
+            // 마커 아이콘 지정
+            markerItem.setIcon(bitmap);
+            // 마커의 좌표 지정
+            markerItem.setTMapPoint(arrTMapPoint.get(i));
+
+            //지도에 마커 추가
+            tmap.addMarkerItem("markerItem" + i, markerItem);
+        }
+    }
+    public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint) {
+        tmap.removeAllMarkerItem();
+        for (int i = 0; i < arrTMapPoint.size(); i++) {
+            TMapMarkerItem markerItem = new TMapMarkerItem();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
+            int height=bitmap.getHeight();
+            int width=bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+
+            // 마커 아이콘 지정
+            markerItem.setIcon(bitmap);
+            // 마커의 좌표 지정
+            markerItem.setTMapPoint(arrTMapPoint.get(i));
+
+            //지도에 마커 추가
+            tmap.addMarkerItem("markerItem" + i, markerItem);
+        }
+    }
+    private void initDatabase() {
+        mDatabase = FirebaseDatabase.getInstance();
+
+        mReference = mDatabase.getReference("log");
+        mReference.child("log").setValue("check");
+
+        mChild = new ChildEventListener() {
+
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        mReference.addChildEventListener(mChild);
     }
 
 
