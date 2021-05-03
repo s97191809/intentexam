@@ -52,7 +52,7 @@ public class FragmentPage1 extends Fragment {
         datePicker.init(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(), new DatePicker.OnDateChangedListener() {
             @Override
             public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // 이미 선택한 날짜에 일기가 있는지 없는지 체크해야할 시간이다
+
 
             }
         });
