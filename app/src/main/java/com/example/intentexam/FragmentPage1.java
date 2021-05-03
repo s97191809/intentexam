@@ -21,12 +21,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FragmentPage1 extends Fragment {
-    DatePicker datePicker;  //  datePicker - 날짜를 선택하는 달력
-    TextView viewDatePick;  //  viewDatePick - 선택한 날짜를 보여주는 textView
-    EditText edtDiary;   //  edtDiary - 선택한 날짜의 일기를 쓰거나 기존에 저장된 일기가 있다면 보여주고 수정하는 영역
-    Button btnSave;   //  btnSave - 선택한 날짜의 일기 저장 및 수정(덮어쓰기) 버튼
+    DatePicker datePicker;
+    TextView viewDatePick;
+    EditText edtDiary;
+    Button btnSave;
 
-    String fileName;   //  fileName - 돌고 도는 선택된 날짜의 파일 이름
+    String fileName;
 
     @Nullable
     @Override
@@ -39,7 +39,7 @@ public class FragmentPage1 extends Fragment {
         edtDiary = (EditText) v.findViewById(R.id.edtDiary);
         btnSave = (Button) v.findViewById(R.id.btnSave);
 
-        // 오늘 날짜를 받게해주는 Calender 친구들
+
 
         //날짜 및 시간 형식 지정
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -66,7 +66,7 @@ public class FragmentPage1 extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    // 일기 저장하는 메소드
+
 
 }
 
