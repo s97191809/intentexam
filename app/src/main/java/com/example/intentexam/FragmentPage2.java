@@ -91,13 +91,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         setGps();//위치 권한 요청.
         listView = (ListView) v.findViewById(R.id.listviewmsg);
         initDatabase();
-        // 공원위치는 경,위도가 있으니까 어레이 리스트에 저장해서 하나씩 찍고 버튼마다 누르면 이전
-        // 에 찍힌 핀 정보를 다 지워주고 새로 핀을 찍어줌
-        // 병원들은 경, 위도가 없으니까 poi 검색으로 건물 이름으로 찾는다
 
-
-        // 어레이 리스트에 주소를 넣어서 poi 검색하는 방법이랑 경도 위도를 각각 넣어서 표시해주는ㄴ 방법
-        //디비에 접근해서 공원위치들부터 쭉 받아오고 지도에 표시
         button3 = v.findViewById(R.id.button3);
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,12 +242,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
             markerItem.setVisible(TMapMarkerItem.VISIBLE);
 
-            // 마커 아이콘 지정
+
             markerItem.setIcon(bitmap);
-            // 마커의 좌표 지정
+
             markerItem.setTMapPoint(arrTMapPoint.get(i));
 
-            //지도에 마커 추가
+
             tmap.addMarkerItem("markerItem" + i, markerItem);
         }
     }
@@ -267,12 +261,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
             markerItem.setVisible(TMapMarkerItem.VISIBLE);
 
-            // 마커 아이콘 지정
+
             markerItem.setIcon(bitmap);
-            // 마커의 좌표 지정
+
             markerItem.setTMapPoint(arrTMapPoint.get(i));
 
-            //지도에 마커 추가
+
             tmap.addMarkerItem("markerItem" + i, markerItem);
         }
     }
