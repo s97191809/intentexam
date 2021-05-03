@@ -129,6 +129,43 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                 }
 
         });
+        button4 = v.findViewById(R.id.button4);
+        button4.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Array_lat.clear();
+                Array_lon.clear();
+                Array_name.clear();
+                mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("h_name").getValue().toString();
+                            String db_lat = messageData.child("h_lat").getValue().toString();
+                            String db_lon = messageData.child("h_lon").getValue().toString();
+                            Array_name.add(db_name);
+                            Array_lon.add(db_lon);
+                            Array_lat.add(db_lat);
+
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointHospital.add(tMapPoint);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                makeMarkerHospital(arrTMapPointHospital);
+            }
+
+
+        });
         button5 = v.findViewById(R.id.button5);
         button5.setOnClickListener(new View.OnClickListener() {
 
@@ -256,6 +293,24 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             TMapMarkerItem markerItem = new TMapMarkerItem();
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
+            int height=bitmap.getHeight();
+            int width=bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+
+
+            markerItem.setIcon(bitmap);
+
+            markerItem.setTMapPoint(arrTMapPoint.get(i));
+
+
+            tmap.addMarkerItem("markerItem" + i, markerItem);
+        }
+    }public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint) {
+        tmap.removeAllMarkerItem();
+        for (int i = 0; i < arrTMapPoint.size(); i++) {
+            TMapMarkerItem markerItem = new TMapMarkerItem();
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
             int height=bitmap.getHeight();
             int width=bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
