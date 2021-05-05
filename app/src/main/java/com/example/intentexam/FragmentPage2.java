@@ -204,7 +204,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         });
 
-
+        
 
         return v;
     }
@@ -251,7 +251,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                10, // 통지사이의 최소 시간간격 (miliSecond)
+                5000, // 통지사이의 최소 시간간격 (miliSecond)
                 1, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }

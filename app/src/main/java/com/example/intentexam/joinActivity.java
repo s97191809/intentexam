@@ -33,6 +33,7 @@ public class joinActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     private ChildEventListener mChild;
+    int check = 0;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,14 +57,18 @@ public class joinActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         for (DataSnapshot messageData : dataSnapshot.getChildren()) {
                             String db_id = messageData.child("userId").getValue().toString().trim();
-                            Log.d("input_id: ", db_id + ", " +
-                                    "input_pw: " + id);
+                            Log.d("input_id: ", id + ", " +
+                                    "db_id: " +db_id );
                             if (db_id.equals(id)) {
                                 overlapId();
                                 break;
-                            } else {
+                            } else if(id != ""){
                                 useId();
+                                check++;
+                            }else{
+                                checkId();
                             }
+
                         }
                     }
 
@@ -77,15 +82,21 @@ public class joinActivity extends AppCompatActivity {
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String id = join_id.getText().toString();
-                String pw = join_pw.getText().toString();
-                String name = join_name.getText().toString();
-                String weight = join_weight.getText().toString();
-
-                writeNewUser(id, name, pw, weight);
+                String id = join_id.getText().toString().trim();
+                String pw = join_pw.getText().toString().trim();
+                String name = join_name.getText().toString().trim();
+                String weight = join_weight.getText().toString().trim();
+                if(id.isEmpty() || pw.isEmpty() || name.isEmpty() || weight.isEmpty() || check > 0) {
+                    // 조건문으로 저 위에 있는 것들 중에 하나라도 입력이 안되었거나 id가 중복이면 회원가입 안되게
+                    notEnoughInfo();
+                }
+                else {
+                    writeNewUser(id, name, pw, weight);
+                }
 
             }
         });
+        check = 0;
     }
 
     private void writeNewUser(String userId, String name, String password, String weight) {
@@ -234,7 +245,12 @@ public class joinActivity extends AppCompatActivity {
     private void overlapId() {
         Toast.makeText(this, "같은 ID가 존재합니다.", Toast.LENGTH_SHORT).show();
     }
-
+    private void notEnoughInfo() {
+        Toast.makeText(this, "입력 정보를 확인하세요.", Toast.LENGTH_SHORT).show();
+    }
+    private void checkId() {
+        Toast.makeText(this, "ID를 입력해 주세요.", Toast.LENGTH_SHORT).show();
+    }
     private void useId() {
         Toast.makeText(this, "사용 가능한 ID입니다.", Toast.LENGTH_SHORT).show();
     }
