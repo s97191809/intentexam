@@ -277,7 +277,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
     /**
      * set selected row
      *
-     * @param selectedRow
+     * @paramselectedRow
      */
     public void setSelectedPosition(int selectedPosition) {
         this.selectedPosition = selectedPosition;

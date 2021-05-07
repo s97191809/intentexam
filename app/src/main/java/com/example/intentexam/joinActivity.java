@@ -86,7 +86,7 @@ public class joinActivity extends AppCompatActivity {
                 String pw = join_pw.getText().toString().trim();
                 String name = join_name.getText().toString().trim();
                 String weight = join_weight.getText().toString().trim();
-                if(id.isEmpty() || pw.isEmpty() || name.isEmpty() || weight.isEmpty() || check > 0) {
+                if(id.isEmpty() || pw.isEmpty() || name.isEmpty() || weight.isEmpty() || check == 0) {
                     // 조건문으로 저 위에 있는 것들 중에 하나라도 입력이 안되었거나 id가 중복이면 회원가입 안되게
                     notEnoughInfo();
                 }
@@ -109,7 +109,7 @@ public class joinActivity extends AppCompatActivity {
                         // Write was successful!
                         Toast.makeText(joinActivity.this, "회원가입을 완료했습니다.", Toast.LENGTH_SHORT).show();
                         // 로그인 화면으로 이동
-                        user.toString();
+                        toString();
                         finish();//종료와 함께 넘어가짐
                     }
                 })

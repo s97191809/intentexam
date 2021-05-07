@@ -1,9 +1,11 @@
 package com.example.intentexam;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -21,9 +23,105 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FragmentPage1 extends Fragment {
+//----------일정
+    /**
+     * 월별 캘린더 뷰 객체
+     */
+    CalendarMonthView monthView;
+
+    /**
+     * 월별 캘린더 어댑터
+     */
+    CalendarMonthAdapter monthViewAdapter;
+
+    /**
+     * 월을 표시하는 텍스트뷰
+     */
+    TextView monthText;
+
+    /**
+     * 현재 연도
+     */
+    int curYear;
+
+    /**
+     * 현재 월
+     */
+    int curMonth;
+
+
+    // ---------일정끝
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        super.onCreate(savedInstanceState);
+
+        View v = inflater.inflate(R.layout.fragment_page_1, container, false);
+//--일정
+        // 월별 캘린더 뷰 객체 참조
+        monthView = (CalendarMonthView) v.findViewById(R.id.monthView);
+        monthViewAdapter = new CalendarMonthAdapter(getContext());
+        monthView.setAdapter(monthViewAdapter);
+
+        // 리스너 설정
+        monthView.setOnDataSelectionListener(new OnDataSelectionListener() {
+            public void onDataSelected(AdapterView parent, View v, int position, long id) {
+                // 현재 선택한 일자 정보 표시
+                MonthItem curItem = (MonthItem) monthViewAdapter.getItem(position);
+                int day = curItem.getDay();
+
+                Log.d("CalendarMonthViewAct", "Selected : " + day);
+
+            }
+        });
+        monthText = (TextView) v.findViewById(R.id.monthText);
+        setMonthText();
+
+        // 이전 월로 넘어가는 이벤트 처리
+        Button monthPrevious = (Button) v.findViewById(R.id.monthPrevious);
+        monthPrevious.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                monthViewAdapter.setPreviousMonth();
+                monthViewAdapter.notifyDataSetChanged();
+
+                setMonthText();
+            }
+        });
+
+        // 다음 월로 넘어가는 이벤트 처리
+        Button monthNext = (Button) v.findViewById(R.id.monthNext);
+        monthNext.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                monthViewAdapter.setNextMonth();
+                monthViewAdapter.notifyDataSetChanged();
+
+                setMonthText();
+            }
+        });
+
+        //--일정끝
+        return v;
+    }
+
+    private void setMonthText() {
+        curYear = monthViewAdapter.getCurYear();
+        curMonth = monthViewAdapter.getCurMonth();
+
+        monthText.setText(curYear + "년 " + (curMonth + 1) + "월");
+    }
+
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+    }
 
 
 }
+
 
 
 

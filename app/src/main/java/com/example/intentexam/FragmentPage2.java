@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.skt.Tmap.TMapCircle;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapMarkerItem;
@@ -43,10 +44,15 @@ import com.skt.Tmap.TMapTapi;
 import com.skt.Tmap.TMapView;
 import com.skt.Tmap.TMapMarkerItemLayer;
 
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback {
     //객체 선언
@@ -92,6 +98,8 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         listView = (ListView) v.findViewById(R.id.listviewmsg);
         initDatabase();
 
+        TMapData tmapdata = new TMapData();
+
         button3 = v.findViewById(R.id.button3);
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,7 +134,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     }
                 });
                 makeMarkerPark(arrTMapPointPark);
-                }
+            }
 
         });
         button4 = v.findViewById(R.id.button4);
@@ -199,13 +207,20 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     }
                 });
                 makeMarkerShop(arrTMapPointShop);
+
             }
 
 
         });
 
-        
-
+        //TMapCircle tMapCircle = new TMapCircle();
+        //tMapCircle.setCenterPoint( point );
+        //tMapCircle.setRadius(300);
+        //tMapCircle.setCircleWidth(2);
+        //tMapCircle.setLineColor(Color.BLUE);
+        //tMapCircle.setAreaColor(Color.GRAY);
+        //tMapCircle.setAreaAlpha(100);
+//        tmap.addTMapCircle("circle1", tMapCircle);
         return v;
     }
 
@@ -243,6 +258,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         TMapPoint point = tmapgps.getLocation();
 
     }
+
 
     public void setGps() {
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
