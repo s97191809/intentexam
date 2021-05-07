@@ -179,10 +179,9 @@ public class CalendarMonthAdapter extends BaseAdapter {
             itemView = (MonthItemView) convertView;
         }
 
-        // create a params
+        // create a params--------------------------
         GridView.LayoutParams params = new GridView.LayoutParams(
-                GridView.LayoutParams.MATCH_PARENT,
-                120);
+                GridView.LayoutParams.MATCH_PARENT,242);//그리드뷰 크기
 
         // calculate row and column
         int rowIndex = position / countColumn;
