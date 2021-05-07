@@ -102,7 +102,7 @@ public class joinActivity extends AppCompatActivity {
     private void writeNewUser(String userId, String name, String password, String weight) {
         User user = new User(userId, name, password, weight);
 
-        mReference.child("user").child(userId).setValue(user)
+        mReference.child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
