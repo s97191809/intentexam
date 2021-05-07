@@ -1,62 +1,46 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    tools:context="com.example.intentexam.FragmentPage1">
+    android:orientation="vertical" >
 
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="fill_horizontal"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <DatePicker
-            android:id="@+id/datePicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="5sp">
-
-
+        android:background="#BFD0E6"
+        >
+        <Button
+            android:id="@+id/monthPrevious"
+            android:layout_width="46dp"
+            android:layout_height="50dp"
+            android:background="@drawable/backward"
+            android:gravity="center_horizontal"
+            android:layout_alignParentLeft="true"
+            />
         <TextView
-            android:id="@+id/viewDatePick"
-            android:layout_width="match_parent"
+            android:id="@+id/monthText"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:background="#DDDDDD"
-            android:gravity="center"
-            android:text=""
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/edtDiary"
-            android:layout_width="match_parent"
-            android:layout_height="80sp"
-            android:background="#DDDDDD"
-            android:ems="10"
-            android:gravity="start|center_vertical"
-            android:inputType="text|textMultiLine|textCapSentences"
-            android:padding="7sp"
-            android:text="" />
+            android:text="MonthView"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            android:gravity="center_horizontal"
+            android:layout_centerInParent="true"
+            />
 
         <Button
-            android:id="@+id/btnSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="새 일기 저장" />
-    </LinearLayout>
+            android:id="@+id/monthNext"
+            android:layout_width="46dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/forward"
+            android:gravity="center_horizontal" />
+    </RelativeLayout>
+
+    <com.example.intentexam.CalendarMonthView
+        android:id="@+id/monthView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
 </LinearLayout>
-
-
-

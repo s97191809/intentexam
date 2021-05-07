@@ -21,51 +21,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FragmentPage1 extends Fragment {
-    DatePicker datePicker;
-    TextView viewDatePick;
-    EditText edtDiary;
-    Button btnSave;
-
-    String fileName;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setHasOptionsMenu(true);
-        View v = inflater.inflate(R.layout.fragment_page_1, container, false);
-        //-----------캘린더-------------------
-        datePicker = (DatePicker) v.findViewById(R.id.datePicker);
-        viewDatePick = (TextView) v.findViewById(R.id.viewDatePick);
-        edtDiary = (EditText) v.findViewById(R.id.edtDiary);
-        btnSave = (Button) v.findViewById(R.id.btnSave);
-
-
-
-        //날짜 및 시간 형식 지정
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        //Date 객체 사용
-        Date date = new Date();
-        String time1 = simpleDateFormat.format(date);
-        viewDatePick.setText(time1);
-
-        datePicker.init(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(), new DatePicker.OnDateChangedListener() {
-            @Override
-            public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-
-
-            }
-        });
-
-
-        return v;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
-
 
 
 }
