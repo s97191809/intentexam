@@ -185,7 +185,7 @@ public class joinActivity extends AppCompatActivity {
 
     private void readUser(String userId, String name, String password, String weight) {
         User user = new User(userId, name, password, weight);
-        mReference.child("users").child(userId).addValueEventListener(new ValueEventListener() {
+        mReference.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
