@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/navigation_1"
-        app:showAsAction="ifRoom"
+        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/calendaricon"
         android:title="일정"
@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/navigation_2"
-        app:showAsAction="ifRoom"
+        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/mapicon"
         android:title="지도"
@@ -22,7 +22,7 @@
     <item
 
         android:id="@+id/navigation_3"
-        app:showAsAction="ifRoom"
+        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/hearticon"
         android:title="커뮤니티"
@@ -31,7 +31,7 @@
     <item
 
         android:id="@+id/navigation_4"
-        app:showAsAction="ifRoom"
+        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/usericon"
         android:title="내정보"

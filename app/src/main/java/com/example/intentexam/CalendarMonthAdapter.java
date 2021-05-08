@@ -205,7 +205,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
         // set background color
         if (position == getSelectedPosition()) {
-            itemView.setBackgroundColor(Color.YELLOW);
+            itemView.setBackgroundColor(Color.rgb(191,208,230));
         } else {
             itemView.setBackgroundColor(Color.WHITE);
         }
