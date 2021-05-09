@@ -19,6 +19,7 @@
         android:background="#BFD0E6"
         app:itemIconTint="#EAEFF8"
         app:menu="@menu/menu_b"
+        app:itemTextColor="#FFFFFFFF"
 
         />
 
