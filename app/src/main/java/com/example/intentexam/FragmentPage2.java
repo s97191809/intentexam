@@ -58,7 +58,6 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback {
-    //객체 선언
     Button button3;
     Button button4;
     Button button5;
