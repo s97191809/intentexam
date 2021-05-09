@@ -11,8 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Page_3"
-        android:textSize="100dp"/>
-
+        android:textSize="100dp" />
 
 
 </LinearLayout>

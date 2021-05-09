@@ -15,12 +15,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,13 +62,20 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     Button button3;
     Button button4;
     Button button5;
+    Button button6;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     private ChildEventListener mChild;
     private ListView listView;
-    List<Object> Array_name = new ArrayList<Object>();
-    List<Object> Array_lat = new ArrayList<Object>();
-    List<Object> Array_lon = new ArrayList<Object>();
+    List<String> arrParkName = new ArrayList<>();
+    List<Double> arrParkLat = new ArrayList<>();
+    List<Double> arrParkLon = new ArrayList<>();
+    List<String> arrHospitalName = new ArrayList<>();
+    List<Double> arrHospitalLat = new ArrayList<>();
+    List<Double> arrHospitalLon = new ArrayList<>();
+    List<String> arrShopName = new ArrayList<>();
+    List<Double> arrShopLat = new ArrayList<>();
+    List<Double> arrShopLon = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointPark = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointHospital = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointShop = new ArrayList<>();
@@ -73,6 +83,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     TMapView tmap;
+
 
     @Nullable
     @Override
@@ -93,6 +104,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.setIconVisibility(true);//현재위치로 표시될 아이콘을 표시할지 여부를 설정합니다.
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
+        location location = new location(getActivity());
 
         setGps();//위치 권한 요청.
         listView = (ListView) v.findViewById(R.id.listviewmsg);
@@ -100,127 +112,340 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         TMapData tmapdata = new TMapData();
 
-        button3 = v.findViewById(R.id.button3);
+        if (arrTMapPointPark.isEmpty()) {// 공원 정보 가져오기
+            mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
+            mReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                        String db_name = messageData.child("p_name").getValue().toString();
+                        String db_lat = messageData.child("p_lat").getValue().toString();
+                        String db_lon = messageData.child("p_lon").getValue().toString();
+                        String msg2 = messageData.getValue().toString();
+                        arrParkName.add(db_name);
+                        arrParkLat.add(Double.valueOf(db_lat));
+                        arrParkLon.add(Double.valueOf(db_lon));
+
+                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                        arrTMapPointPark.add(tMapPoint);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        button3 = v.findViewById(R.id.button3);// 공원 위치 표시
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Array_lat.clear();
-                Array_lon.clear();
-                Array_name.clear();
-                mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
-                mReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-
-                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                            String db_name = messageData.child("p_name").getValue().toString();
-                            String db_lat = messageData.child("p_lat").getValue().toString();
-                            String db_lon = messageData.child("p_lon").getValue().toString();
-                            String msg2 = messageData.getValue().toString();
-                            Array_name.add(db_name);
-                            Array_lon.add(db_lon);
-                            Array_lat.add(db_lat);
 
 
-                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                            arrTMapPointPark.add(tMapPoint);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
                 makeMarkerPark(arrTMapPointPark);
             }
 
         });
-        button4 = v.findViewById(R.id.button4);
+        if (arrTMapPointHospital.isEmpty()) {// 병원 정보 가져오기
+            mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
+            mReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                        String db_name = messageData.child("h_name").getValue().toString();
+                        String db_lat = messageData.child("h_lat").getValue().toString();
+                        String db_lon = messageData.child("h_lon").getValue().toString();
+                        arrHospitalName.add(db_name);
+                        arrHospitalLat.add(Double.valueOf(db_lat));
+                        arrHospitalLon.add(Double.valueOf(db_lon));
+
+                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                        arrTMapPointHospital.add(tMapPoint);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+        button4 = v.findViewById(R.id.button4);// 병원 위치 표시
         button4.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Array_lat.clear();
-                Array_lon.clear();
-                Array_name.clear();
-                mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
-                mReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                            String db_name = messageData.child("h_name").getValue().toString();
-                            String db_lat = messageData.child("h_lat").getValue().toString();
-                            String db_lon = messageData.child("h_lon").getValue().toString();
-                            Array_name.add(db_name);
-                            Array_lon.add(db_lon);
-                            Array_lat.add(db_lat);
 
-
-                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                            arrTMapPointHospital.add(tMapPoint);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 makeMarkerHospital(arrTMapPointHospital);
             }
 
 
         });
-        button5 = v.findViewById(R.id.button5);
+        if (arrTMapPointShop.isEmpty()) {// 관련상점 정보 가져오기
+            mReference = mDatabase.getReference("shop"); // 변경값을 확인할 child 이름
+            mReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                        String db_name = messageData.child("s_name").getValue().toString();
+                        String db_lat = messageData.child("s_lat").getValue().toString();
+                        String db_lon = messageData.child("s_lon").getValue().toString();
+                        arrShopName.add(db_name);
+                        arrShopLat.add(Double.valueOf(db_lat));
+                        arrShopLon.add(Double.valueOf(db_lon));
+
+
+                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                        arrTMapPointShop.add(tMapPoint);
+
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+        button5 = v.findViewById(R.id.button5);// 관련 상점 위치 표시
         button5.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Array_lat.clear();
-                Array_lon.clear();
-                Array_name.clear();
-                mReference = mDatabase.getReference("shop"); // 변경값을 확인할 child 이름
-                mReference.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                            String db_name = messageData.child("s_name").getValue().toString();
-                            String db_lat = messageData.child("s_lat").getValue().toString();
-                            String db_lon = messageData.child("s_lon").getValue().toString();
-                            Array_name.add(db_name);
-                            Array_lon.add(db_lon);
-                            Array_lat.add(db_lat);
 
-
-                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                            arrTMapPointShop.add(tMapPoint);
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
                 makeMarkerShop(arrTMapPointShop);
 
             }
 
 
         });
+        // 반경 설정 콤보 박스
+        Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
+        ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
+        sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spiner.setAdapter(sAdapter);
+        spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectDist = (String) spiner.getSelectedItem();
+                final ArrayList<TMapPoint> distTmapParkPoint = new ArrayList<>();
+                final ArrayList<TMapPoint> distTmapHospitalPoint = new ArrayList<>();
+                final ArrayList<TMapPoint> distTmapShopPoint = new ArrayList<>();
+                if (selectDist.equals("거리 선택")) {
+                    // 배열 초기화
+                    distTmapParkPoint.clear();
+                    distTmapHospitalPoint.clear();
+                    distTmapShopPoint.clear();
+                    // 마커와 원 삭제
+                    tmap.removeAllMarkerItem();
+                    tmap.removeAllTMapCircle();
+                } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
+                    distTmapParkPoint.clear();
+                    tmap.removeAllMarkerItem();
+                    location location = new location(getActivity());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(500);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
+                    Location location2 = new Location("");//현재위치
+                    location2.setLatitude(lat);
+                    location2.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
 
-        //TMapCircle tMapCircle = new TMapCircle();
-        //tMapCircle.setCenterPoint( point );
-        //tMapCircle.setRadius(300);
-        //tMapCircle.setCircleWidth(2);
-        //tMapCircle.setLineColor(Color.BLUE);
-        //tMapCircle.setAreaColor(Color.GRAY);
-        //tMapCircle.setAreaAlpha(100);
-//        tmap.addTMapCircle("circle1", tMapCircle);
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location location3 = new Location("");
+                        location3.setLatitude(arrParkLat.get(i));
+                        location3.setLongitude(arrParkLon.get(i));
+
+                        double distance = location2.distanceTo(location3);
+
+                        //걸러진 어레이 리스트도 필요함
+                        if (distance <= 500) {// 단위 (M)
+                            Log.d("1KM 반경 거리", String.valueOf(distance));
+                            Log.d("1km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
+                            distTmapParkPoint.add(dtpoint);
+                        }
+                    }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location location4 = new Location("");
+                        location4.setLatitude(arrHospitalLat.get(j));
+                        location4.setLongitude(arrHospitalLon.get(j));
+
+                        double distance = location2.distanceTo(location4);
+
+                        if (distance <= 500) {
+                            TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
+                            distTmapHospitalPoint.add(dtpoint);
+                        }
+                    }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
+                        Location location5 = new Location("");
+                        location5.setLatitude(arrShopLat.get(k));
+                        location5.setLongitude(arrShopLon.get(k));
+
+                        double distance = location2.distanceTo(location5);
+
+                        if (distance <= 500) {
+                            TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
+                            distTmapShopPoint.add(dtpoint);
+                        }
+                    }
+                    makeMarkerShop(distTmapShopPoint);
+                    makeMarkerHospital(distTmapHospitalPoint);
+                    makeMarkerPark(distTmapParkPoint);
+                } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
+                    distTmapParkPoint.clear();
+                    location location = new location(getActivity());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(1000);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
+
+                    Location CurrentLocation = new Location("");//현재위치
+                    CurrentLocation.setLatitude(lat);
+                    CurrentLocation.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
+
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location parkLocation = new Location("");
+                        parkLocation.setLatitude(arrParkLat.get(i));
+                        parkLocation.setLongitude(arrParkLon.get(i));
+
+                        double distance = CurrentLocation.distanceTo(parkLocation);
+
+                        if (distance <= 1000) {
+                            Log.d("2KM 반경 거리", String.valueOf(distance));
+                            Log.d("2km 반경 포인트", String.valueOf(parkLocation.getLatitude()) + "," + parkLocation.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(parkLocation.getLatitude(), parkLocation.getLongitude());
+                            distTmapParkPoint.add(dtpoint);
+                        }
+                    }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location hostpitalLocation = new Location("");
+                        hostpitalLocation.setLatitude(arrHospitalLat.get(j));
+                        hostpitalLocation.setLongitude(arrHospitalLon.get(j));
+
+                        double distance = CurrentLocation.distanceTo(hostpitalLocation);
+
+                        if (distance <= 1000) {
+                            TMapPoint dtpoint = new TMapPoint(hostpitalLocation.getLatitude(), hostpitalLocation.getLongitude());
+                            distTmapHospitalPoint.add(dtpoint);
+                        }
+                    }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련상점
+                        Location shopLocation = new Location("");
+                        shopLocation.setLatitude(arrShopLat.get(k));
+                        shopLocation.setLongitude(arrShopLon.get(k));
+
+                        double distance = CurrentLocation.distanceTo(shopLocation);
+
+                        if (distance <= 1000) {
+                            TMapPoint dtpoint = new TMapPoint(shopLocation.getLatitude(), shopLocation.getLongitude());
+                            distTmapShopPoint.add(dtpoint);
+                        }
+                    }
+                    makeMarkerShop(distTmapShopPoint);
+                    makeMarkerHospital(distTmapHospitalPoint);
+
+                    makeMarkerPark(distTmapParkPoint);
+                } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
+                    distTmapParkPoint.clear();
+                    distTmapHospitalPoint.clear();
+                    distTmapShopPoint.clear();
+                    location location = new location(getActivity());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(1500);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
+
+                    Location location2 = new Location("");//현재위치
+                    location2.setLatitude(lat);
+                    location2.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
+
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location location3 = new Location("");
+                        location3.setLatitude(arrParkLat.get(i));
+                        location3.setLongitude(arrParkLon.get(i));
+
+                        double distance = location2.distanceTo(location3);
+
+                        //걸러진 어레이 리스트도 필요함
+                        if (distance <= 1500) {
+                            Log.d("3KM 반경 거리", String.valueOf(distance));
+                            Log.d("3km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
+                            distTmapParkPoint.add(dtpoint);
+                        }
+
+                    }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location location4 = new Location("");
+                        location4.setLatitude(arrHospitalLat.get(j));
+                        location4.setLongitude(arrHospitalLon.get(j));
+
+                        double distance = location2.distanceTo(location4);
+
+                        if (distance <= 1500) {
+                            TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
+                            distTmapHospitalPoint.add(dtpoint);
+                        }
+                    }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
+                        Location location5 = new Location("");
+                        location5.setLatitude(arrShopLat.get(k));
+                        location5.setLongitude(arrShopLon.get(k));
+
+                        double distance = location2.distanceTo(location5);
+
+                        if (distance <= 1500) {
+                            TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
+                            distTmapShopPoint.add(dtpoint);
+                        }
+                    }
+                    makeMarkerShop(distTmapShopPoint);
+                    makeMarkerHospital(distTmapHospitalPoint);
+                    makeMarkerPark(distTmapParkPoint);
+
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+
+        });
+
+
         return v;
     }
 
@@ -259,7 +484,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
     }
 
-
     public void setGps() {
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -267,11 +491,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                5000, // 통지사이의 최소 시간간격 (miliSecond)
-                1, // 통지사이의 최소 변경거리 (m)
+                0, // 통지사이의 최소 시간간격 (miliSecond)
+                0, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
-    public void setNavi(){
+
+    public void setNavi() {
         TMapPoint tMapPointStart = new TMapPoint(37.570841, 126.985302); // SKT타워(출발지)
         TMapPoint tMapPointEnd = new TMapPoint(37.551135, 126.988205); // N서울타워(목적지)
 
@@ -281,37 +506,36 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             tMapPolyLine.setLineWidth(2);
             tmap.addTMapPolyLine("Line1", tMapPolyLine);
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint) {
-        tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             TMapMarkerItem markerItem = new TMapMarkerItem();
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_park);
-            int height=bitmap.getHeight();
-            int width=bitmap.getWidth();
-            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             markerItem.setVisible(TMapMarkerItem.VISIBLE);
-
 
             markerItem.setIcon(bitmap);
 
             markerItem.setTMapPoint(arrTMapPoint.get(i));
 
 
-            tmap.addMarkerItem("markerItem" + i, markerItem);
+            tmap.addMarkerItem("markerItemP" + i, markerItem);
         }
     }
+
     public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint) {
-        tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             TMapMarkerItem markerItem = new TMapMarkerItem();
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
-            int height=bitmap.getHeight();
-            int width=bitmap.getWidth();
-            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             markerItem.setVisible(TMapMarkerItem.VISIBLE);
 
 
@@ -320,16 +544,18 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             markerItem.setTMapPoint(arrTMapPoint.get(i));
 
 
-            tmap.addMarkerItem("markerItem" + i, markerItem);
+            tmap.addMarkerItem("markerItemS" + i, markerItem);
         }
-    }public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint) {
-        tmap.removeAllMarkerItem();
+    }
+
+    public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint) {
+
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             TMapMarkerItem markerItem = new TMapMarkerItem();
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
-            int height=bitmap.getHeight();
-            int width=bitmap.getWidth();
-            bitmap = bitmap.createScaledBitmap(bitmap, 100, height/(width/100), true);
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             markerItem.setVisible(TMapMarkerItem.VISIBLE);
 
 
@@ -338,9 +564,10 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             markerItem.setTMapPoint(arrTMapPoint.get(i));
 
 
-            tmap.addMarkerItem("markerItem" + i, markerItem);
+            tmap.addMarkerItem("markerItemH" + i, markerItem);
         }
     }
+
     private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
 

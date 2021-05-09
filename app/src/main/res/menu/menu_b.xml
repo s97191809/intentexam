@@ -1,39 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    >
 
     <item
         android:id="@+id/navigation_1"
-        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/calendaricon"
         android:title="일정"
-        />
-         <!--일정-->
+        app:showAsAction="withText" />
+    <!--일정-->
 
     <item
         android:id="@+id/navigation_2"
-        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/mapicon"
         android:title="지도"
-       /><!--지도-->
+        app:showAsAction="withText" /><!--지도-->
 
     <item
 
         android:id="@+id/navigation_3"
-        app:showAsAction="withText"
+
         android:enabled="true"
         android:icon="@drawable/hearticon"
         android:title="커뮤니티"
-        /><!--커뮤니티-->
+        app:showAsAction="withText" /><!--커뮤니티-->
 
     <item
 
         android:id="@+id/navigation_4"
-        app:showAsAction="withText"
         android:enabled="true"
         android:icon="@drawable/usericon"
         android:title="내정보"
-        /><!--내정보-->
+        app:showAsAction="withText" /><!--내정보-->
 </menu>

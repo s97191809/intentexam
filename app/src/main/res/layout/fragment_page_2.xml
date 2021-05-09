@@ -6,35 +6,42 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical">
+
     <Button
         android:id="@+id/button3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="공원"
+
         />
+
     <Button
         android:id="@+id/button4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="병원"
-        />
+        android:text="병원" />
+
     <Button
         android:id="@+id/button5"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="상점"
-        />
+        android:text="상점" />
+
+    <Spinner
+        android:id="@+id/select_distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:spinnerMode="dropdown" />
+
     <LinearLayout
         android:id="@+id/tmap"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="100"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
     </LinearLayout>
-
-
 
 
 </LinearLayout>

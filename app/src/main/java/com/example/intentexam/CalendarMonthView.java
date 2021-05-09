@@ -82,7 +82,7 @@ public class CalendarMonthView extends GridView {
      * @return
      */
     public BaseAdapter getAdapter() {
-        return (BaseAdapter)super.getAdapter();
+        return (BaseAdapter) super.getAdapter();
     }
 
     /**

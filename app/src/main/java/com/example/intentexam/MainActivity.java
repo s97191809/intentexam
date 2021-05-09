@@ -1,6 +1,7 @@
 package com.example.intentexam;
 
 import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 
 import android.util.Log;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -27,6 +29,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.opencsv.CSVReader;
 
@@ -40,10 +43,6 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
 
-
-
-
-
 public class MainActivity extends FragmentActivity {
     private BottomNavigationView mBottomNV;
 
@@ -52,8 +51,9 @@ public class MainActivity extends FragmentActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       //------------------------------------네비시작
+        //------------------------------------네비시작
         BottomNavigationView mBottomNV = findViewById(R.id.nav_view);
+
         mBottomNV.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() { //NavigationItemSelecte
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -80,14 +80,13 @@ public class MainActivity extends FragmentActivity {
             if (id == R.id.navigation_1) {
                 fragment = new FragmentPage1();
 
-            } else if (id == R.id.navigation_2){
+            } else if (id == R.id.navigation_2) {
 
                 fragment = new FragmentPage2();
-            }
-            else if (id == R.id.navigation_3){
+            } else if (id == R.id.navigation_3) {
 
                 fragment = new FragmentPage3();
-            }else {
+            } else {
                 fragment = new FragmentPage4();
             }
 
@@ -102,7 +101,7 @@ public class MainActivity extends FragmentActivity {
 
 
     }
-            //------------------------------------네비 끝
+    //------------------------------------네비 끝
 }
 
 

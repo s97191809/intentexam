@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="question">
+        <item>거리 선택</item>
+        <item>1km (약 15분)</item>
+        <item>2km (약 30분)</item>
+        <item>3km (약 45분)</item>
+
+    </string-array>
+</resources>

@@ -65,8 +65,6 @@ public class joinActivity extends AppCompatActivity {
                             } else if(id != ""){
                                 useId();
                                 check++;
-                            }else{
-                                checkId();
                             }
 
                         }
@@ -87,10 +85,10 @@ public class joinActivity extends AppCompatActivity {
                 String name = join_name.getText().toString().trim();
                 String weight = join_weight.getText().toString().trim();
                 if(id.isEmpty() || pw.isEmpty() || name.isEmpty() || weight.isEmpty() || check == 0) {
-                    // 조건문으로 저 위에 있는 것들 중에 하나라도 입력이 안되었거나 id가 중복이면 회원가입 안되게
+
                     notEnoughInfo();
                 }
-                else {
+                else if(check>0){
                     writeNewUser(id, name, pw, weight);
                 }
 

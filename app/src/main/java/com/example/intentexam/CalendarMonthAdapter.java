@@ -17,7 +17,6 @@ import android.widget.GridView;
  * 어댑터 객체 정의
  *
  * @author Mike
- *
  */
 public class CalendarMonthAdapter extends BaseAdapter {
 
@@ -112,7 +111,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
     public void resetDayNumbers() {
         for (int i = 0; i < 42; i++) {
             // calculate day number
-            int dayNumber = (i+1) - firstDay;
+            int dayNumber = (i + 1) - firstDay;
             if (dayNumber < 1 || dayNumber > lastDay) {
                 dayNumber = 0;
             }
@@ -181,7 +180,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
         // create a params--------------------------
         GridView.LayoutParams params = new GridView.LayoutParams(
-                GridView.LayoutParams.MATCH_PARENT,242);//그리드뷰 크기
+                GridView.LayoutParams.MATCH_PARENT, 242);//그리드뷰 크기
 
         // calculate row and column
         int rowIndex = position / countColumn;
@@ -205,12 +204,10 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
         // set background color
         if (position == getSelectedPosition()) {
-            itemView.setBackgroundColor(Color.rgb(191,208,230));
+            itemView.setBackgroundColor(Color.rgb(191, 208, 230));
         } else {
             itemView.setBackgroundColor(Color.WHITE);
         }
-
-
 
 
         return itemView;
@@ -219,6 +216,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
     /**
      * Get first day of week as android.text.format.Time constant.
+     *
      * @return the first day of week in android.text.format.Time
      */
     public static int getFirstDayOfWeek() {
@@ -240,7 +238,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
      * @param month
      * @return
      */
-    private int getMonthLastDay(int year, int month){
+    private int getMonthLastDay(int year, int month) {
         switch (month) {
             case 0:
             case 2:
@@ -258,19 +256,13 @@ public class CalendarMonthAdapter extends BaseAdapter {
                 return (30);
 
             default:
-                if(((year%4==0)&&(year%100!=0)) || (year%400==0) ) {
+                if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
                     return (29);   // 2월 윤년계산
                 } else {
                     return (28);
                 }
         }
     }
-
-
-
-
-
-
 
 
     /**
