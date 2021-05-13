@@ -16,11 +16,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.view.View;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class FragmentPage1 extends Fragment {
 //----------일정
@@ -50,7 +61,6 @@ public class FragmentPage1 extends Fragment {
     int curMonth;
 
 
-    // ---------일정끝
 
     @Nullable
     @Override
@@ -59,16 +69,19 @@ public class FragmentPage1 extends Fragment {
         super.onCreate(savedInstanceState);
 
         View v = inflater.inflate(R.layout.fragment_page_1, container, false);
-//--일정
+
         // 월별 캘린더 뷰 객체 참조
         monthView = (CalendarMonthView) v.findViewById(R.id.monthView);
         monthViewAdapter = new CalendarMonthAdapter(getContext());
         monthView.setAdapter(monthViewAdapter);
 
+
+
         // 리스너 설정
         monthView.setOnDataSelectionListener(new OnDataSelectionListener() {
             public void onDataSelected(AdapterView parent, View v, int position, long id) {
                 // 현재 선택한 일자 정보 표시
+
                 MonthItem curItem = (MonthItem) monthViewAdapter.getItem(position);
                 int day = curItem.getDay();
 
@@ -101,7 +114,6 @@ public class FragmentPage1 extends Fragment {
             }
         });
 
-        //--일정끝
         return v;
     }
 
@@ -112,12 +124,6 @@ public class FragmentPage1 extends Fragment {
         monthText.setText(curYear + "년 " + (curMonth + 1) + "월");
     }
 
-
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-    }
 
 
 }

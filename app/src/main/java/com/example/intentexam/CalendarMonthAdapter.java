@@ -205,6 +205,12 @@ public class CalendarMonthAdapter extends BaseAdapter {
         // set background color
         if (position == getSelectedPosition()) {
             itemView.setBackgroundColor(Color.rgb(191, 208, 230));
+
+            CustomDialog customDialog = new CustomDialog();
+            // 커스텀 다이얼로그를 호출한다.
+
+            customDialog.callFunction();
+
         } else {
             itemView.setBackgroundColor(Color.WHITE);
         }
