@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
@@ -205,11 +206,6 @@ public class CalendarMonthAdapter extends BaseAdapter {
         // set background color
         if (position == getSelectedPosition()) {
             itemView.setBackgroundColor(Color.rgb(191, 208, 230));
-
-            CustomDialog customDialog = new CustomDialog();
-            // 커스텀 다이얼로그를 호출한다.
-
-            customDialog.callFunction();
 
         } else {
             itemView.setBackgroundColor(Color.WHITE);

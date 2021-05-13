@@ -69,12 +69,15 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     List<String> arrParkName = new ArrayList<>();
     List<Double> arrParkLat = new ArrayList<>();
     List<Double> arrParkLon = new ArrayList<>();
+    List<String> arrParkAddr = new ArrayList<>();
     List<String> arrHospitalName = new ArrayList<>();
     List<Double> arrHospitalLat = new ArrayList<>();
     List<Double> arrHospitalLon = new ArrayList<>();
+    List<String> arrHospitalAddr = new ArrayList<>();
     List<String> arrShopName = new ArrayList<>();
     List<Double> arrShopLat = new ArrayList<>();
     List<Double> arrShopLon = new ArrayList<>();
+    List<String> arrShopAddr = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointPark = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointHospital = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointShop = new ArrayList<>();
@@ -157,9 +160,11 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         String db_name = messageData.child("h_name").getValue().toString();
                         String db_lat = messageData.child("h_lat").getValue().toString();
                         String db_lon = messageData.child("h_lon").getValue().toString();
+                        String db_addr = messageData.child("h_addr").getValue().toString();
                         arrHospitalName.add(db_name);
                         arrHospitalLat.add(Double.valueOf(db_lat));
                         arrHospitalLon.add(Double.valueOf(db_lon));
+                        arrHospitalAddr.add(db_addr);
 
                         TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
                         arrTMapPointHospital.add(tMapPoint);
@@ -564,9 +569,26 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
 
             tmap.addMarkerItem("markerItemH" + i, markerItem);
+            setBalloonView(markerItem, arrHospitalName.get(i), arrHospitalAddr.get(i));
+
         }
     }
+    private void setBalloonView(TMapMarkerItem marker, String title, String address)
+    {
+        marker.setCanShowCallout(true);
+// 병원 이름 어레이랑 주소 어레이 크기만큼 반복해서 받아온다 아니면
 
+            if( marker.getCanShowCallout() )
+            {
+                marker.setCalloutTitle(title);
+                marker.setCalloutSubTitle(address);
+
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
+                marker.setCalloutRightButtonImage(bitmap);
+            }
+
+
+    }
     private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
 

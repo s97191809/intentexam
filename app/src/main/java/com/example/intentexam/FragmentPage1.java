@@ -84,7 +84,10 @@ public class FragmentPage1 extends Fragment {
 
                 MonthItem curItem = (MonthItem) monthViewAdapter.getItem(position);
                 int day = curItem.getDay();
+                CustomDialog customDialog = new CustomDialog(getContext());
+                // 커스텀 다이얼로그를 호출한다.
 
+                customDialog.callFunction();
                 Log.d("CalendarMonthViewAct", "Selected : " + day);
 
             }

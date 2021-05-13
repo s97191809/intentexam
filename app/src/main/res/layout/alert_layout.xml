@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff">
+    android:background="#EAEFF8">
 
     <TextView
         android:id="@+id/htitle"
@@ -12,7 +12,7 @@
         android:textColor="#ffffff"
         android:textSize="16dp"
         android:text="일정 추가"
-        android:background="@color/colorAccent"/>
+/>
 
     <View
         android:layout_width="match_parent"

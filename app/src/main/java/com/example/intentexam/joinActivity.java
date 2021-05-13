@@ -84,6 +84,8 @@ public class joinActivity extends AppCompatActivity {
                 String pw = join_pw.getText().toString().trim();
                 String name = join_name.getText().toString().trim();
                 String weight = join_weight.getText().toString().trim();
+
+
                 if(id.isEmpty() || pw.isEmpty() || name.isEmpty() || weight.isEmpty() || check == 0) {
 
                     notEnoughInfo();
@@ -99,7 +101,7 @@ public class joinActivity extends AppCompatActivity {
 
     private void writeNewUser(String userId, String name, String password, String weight) {
         User user = new User(userId, name, password, weight);
-
+        // 중복 체크를 했을 때 트루면 가입 안되게 하고 펄스면 되게
         mReference.child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -239,7 +241,14 @@ public class joinActivity extends AppCompatActivity {
         };
         mReference.addChildEventListener(mChild);
     }
+    private boolean checkId(String db_id, String input_id){
+        if(db_id.equals(input_id)){
+            return true;
+        } else{
+          return false;
+        }
 
+    }
     private void overlapId() {
         Toast.makeText(this, "같은 ID가 존재합니다.", Toast.LENGTH_SHORT).show();
     }
