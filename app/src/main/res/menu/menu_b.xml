@@ -9,6 +9,7 @@
         android:enabled="true"
         android:icon="@drawable/calendaricon"
         android:title="일정"
+        android:textColor="#707070"
         app:showAsAction="withText" />
     <!--일정-->
 
@@ -17,6 +18,7 @@
         android:enabled="true"
         android:icon="@drawable/mapicon"
         android:title="지도"
+        android:textColor="#707070"
         app:showAsAction="withText" /><!--지도-->
 
     <item
@@ -26,6 +28,7 @@
         android:enabled="true"
         android:icon="@drawable/hearticon"
         android:title="커뮤니티"
+        android:textColor="#707070"
         app:showAsAction="withText" /><!--커뮤니티-->
 
     <item
@@ -34,5 +37,6 @@
         android:enabled="true"
         android:icon="@drawable/usericon"
         android:title="내정보"
+        android:textColor="#707070"
         app:showAsAction="withText" /><!--내정보-->
 </menu>
