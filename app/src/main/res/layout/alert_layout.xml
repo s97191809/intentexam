@@ -9,9 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="center"
-        android:textColor="#ffffff"
+        android:textColor="#707070"
         android:textSize="16dp"
         android:text="일정 추가"
+        android:background="#BFD0E6"
 />
 
     <View
@@ -51,7 +52,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="추가"
-            android:textColor="#000000"
+            android:textColor="#707070"
             android:textSize="16dp"
             android:background="#ffffff"/>
 
@@ -67,7 +68,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="취소"
-            android:textColor="#000000"
+            android:textColor="#707070"
             android:textSize="16dp"
             android:background="#ffffff"/>
     </LinearLayout>
