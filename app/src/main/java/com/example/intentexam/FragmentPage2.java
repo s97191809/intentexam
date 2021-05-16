@@ -371,7 +371,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     }
                     makeMarkerShop(distTmapShopPoint);
                     makeMarkerHospital(distTmapHospitalPoint);
-
                     makeMarkerPark(distTmapParkPoint);
                 } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
                     distTmapParkPoint.clear();
@@ -421,6 +420,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         if (distance <= 1500) {
                             TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
                             distTmapHospitalPoint.add(dtpoint);
+                            Log.d("씨ㅣㅣ빨!!!!", dtpoint.toString());
                         }
                     }
                     for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
@@ -435,6 +435,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                             distTmapShopPoint.add(dtpoint);
                         }
                     }
+
                     makeMarkerShop(distTmapShopPoint);
                     makeMarkerHospital(distTmapHospitalPoint);
                     makeMarkerPark(distTmapParkPoint);
@@ -569,7 +570,18 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
 
             tmap.addMarkerItem("markerItemH" + i, markerItem);
-            setBalloonView(markerItem, arrHospitalName.get(i), arrHospitalAddr.get(i));
+            //setBalloonView(markerItem, arrHospitalName.get(i), arrHospitalAddr.get(i));
+
+            MarkerOverlay markerOverlay = new MarkerOverlay(getContext(), arrHospitalName.get(i), arrHospitalAddr.get(i));
+            String strID = "TMapMarkerItem2";
+
+            markerOverlay.setPosition(0.2f,0.2f);
+            markerOverlay.getTMapPoint();
+            markerOverlay.setID(strID);
+            markerOverlay.setIcon(BitmapFactory.decodeResource(getResources(), R.drawable.balloon_overlay_focused));
+            markerOverlay.setTMapPoint(arrTMapPoint.get(i));
+
+            tmap.addMarkerItem2(strID, markerOverlay);
 
         }
     }
@@ -580,11 +592,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
             if( marker.getCanShowCallout() )
             {
-                marker.setCalloutTitle(title);
-                marker.setCalloutSubTitle(address);
+            //    marker.setCalloutTitle(title);
+              //  marker.setCalloutSubTitle(address);
+                //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
+                //marker.setCalloutRightButtonImage(bitmap);
 
-                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
-                marker.setCalloutRightButtonImage(bitmap);
+
             }
 
 
