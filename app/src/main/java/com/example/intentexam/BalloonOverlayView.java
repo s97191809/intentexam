@@ -38,6 +38,8 @@ public class BalloonOverlayView extends FrameLayout {
 
         View view = inflater.inflate(R.layout.balloon_overlay, parent, true);
 
+        title = (TextView) findViewById(R.id.all_path);
+        subTitle = (TextView) findViewById(R.id.section_path);
 
         setTitle(labelName);
         setSubTitle(id);
@@ -45,11 +47,13 @@ public class BalloonOverlayView extends FrameLayout {
     }
 
     public void setTitle(String str) {
+
         title.setText(str);
     }
 
     public void setSubTitle(String str) {
         subTitle.setText(str);
+
     }
 }
 
