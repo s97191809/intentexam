@@ -8,7 +8,7 @@
         android:id="@+id/navigation_1"
         android:enabled="true"
         android:icon="@drawable/calendaricon"
-        android:title="일정"
+        android:title=""
         android:textColor="#707070"
         app:showAsAction="withText" />
     <!--일정-->
@@ -17,7 +17,7 @@
         android:id="@+id/navigation_2"
         android:enabled="true"
         android:icon="@drawable/mapicon"
-        android:title="지도"
+        android:title=""
         android:textColor="#707070"
         app:showAsAction="withText" /><!--지도-->
 
@@ -27,7 +27,7 @@
 
         android:enabled="true"
         android:icon="@drawable/hearticon"
-        android:title="커뮤니티"
+        android:title=""
         android:textColor="#707070"
         app:showAsAction="withText" /><!--커뮤니티-->
 
@@ -36,7 +36,7 @@
         android:id="@+id/navigation_4"
         android:enabled="true"
         android:icon="@drawable/usericon"
-        android:title="내정보"
+        android:title=""
         android:textColor="#707070"
         app:showAsAction="withText" /><!--내정보-->
 </menu>

@@ -18,10 +18,9 @@ public class MarkerOverlay extends TMapMarkerItem2 {
 
     private DisplayMetrics dm = null;
 
-    private Context mContext = null;
+    private Context 	mContext = null;
     private BalloonOverlayView balloonView = null;
     private int mAnimationCount = 0;
-    private Rect rect;
 
 
     @Override
@@ -124,10 +123,10 @@ public class MarkerOverlay extends TMapMarkerItem2 {
 
             canvas.translate(nTempX, nTempY);
             balloonView.draw(canvas);
-
+            Rect rect = new Rect();
             // 풍선뷰 영역 설정
-            rect.left = nTempX;
-            rect.top = nTempY;
+            rect.left = nTempX /2;
+            rect.top = nTempY/2;
             rect.right = rect.left + balloonView.getMeasuredWidth();
             rect.bottom = rect.top + balloonView.getMeasuredHeight();
 
@@ -138,7 +137,7 @@ public class MarkerOverlay extends TMapMarkerItem2 {
 
     public boolean onSingleTapUp(PointF point, TMapView mapView) {
         mapView.showCallOutViewWithMarkerItemID(getID());
-        return false;
+        return true;
     }
 
     Handler mHandler = null;
@@ -146,7 +145,7 @@ public class MarkerOverlay extends TMapMarkerItem2 {
     @Override
     public void startAnimation() {
         super.startAnimation();
-        TMapView mMapView = new TMapView(mContext);
+
         Runnable mRunnable = new Runnable() {
             @Override
             public void run() {
@@ -155,7 +154,7 @@ public class MarkerOverlay extends TMapMarkerItem2 {
                         mAnimationCount = 0;
 
                     setIcon(getAnimationIcons().get(mAnimationCount));
-                    mMapView.postInvalidate();
+                    balloonView.postInvalidate();
                     mAnimationCount++;
                     mHandler.postDelayed(this, getAniDuration());
                 }

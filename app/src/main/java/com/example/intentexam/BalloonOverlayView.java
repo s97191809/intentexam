@@ -29,6 +29,7 @@ public class BalloonOverlayView extends FrameLayout {
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.NO_GRAVITY;
         addView(layout, params);
+
     }
 
 
@@ -38,8 +39,8 @@ public class BalloonOverlayView extends FrameLayout {
 
         View view = inflater.inflate(R.layout.balloon_overlay, parent, true);
 
-        title = (TextView) findViewById(R.id.all_path);
-        subTitle = (TextView) findViewById(R.id.section_path);
+        title = (TextView) view.findViewById(R.id.all_path);
+        subTitle = (TextView) view.findViewById(R.id.section_path);
 
         setTitle(labelName);
         setSubTitle(id);
@@ -47,7 +48,6 @@ public class BalloonOverlayView extends FrameLayout {
     }
 
     public void setTitle(String str) {
-
         title.setText(str);
     }
 
