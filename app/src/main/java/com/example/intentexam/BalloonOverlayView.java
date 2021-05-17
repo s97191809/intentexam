@@ -41,7 +41,6 @@ public class BalloonOverlayView extends FrameLayout {
 
         title = (TextView) view.findViewById(R.id.all_path);
         subTitle = (TextView) view.findViewById(R.id.section_path);
-
         setTitle(labelName);
         setSubTitle(id);
 

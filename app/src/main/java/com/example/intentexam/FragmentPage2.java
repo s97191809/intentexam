@@ -57,6 +57,7 @@ import com.skt.Tmap.TMapMarkerItemLayer;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -74,18 +75,18 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     private DatabaseReference mReference;
     private ChildEventListener mChild;
     private ListView listView;
-    List<String> arrParkName = new ArrayList<>();
-    List<Double> arrParkLat = new ArrayList<>();
-    List<Double> arrParkLon = new ArrayList<>();
-    List<String> arrParkAddr = new ArrayList<>();
-    List<String> arrHospitalName = new ArrayList<>();
-    List<Double> arrHospitalLat = new ArrayList<>();
-    List<Double> arrHospitalLon = new ArrayList<>();
-    List<String> arrHospitalAddr = new ArrayList<>();
-    List<String> arrShopName = new ArrayList<>();
-    List<Double> arrShopLat = new ArrayList<>();
-    List<Double> arrShopLon = new ArrayList<>();
-    List<String> arrShopAddr = new ArrayList<>();
+    final ArrayList<String> arrParkName = new ArrayList<>();
+    final ArrayList<Double> arrParkLat = new ArrayList<>();
+    final ArrayList<Double> arrParkLon = new ArrayList<>();
+    final ArrayList<String> arrParkAddr = new ArrayList<>();
+    final ArrayList<String> arrHospitalName = new ArrayList<>();
+    final ArrayList<Double> arrHospitalLat = new ArrayList<>();
+    final ArrayList<Double> arrHospitalLon = new ArrayList<>();
+    final ArrayList<String> arrHospitalAddr = new ArrayList<>();
+    final ArrayList<String> arrShopName = new ArrayList<>();
+    final ArrayList<Double> arrShopLat = new ArrayList<>();
+    final ArrayList<Double> arrShopLon = new ArrayList<>();
+    final ArrayList<String> arrShopAddr = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointPark = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointHospital = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointShop = new ArrayList<>();
@@ -116,6 +117,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
         location location = new location(getActivity());
+
 
         setGps();//위치 권한 요청.
         listView = (ListView) v.findViewById(R.id.listviewmsg);
@@ -158,9 +160,18 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tmap.removeAllTMapPolyLine();
+                for(int c = 0; c < arrHospitalName.size(); c++) {
+                    tmap.removeMarkerItem2(arrHospitalName.get(c));
+                }
+                for(int c = 0; c < arrShopName.size(); c++) {
+                    tmap.removeMarkerItem2(arrShopName.get(c));
+                }
+                for(int c = 0; c < arrParkName.size(); c++) {
+                    tmap.removeMarkerItem2(arrParkName.get(c));
+                }
 
-
-                makeMarkerPark(arrTMapPointPark);
+                makeMarkerPark(arrTMapPointPark,arrParkName,arrParkAddr);
             }
 
         });
@@ -196,8 +207,18 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
             @Override
             public void onClick(View v) {
+                tmap.removeAllTMapPolyLine();
+                for(int c = 0; c < arrHospitalName.size(); c++) {
+                    tmap.removeMarkerItem2(arrHospitalName.get(c));
+                }
+                for(int c = 0; c < arrShopName.size(); c++) {
+                    tmap.removeMarkerItem2(arrShopName.get(c));
+                }
+                for(int c = 0; c < arrParkName.size(); c++) {
+                    tmap.removeMarkerItem2(arrParkName.get(c));
+                }
+              makeMarkerHospital(arrTMapPointHospital,arrHospitalName,arrHospitalAddr);
 
-                makeMarkerHospital(arrTMapPointHospital);
             }
 
 
@@ -237,8 +258,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
             @Override
             public void onClick(View v) {
-
-                makeMarkerShop(arrTMapPointShop);
+                tmap.removeAllTMapPolyLine();
+                for(int c = 0; c < arrHospitalName.size(); c++) {
+                    tmap.removeMarkerItem2(arrHospitalName.get(c));
+                }
+                for(int c = 0; c < arrShopName.size(); c++) {
+                    tmap.removeMarkerItem2(arrShopName.get(c));
+                }
+                for(int c = 0; c < arrParkName.size(); c++) {
+                    tmap.removeMarkerItem2(arrParkName.get(c));
+                }
+                makeMarkerShop(arrTMapPointShop,arrParkName,arrParkAddr);
 
             }
 
@@ -254,17 +284,53 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectDist = (String) spiner.getSelectedItem();
                 final ArrayList<TMapPoint> distTmapParkPoint = new ArrayList<>();
+                final ArrayList<String> distTmapParkName = new ArrayList<>();
+                final ArrayList<String> distTmapParkAddr = new ArrayList<>();
+
                 final ArrayList<TMapPoint> distTmapHospitalPoint = new ArrayList<>();
+                final ArrayList<String> distTmapHospitalName = new ArrayList<>();
+                final ArrayList<String> distTmapHospitalAddr = new ArrayList<>();
+
                 final ArrayList<TMapPoint> distTmapShopPoint = new ArrayList<>();
+                final ArrayList<String> distTmapShopName = new ArrayList<>();
+                final ArrayList<String> distTmapShopAddr = new ArrayList<>();
+
                 if (selectDist.equals("거리 선택")) {
+                    tmap.removeAllTMapPolyLine();
+                    for(int c = 0; c < arrHospitalName.size(); c++) {
+                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    }
+                    for(int c = 0; c < arrShopName.size(); c++) {
+                        tmap.removeMarkerItem2(arrShopName.get(c));
+                    }
+                    for(int c = 0; c < arrParkName.size(); c++) {
+                        tmap.removeMarkerItem2(arrParkName.get(c));
+                    }
                     // 배열 초기화
                     distTmapParkPoint.clear();
+                    distTmapParkName.clear();
+                    distTmapParkAddr.clear();
                     distTmapHospitalPoint.clear();
+                    distTmapHospitalName.clear();
+                    distTmapHospitalName.clear();
                     distTmapShopPoint.clear();
+                    distTmapShopName.clear();
+                    distTmapShopAddr.clear();
+
                     // 마커와 원 삭제
                     tmap.removeAllMarkerItem();
                     tmap.removeAllTMapCircle();
                 } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
+                    tmap.removeAllTMapPolyLine();
+                    for(int c = 0; c < arrHospitalName.size(); c++) {
+                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    }
+                    for(int c = 0; c < arrShopName.size(); c++) {
+                        tmap.removeMarkerItem2(arrShopName.get(c));
+                    }
+                    for(int c = 0; c < arrParkName.size(); c++) {
+                        tmap.removeMarkerItem2(arrParkName.get(c));
+                    }
                     distTmapParkPoint.clear();
                     tmap.removeAllMarkerItem();
                     location location = new location(getActivity());
@@ -285,49 +351,69 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     // 리스트 크기만큼 반복문
 
                     for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
-                        Location location3 = new Location("");
-                        location3.setLatitude(arrParkLat.get(i));
-                        location3.setLongitude(arrParkLon.get(i));
+                        Location parkDestination1Km = new Location("");
+                        parkDestination1Km.setLatitude(arrParkLat.get(i));
+                        parkDestination1Km.setLongitude(arrParkLon.get(i));
 
-                        double distance = location2.distanceTo(location3);
+                        double distance = location2.distanceTo(parkDestination1Km);
 
                         //걸러진 어레이 리스트도 필요함
                         if (distance <= 500) {// 단위 (M)
-                            Log.d("1KM 반경 거리", String.valueOf(distance));
-                            Log.d("1km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
-                            TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(parkDestination1Km.getLatitude(), parkDestination1Km.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
                             distTmapParkPoint.add(dtpoint);
                         }
                     }
                     for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
-                        Location location4 = new Location("");
-                        location4.setLatitude(arrHospitalLat.get(j));
-                        location4.setLongitude(arrHospitalLon.get(j));
+                        Location hospitalDestination1Km = new Location("");
+                        hospitalDestination1Km.setLatitude(arrHospitalLat.get(j));
+                        hospitalDestination1Km.setLongitude(arrHospitalLon.get(j));
 
-                        double distance = location2.distanceTo(location4);
+                        double distance = location2.distanceTo(hospitalDestination1Km);
 
                         if (distance <= 500) {
-                            TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(hospitalDestination1Km.getLatitude(), hospitalDestination1Km.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
                             distTmapHospitalPoint.add(dtpoint);
+
                         }
                     }
                     for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
-                        Location location5 = new Location("");
-                        location5.setLatitude(arrShopLat.get(k));
-                        location5.setLongitude(arrShopLon.get(k));
+                        Location shopDestination1Km = new Location("");
+                        shopDestination1Km.setLatitude(arrShopLat.get(k));
+                        shopDestination1Km.setLongitude(arrShopLon.get(k));
 
-                        double distance = location2.distanceTo(location5);
+                        double distance = location2.distanceTo(shopDestination1Km);
 
                         if (distance <= 500) {
-                            TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(shopDestination1Km.getLatitude(), shopDestination1Km.getLongitude());
+                            String dtname = arrHospitalName.get(k);
+                            String dtaddr = arrHospitalAddr.get(k);
                             distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
                         }
                     }
-                    makeMarkerShop(distTmapShopPoint);
-                    makeMarkerHospital(distTmapHospitalPoint);
-                    makeMarkerPark(distTmapParkPoint);
+                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
                 } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
-                    distTmapParkPoint.clear();
+                    tmap.removeAllTMapPolyLine();
+                    for(int c = 0; c < arrHospitalName.size(); c++) {
+                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    }
+                    for(int c = 0; c < arrShopName.size(); c++) {
+                        tmap.removeMarkerItem2(arrShopName.get(c));
+                    }
+                    for(int c = 0; c < arrParkName.size(); c++) {
+                        tmap.removeMarkerItem2(arrParkName.get(c));
+                    }
                     location location = new location(getActivity());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
@@ -357,7 +443,11 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                             Log.d("2KM 반경 거리", String.valueOf(distance));
                             Log.d("2km 반경 포인트", String.valueOf(parkLocation.getLatitude()) + "," + parkLocation.getLongitude());
                             TMapPoint dtpoint = new TMapPoint(parkLocation.getLatitude(), parkLocation.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
                             distTmapParkPoint.add(dtpoint);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
                         }
                     }
                     for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
@@ -369,6 +459,10 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
                         if (distance <= 1000) {
                             TMapPoint dtpoint = new TMapPoint(hostpitalLocation.getLatitude(), hostpitalLocation.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
                             distTmapHospitalPoint.add(dtpoint);
                         }
                     }
@@ -381,13 +475,28 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
                         if (distance <= 1000) {
                             TMapPoint dtpoint = new TMapPoint(shopLocation.getLatitude(), shopLocation.getLongitude());
+                            String dtname = arrShopName.get(k);
+                            String dtaddr = arrShopAddr.get(k);
                             distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
+
                         }
                     }
-                    makeMarkerShop(distTmapShopPoint);
-                    makeMarkerHospital(distTmapHospitalPoint);
-                    makeMarkerPark(distTmapParkPoint);
+                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
                 } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
+                    tmap.removeAllTMapPolyLine();
+                    for(int c = 0; c < arrHospitalName.size(); c++) {
+                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    }
+                    for(int c = 0; c < arrShopName.size(); c++) {
+                        tmap.removeMarkerItem2(arrShopName.get(c));
+                    }
+                    for(int c = 0; c < arrParkName.size(); c++) {
+                        tmap.removeMarkerItem2(arrParkName.get(c));
+                    }
                     distTmapParkPoint.clear();
                     distTmapHospitalPoint.clear();
                     distTmapShopPoint.clear();
@@ -421,6 +530,10 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                             Log.d("3KM 반경 거리", String.valueOf(distance));
                             Log.d("3km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
                             TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
                             distTmapParkPoint.add(dtpoint);
                         }
 
@@ -434,6 +547,10 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
                         if (distance <= 1500) {
                             TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
                             distTmapHospitalPoint.add(dtpoint);
                         }
                     }
@@ -446,13 +563,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
                         if (distance <= 1500) {
                             TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
+                            String dtname = arrHospitalName.get(k);
+                            String dtaddr = arrHospitalAddr.get(k);
                             distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
                         }
                     }
                     // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
-                    makeMarkerShop(distTmapShopPoint);
-                    makeMarkerHospital(distTmapHospitalPoint);
-                    makeMarkerPark(distTmapParkPoint);
+                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
 
                 }
 
@@ -478,6 +599,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             }
 
             public void run() {
+
                 TMapData tmapdata = new TMapData();
                 tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
                     //마커 정보를 여기서 가져와서
@@ -567,59 +689,63 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         }
     }
 
-    public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint) {
+    public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-            TMapMarkerItem markerItem = new TMapMarkerItem();
-            MarkerOverlay marker = new MarkerOverlay(getContext(), arrParkName.get(i), arrParkAddr.get(i));
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_park);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             marker.setPosition(0.2f, 0.2f);
             marker.getTMapPoint();
-            marker.setID(arrParkName.get(i));
+
+            marker.setID(arrName.get(i));
             marker.setIcon(bitmap);
             marker.setTMapPoint(arrTMapPoint.get(i));
 
-            tmap.addMarkerItem2(arrParkName.get(i), marker);
-            tmap.showCallOutViewWithMarkerItemID(arrParkName.get(i));
+            tmap.addMarkerItem2(arrName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrName.get(i));
         }
     }
 
-    public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint) {
+    public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+        tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-            MarkerOverlay marker = new MarkerOverlay(getContext(), arrShopName.get(i), arrShopAddr.get(i));
+            TMapMarkerItem markerItem = new TMapMarkerItem();
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
+
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             marker.setPosition(0.2f, 0.2f);
             marker.getTMapPoint();
-            marker.setID(arrShopName.get(i));
+            marker.setID(arrName.get(i));
             marker.setIcon(bitmap);
             marker.setTMapPoint(arrTMapPoint.get(i));
 
-            tmap.addMarkerItem2(arrShopName.get(i), marker);
-            tmap.showCallOutViewWithMarkerItemID(arrShopName.get(i));
+            tmap.addMarkerItem2(arrName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrName.get(i));
         }
     }
 
-    public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint) {
-
+    public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+        tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-            MarkerOverlay marker = new MarkerOverlay(getContext(), arrHospitalName.get(i), arrHospitalAddr.get(i));
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
             marker.setPosition(0.2f, 0.2f);
             marker.getTMapPoint();
-            marker.setID(arrHospitalName.get(i));
+            marker.setID(arrName.get(i));
             marker.setIcon(bitmap);
             marker.setTMapPoint(arrTMapPoint.get(i));
 
-            tmap.addMarkerItem2(arrHospitalName.get(i), marker);
-            tmap.showCallOutViewWithMarkerItemID(arrHospitalName.get(i));
+            tmap.addMarkerItem2(arrName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrName.get(i));
 
         }
     }

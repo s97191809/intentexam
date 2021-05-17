@@ -125,8 +125,8 @@ public class MarkerOverlay extends TMapMarkerItem2 {
             balloonView.draw(canvas);
             Rect rect = new Rect();
             // 풍선뷰 영역 설정
-            rect.left = nTempX /2;
-            rect.top = nTempY/2;
+            rect.left = nTempX;
+            rect.top = nTempY;
             rect.right = rect.left + balloonView.getMeasuredWidth();
             rect.bottom = rect.top + balloonView.getMeasuredHeight();
 
@@ -137,7 +137,7 @@ public class MarkerOverlay extends TMapMarkerItem2 {
 
     public boolean onSingleTapUp(PointF point, TMapView mapView) {
         mapView.showCallOutViewWithMarkerItemID(getID());
-        return true;
+        return false;
     }
 
     Handler mHandler = null;
