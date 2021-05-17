@@ -2,22 +2,26 @@ package com.example.intentexam;
 
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -40,6 +44,9 @@ import com.skt.Tmap.TMapCircle;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
 import com.skt.Tmap.TMapMarkerItem;
+import com.skt.Tmap.TMapMarkerItem2;
+import com.skt.Tmap.TMapOverlay;
+import com.skt.Tmap.TMapOverlayItem;
 import com.skt.Tmap.TMapPOIItem;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
@@ -54,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -85,6 +93,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     TMapView tmap;
+    ExampleThread thread;
 
 
     @Nullable
@@ -112,7 +121,9 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         listView = (ListView) v.findViewById(R.id.listviewmsg);
         initDatabase();
 
-        TMapData tmapdata = new TMapData();
+        thread = new ExampleThread();
+        thread.start();
+
 
         if (arrTMapPointPark.isEmpty()) {// 공원 정보 가져오기
             mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
@@ -124,10 +135,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         String db_name = messageData.child("p_name").getValue().toString();
                         String db_lat = messageData.child("p_lat").getValue().toString();
                         String db_lon = messageData.child("p_lon").getValue().toString();
+                        String db_addr = messageData.child("p_addr").getValue().toString();
                         String msg2 = messageData.getValue().toString();
                         arrParkName.add(db_name);
                         arrParkLat.add(Double.valueOf(db_lat));
                         arrParkLon.add(Double.valueOf(db_lon));
+                        arrParkAddr.add(db_addr);
 
                         TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
                         arrTMapPointPark.add(tMapPoint);
@@ -198,9 +211,11 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         String db_name = messageData.child("s_name").getValue().toString();
                         String db_lat = messageData.child("s_lat").getValue().toString();
                         String db_lon = messageData.child("s_lon").getValue().toString();
+                        String db_addr = messageData.child("s_addr").getValue().toString();
                         arrShopName.add(db_name);
                         arrShopLat.add(Double.valueOf(db_lat));
                         arrShopLon.add(Double.valueOf(db_lon));
+                        arrShopAddr.add(db_addr);
 
 
                         TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
@@ -420,7 +435,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         if (distance <= 1500) {
                             TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
                             distTmapHospitalPoint.add(dtpoint);
-                            Log.d("씨ㅣㅣ빨!!!!", dtpoint.toString());
                         }
                     }
                     for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
@@ -435,12 +449,13 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                             distTmapShopPoint.add(dtpoint);
                         }
                     }
-
+                    // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
                     makeMarkerShop(distTmapShopPoint);
                     makeMarkerHospital(distTmapHospitalPoint);
                     makeMarkerPark(distTmapParkPoint);
 
                 }
+
             }
 
             @Override
@@ -453,6 +468,41 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         return v;
     }
+
+
+        private class ExampleThread extends Thread {
+            private static final String TAG = "ExampleThread";
+
+            public ExampleThread() {
+                // 초기화 작업
+            }
+
+            public void run() {
+                TMapData tmapdata = new TMapData();
+                tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
+                    //마커 정보를 여기서 가져와서
+
+                    @Override
+                    public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
+                        tmap.removeAllTMapPolyLine();
+                        Log.d("아이템 확인 : " , s);
+                        location location = new location(getActivity());
+                        double lat = location.getLatitude();
+                        double lon = location.getLongitude();
+                        TMapPoint st_point = new TMapPoint(lat, lon);
+                        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
+                            @Override
+                            public void onFindPathData(TMapPolyLine polyLine) {
+                                tmap.addTMapPath(polyLine);
+                            }
+                        });
+
+                    }
+                });
+            }
+        }
+
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -489,6 +539,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
     }
 
+
     public void setGps() {
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -519,88 +570,97 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint) {
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             TMapMarkerItem markerItem = new TMapMarkerItem();
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrParkName.get(i), arrParkAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_park);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
-            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+            marker.setPosition(0.2f, 0.2f);
+            marker.getTMapPoint();
+            marker.setID(arrParkName.get(i));
+            marker.setIcon(bitmap);
+            marker.setTMapPoint(arrTMapPoint.get(i));
 
-            markerItem.setIcon(bitmap);
-
-            markerItem.setTMapPoint(arrTMapPoint.get(i));
-
-
-            tmap.addMarkerItem("markerItemP" + i, markerItem);
+            tmap.addMarkerItem2(arrParkName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrParkName.get(i));
         }
     }
 
     public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint) {
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-            TMapMarkerItem markerItem = new TMapMarkerItem();
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrShopName.get(i), arrShopAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
-            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+            marker.setPosition(0.2f, 0.2f);
+            marker.getTMapPoint();
+            marker.setID(arrShopName.get(i));
+            marker.setIcon(bitmap);
+            marker.setTMapPoint(arrTMapPoint.get(i));
 
-
-            markerItem.setIcon(bitmap);
-
-            markerItem.setTMapPoint(arrTMapPoint.get(i));
-
-
-            tmap.addMarkerItem("markerItemS" + i, markerItem);
+            tmap.addMarkerItem2(arrShopName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrShopName.get(i));
         }
     }
 
     public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint) {
 
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-            TMapMarkerItem markerItem = new TMapMarkerItem();
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrHospitalName.get(i), arrHospitalAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_hospital);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
-            markerItem.setVisible(TMapMarkerItem.VISIBLE);
+            marker.setPosition(0.2f, 0.2f);
+            marker.getTMapPoint();
+            marker.setID(arrHospitalName.get(i));
+            marker.setIcon(bitmap);
+            marker.setTMapPoint(arrTMapPoint.get(i));
 
-
-            markerItem.setIcon(bitmap);
-
-            markerItem.setTMapPoint(arrTMapPoint.get(i));
-
-
-            tmap.addMarkerItem("markerItemH" + i, markerItem);
-            //setBalloonView(markerItem, arrHospitalName.get(i), arrHospitalAddr.get(i));
-
-            MarkerOverlay markerOverlay = new MarkerOverlay(getContext(), arrHospitalName.get(i), arrHospitalAddr.get(i));
-            String strID = "TMapMarkerItem2";
-
-            markerOverlay.setPosition(0.2f,0.2f);
-            markerOverlay.getTMapPoint();
-            markerOverlay.setID(strID);
-            markerOverlay.setIcon(BitmapFactory.decodeResource(getResources(), R.drawable.balloon_overlay_focused));
-            markerOverlay.setTMapPoint(arrTMapPoint.get(i));
-
-            tmap.addMarkerItem2(strID, markerOverlay);
+            tmap.addMarkerItem2(arrHospitalName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrHospitalName.get(i));
 
         }
     }
-    private void setBalloonView(TMapMarkerItem marker, String title, String address)
-    {
-        marker.setCanShowCallout(true);
-// 병원 이름 어레이랑 주소 어레이 크기만큼 반복해서 받아온다 아니면
 
-            if( marker.getCanShowCallout() )
-            {
-            //    marker.setCalloutTitle(title);
-              //  marker.setCalloutSubTitle(address);
-                //Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher_background);
-                //marker.setCalloutRightButtonImage(bitmap);
+    private void setBalloonView(TMapMarkerItem2 marker, String title, String address, TMapPoint point) {
+
+
+        marker.setPosition(0.2f,0.2f);
+        marker.getTMapPoint();
+        marker.setID(title);
+        marker.setIcon(BitmapFactory.decodeResource(getResources(), R.drawable.balloon_overlay_focused));
+        marker.setTMapPoint(point);
+
+        tmap.addMarkerItem2(title, marker);
+        tmap.showCallOutViewWithMarkerItemID(title);
+    }
+    private void balloonViewEvent(){
+        // 흠 지금 아이템 이름을 주소가아닌 이름으로 했으니 흠 ㅇㅋ
+        //함수에 필요한게 마커 아이템이랑 출발, 도착지점 도착지점은 이름 리스트의 인덱스랑 일치하는 곳의 좌표로 설정 그럼될듯
+        tmap.removeAllTMapPolyLine();
+        tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
+            TMapData tmapdata = new TMapData();
+            @Override
+            public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
+
+                tmap.getMarkerItem2FromID(s).getTMapPoint();
+                location location = new location(getActivity());
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
+                TMapPoint st_point = new TMapPoint(lat, lon);
+                tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
+                    @Override
+                    public void onFindPathData(TMapPolyLine polyLine) {
+                        tmap.addTMapPath(polyLine);
+                    }
+                });
+
 
 
             }
-
-
+        });
     }
     private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
