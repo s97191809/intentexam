@@ -7,6 +7,10 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -25,9 +29,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -44,7 +50,10 @@ import com.skt.Tmap.TMapMarkerItem2;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
-
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import java.util.ArrayList;
 
 
@@ -93,6 +102,10 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     ballonEvent ballonEventThread;
     dbLoad dbLoad;
     removeMarker removeMarker;
+    TextView tv_sensor;
+    SensorManager sm;
+    Sensor sensor_step_detector;
+
     private searchAdapter adapter;
 
 
@@ -108,7 +121,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
-
+        setGps();//위치 권한 요청.
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
 
@@ -125,7 +138,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.setSightVisible(true);
         location location = new location(getActivity());
 
-        setGps();//위치 권한 요청.
+
 
         TMapPolyLine polyline = new TMapPolyLine();
         double lat = location.getLatitude();
@@ -141,6 +154,8 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         dbLoad = new dbLoad();
         dbLoad.start();
+
+
 
         removeMarker = new removeMarker();
         button3 = v.findViewById(R.id.button3);// 공원 위치 표시
@@ -901,5 +916,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             }
         }
     }
+
 
 }
