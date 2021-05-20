@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -39,15 +40,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.skt.Tmap.TMapCircle;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
-import com.skt.Tmap.TMapMarkerItem;
 import com.skt.Tmap.TMapMarkerItem2;
-import com.skt.Tmap.TMapPOIItem;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+
 
 public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback {
     Button button3;
@@ -74,13 +73,27 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     final ArrayList<TMapPoint> arrTMapPointPark = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointHospital = new ArrayList<>();
     final ArrayList<TMapPoint> arrTMapPointShop = new ArrayList<>();
-    final ArrayList<String> arrAlladdr = new ArrayList<>();
+    final ArrayList<String> arrAllname = new ArrayList<>();
+    final ArrayList<String> arrTempAllname = new ArrayList<>();
+    final ArrayList<TMapPoint> distTmapParkPoint = new ArrayList<>();
+    final ArrayList<String> distTmapParkName = new ArrayList<>();
+    final ArrayList<String> distTmapParkAddr = new ArrayList<>();
+
+    final ArrayList<TMapPoint> distTmapHospitalPoint = new ArrayList<>();
+    final ArrayList<String> distTmapHospitalName = new ArrayList<>();
+    final ArrayList<String> distTmapHospitalAddr = new ArrayList<>();
+
+    final ArrayList<TMapPoint> distTmapShopPoint = new ArrayList<>();
+    final ArrayList<String> distTmapShopName = new ArrayList<>();
+    final ArrayList<String> distTmapShopAddr = new ArrayList<>();
     private TMapGpsManager tmapgps = null;
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     TMapView tmap;
-    ballonEvent thread;
-    private ArrayAdapter<String> adapter;
+    ballonEvent ballonEventThread;
+    dbLoad dbLoad;
+    removeMarker removeMarker;
+    private searchAdapter adapter;
 
 
     @Override
@@ -100,7 +113,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
 
         LinearLayout linearLayoutTmap = (LinearLayout) v.findViewById(R.id.tmap);
-        TMapMarkerItem2 markerItem2 = new TMapMarkerItem2();
+
 
         tmap = new TMapView(getActivity());
 
@@ -115,208 +128,85 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         setGps();//위치 권한 요청.
 
         TMapPolyLine polyline = new TMapPolyLine();
-            double lat = location.getLatitude();
-            double lon = location.getLongitude();
-            TMapPoint polypoint = new TMapPoint(lat, lon);
-            polyline.addLinePoint(polypoint);
+        double lat = location.getLatitude();
+        double lon = location.getLongitude();
+        TMapPoint polypoint = new TMapPoint(lat, lon);
+        polyline.addLinePoint(polypoint);
 
 
         initDatabase();
 
-        thread = new ballonEvent();
-        thread.start();
+        ballonEventThread = new ballonEvent();
+        ballonEventThread.start();
 
-        if (arrTMapPointPark.isEmpty()) {// 공원 정보 가져오기
-            mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
-            mReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+        dbLoad = new dbLoad();
+        dbLoad.start();
 
-                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                        String db_name = messageData.child("p_name").getValue().toString();
-                        String db_lat = messageData.child("p_lat").getValue().toString();
-                        String db_lon = messageData.child("p_lon").getValue().toString();
-                        String db_addr = messageData.child("p_addr").getValue().toString();
-                        String msg2 = messageData.getValue().toString();
-                        arrParkName.add(db_name);
-                        arrParkLat.add(Double.valueOf(db_lat));
-                        arrParkLon.add(Double.valueOf(db_lon));
-                        arrParkAddr.add(db_addr);
-
-                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                        arrTMapPointPark.add(tMapPoint);
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-
+        removeMarker = new removeMarker();
         button3 = v.findViewById(R.id.button3);// 공원 위치 표시
-        button3.setOnClickListener(new View.OnClickListener() {
+        button3.setOnClickListener(new OnSingleClickListener() {
             @Override
-            public void onClick(View v) {
-                tmap.removeAllTMapPolyLine();
+            public void onSingleClick(View v) {
 
-                for(int c = 0; c < arrHospitalName.size(); c++) {
-                    tmap.removeMarkerItem2(arrHospitalName.get(c));
-                }
-                for(int c = 0; c < arrShopName.size(); c++) {
-                    tmap.removeMarkerItem2(arrShopName.get(c));
-                }
-                for(int c = 0; c < arrParkName.size(); c++) {
-                    tmap.removeMarkerItem2(arrParkName.get(c));
-                }
+                if(removeMarker.isAlive()){
 
-                makeMarkerPark(arrTMapPointPark,arrParkName,arrParkAddr);
+                    removeMarker.interrupt();
+
+                }
+               removeMarker = new removeMarker();
+               removeMarker.start();
+                makeMarkerPark(arrTMapPointPark, arrParkName, arrParkAddr);
             }
 
-        });
-        if (arrTMapPointHospital.isEmpty()) {// 병원 정보 가져오기
-            mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
-            mReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                        String db_name = messageData.child("h_name").getValue().toString();
-                        String db_lat = messageData.child("h_lat").getValue().toString();
-                        String db_lon = messageData.child("h_lon").getValue().toString();
-                        String db_addr = messageData.child("h_addr").getValue().toString();
-                        arrHospitalName.add(db_name);
-                        arrHospitalLat.add(Double.valueOf(db_lat));
-                        arrHospitalLon.add(Double.valueOf(db_lon));
-                        arrHospitalAddr.add(db_addr);
-
-                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                        arrTMapPointHospital.add(tMapPoint);
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
-        if(arrAlladdr.isEmpty()) {
-            arrAlladdr.addAll(arrHospitalAddr);
-            arrAlladdr.addAll(arrParkAddr);
-            arrAlladdr.addAll(arrShopAddr);
-        }
-
-        listView = (ListView) v.findViewById(R.id.listView);
-        adapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, new ArrayList<String>());
-        listView.setAdapter(adapter);
-
-
-        //주소로도 검색하고 이름으로도 검색할테니 둘다 필요하겠네 리스트가
-        // 필요한게 디비에서 주소 목록들 싹 불러와야 겠지 첨에 흠
-        // 띄어쓰기도 못할수도 있으니까 trim과 replace(" ")을 해주고 어레이 리스트에서 검색
-        // 디비에서 받아올 떄도 trim이랑 replace함
-        // 검색한 주소나 공원 이름을 받아 위치를 찾아줘야 겠지
-        //그럼 주소를 키값으로 경, 위도를 받아오고
-        // 공원을 키값으로 경, 위도로 받아온담에 마커를 찍어주면 된다
-        editText1 = v.findViewById(R.id.search_edit);
-        String searchAddr = editText1.toString().trim().replace(" ", "");
-        editText1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //입력할 때마다 불러짐
-                String text = editText1.getText().toString();
-                search(text);
-            }
         });
 
 
         button4 = v.findViewById(R.id.button4);// 병원 위치 표시
-        button4.setOnClickListener(new View.OnClickListener() {
+        button4.setOnClickListener(new OnSingleClickListener() {
 
             @Override
-            public void onClick(View v) {
-                tmap.removeAllTMapPolyLine();
-                tmap.removeAllTMapCircle();
-                for(int c = 0; c < arrHospitalName.size(); c++) {
-                    tmap.removeMarkerItem2(arrHospitalName.get(c));
+            public void onSingleClick(View v) {
+                if(removeMarker.isAlive()){
+
+                    removeMarker.interrupt();
+
                 }
-                for(int c = 0; c < arrShopName.size(); c++) {
-                    tmap.removeMarkerItem2(arrShopName.get(c));
-                }
-                for(int c = 0; c < arrParkName.size(); c++) {
-                    tmap.removeMarkerItem2(arrParkName.get(c));
-                }
-              makeMarkerHospital(arrTMapPointHospital,arrHospitalName,arrHospitalAddr);
+                removeMarker = new removeMarker();
+                removeMarker.start();
+                makeMarkerHospital(arrTMapPointHospital, arrHospitalName, arrHospitalAddr);
 
             }
 
 
         });
-        if (arrTMapPointShop.isEmpty()) {// 관련상점 정보 가져오기
-            mReference = mDatabase.getReference("shop"); // 변경값을 확인할 child 이름
-            mReference.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Log.d("관련상점 몇번 호출되는지 ", "shopinp");
-                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                        String db_name = messageData.child("s_name").getValue().toString();
-                        String db_lat = messageData.child("s_lat").getValue().toString();
-                        String db_lon = messageData.child("s_lon").getValue().toString();
-                        String db_addr = messageData.child("s_addr").getValue().toString();
-                        arrShopName.add(db_name);
-                        arrShopLat.add(Double.valueOf(db_lat));
-                        arrShopLon.add(Double.valueOf(db_lon));
-                        arrShopAddr.add(db_addr);
 
-
-                        TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                        arrTMapPointShop.add(tMapPoint);
-
-
-                    }
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-        }
         button5 = v.findViewById(R.id.button5);// 관련 상점 위치 표시
-        button5.setOnClickListener(new View.OnClickListener() {
+        button5.setOnClickListener(new OnSingleClickListener() {
 
             @Override
-            public void onClick(View v) {
-                tmap.removeAllTMapPolyLine();
-                for(int c = 0; c < arrHospitalName.size(); c++) {
-                    tmap.removeMarkerItem2(arrHospitalName.get(c));
+            public void onSingleClick(View v) {
+                if(removeMarker.isAlive()){
+
+                    removeMarker.interrupt();
+
                 }
-                for(int c = 0; c < arrShopName.size(); c++) {
-                    tmap.removeMarkerItem2(arrShopName.get(c));
-                }
-                for(int c = 0; c < arrParkName.size(); c++) {
-                    tmap.removeMarkerItem2(arrParkName.get(c));
-                }
-                makeMarkerShop(arrTMapPointShop,arrParkName,arrParkAddr);
+                removeMarker = new removeMarker();
+                removeMarker.start();
+                makeMarkerShop(arrTMapPointShop, arrParkName, arrParkAddr);
 
             }
 
 
         });
-        // 반경 설정 콤보 박스
+        arrAllname.addAll(arrParkName);
+        arrAllname.addAll(arrShopName);
+        arrAllname.addAll(arrHospitalName);
+        Log.d("총길이 : ", String.valueOf(arrParkName.size()));
+        listView = (ListView) v.findViewById(R.id.listView);
+        editText1 = v.findViewById(R.id.search_edit);
+        arrTempAllname.addAll(arrAllname);
+
+        adapter = new searchAdapter(arrAllname, getContext());
         Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
         ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
         sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -325,21 +215,16 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectDist = (String) spiner.getSelectedItem();
-                final ArrayList<TMapPoint> distTmapParkPoint = new ArrayList<>();
-                final ArrayList<String> distTmapParkName = new ArrayList<>();
-                final ArrayList<String> distTmapParkAddr = new ArrayList<>();
 
-                final ArrayList<TMapPoint> distTmapHospitalPoint = new ArrayList<>();
-                final ArrayList<String> distTmapHospitalName = new ArrayList<>();
-                final ArrayList<String> distTmapHospitalAddr = new ArrayList<>();
-
-                final ArrayList<TMapPoint> distTmapShopPoint = new ArrayList<>();
-                final ArrayList<String> distTmapShopName = new ArrayList<>();
-                final ArrayList<String> distTmapShopAddr = new ArrayList<>();
 
                 if (selectDist.equals("거리 선택")) {
-                    tmap.removeAllTMapPolyLine();
-                    tmap.removeAllMarkerItem();
+                    if(removeMarker.isAlive()){
+
+                        removeMarker.interrupt();
+
+                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
                     // 배열 초기화
                     distTmapParkPoint.clear();
                     distTmapParkName.clear();
@@ -355,19 +240,16 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     tmap.removeAllMarkerItem();
                     tmap.removeAllTMapCircle();
                 } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
-                    tmap.removeAllTMapPolyLine();
-                    for(int c = 0; c < arrHospitalName.size(); c++) {
-                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    if(removeMarker.isAlive()){
+
+                        removeMarker.interrupt();
+
                     }
-                    for(int c = 0; c < arrShopName.size(); c++) {
-                        tmap.removeMarkerItem2(arrShopName.get(c));
-                    }
-                    for(int c = 0; c < arrParkName.size(); c++) {
-                        tmap.removeMarkerItem2(arrParkName.get(c));
-                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
                     distTmapParkPoint.clear();
                     tmap.removeAllMarkerItem();
-                    location location = new location(getActivity());
+                    location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
                     point = new TMapPoint(lat, lon);
@@ -434,21 +316,19 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                             distTmapShopAddr.add(dtaddr);
                         }
                     }
-                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
-                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
-                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
                 } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
-                    tmap.removeAllTMapPolyLine();
-                    for(int c = 0; c < arrHospitalName.size(); c++) {
-                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+
+                    if(removeMarker.isAlive()){
+
+                        removeMarker.interrupt();
+
                     }
-                    for(int c = 0; c < arrShopName.size(); c++) {
-                        tmap.removeMarkerItem2(arrShopName.get(c));
-                    }
-                    for(int c = 0; c < arrParkName.size(); c++) {
-                        tmap.removeMarkerItem2(arrParkName.get(c));
-                    }
-                    location location = new location(getActivity());
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
+                    location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
                     point = new TMapPoint(lat, lon);
@@ -474,8 +354,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         double distance = CurrentLocation.distanceTo(parkLocation);
 
                         if (distance <= 1000) {
-                            Log.d("2KM 반경 거리", String.valueOf(distance));
-                            Log.d("2km 반경 포인트", String.valueOf(parkLocation.getLatitude()) + "," + parkLocation.getLongitude());
                             TMapPoint dtpoint = new TMapPoint(parkLocation.getLatitude(), parkLocation.getLongitude());
                             String dtname = arrParkName.get(i);
                             String dtaddr = arrParkAddr.get(i);
@@ -517,24 +395,22 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
                         }
                     }
-                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
-                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
-                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
                 } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
-                    tmap.removeAllTMapPolyLine();
-                    for(int c = 0; c < arrHospitalName.size(); c++) {
-                        tmap.removeMarkerItem2(arrHospitalName.get(c));
+                    if(removeMarker.isAlive()){
+
+                        removeMarker.interrupt();
+
                     }
-                    for(int c = 0; c < arrShopName.size(); c++) {
-                        tmap.removeMarkerItem2(arrShopName.get(c));
-                    }
-                    for(int c = 0; c < arrParkName.size(); c++) {
-                        tmap.removeMarkerItem2(arrParkName.get(c));
-                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
+
                     distTmapParkPoint.clear();
                     distTmapHospitalPoint.clear();
                     distTmapShopPoint.clear();
-                    location location = new location(getActivity());
+                    location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
                     point = new TMapPoint(lat, lon);
@@ -605,9 +481,9 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                         }
                     }
                     // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
-                    makeMarkerShop(distTmapShopPoint,distTmapShopName,distTmapShopAddr);
-                    makeMarkerHospital(distTmapHospitalPoint,distTmapHospitalName,distTmapHospitalAddr);
-                    makeMarkerPark(distTmapParkPoint,distTmapParkName,distTmapParkAddr);
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
 
                 }
 
@@ -619,46 +495,193 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             }
 
         });
+        // 리스트뷰에 아답터를 연결한다.
+        listView.setAdapter(adapter);
+
+        editText1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String text = editText1.getText().toString();
+                search(text);
+            }
+        });
+
+        //주소로도 검색하고 이름으로도 검색할테니 둘다 필요하겠네 리스트가
+        // 필요한게 디비에서 주소 목록들 싹 불러와야 겠지 첨에 흠
+        // 띄어쓰기도 못할수도 있으니까 trim과 replace(" ")을 해주고 어레이 리스트에서 검색
+        // 디비에서 받아올 떄도 trim이랑 replace함
+        // 검색한 주소나 공원 이름을 받아 위치를 찾아줘야 겠지
+        //그럼 주소를 키값으로 경, 위도를 받아오고
+        // 공원을 키값으로 경, 위도로 받아온담에 마커를 찍어주면 된다
 
 
         return v;
     }
 
+    private class dbLoad extends Thread {
+        public dbLoad() {
 
-        private class ballonEvent extends Thread {
-            private static final String TAG = "ballonEvent";
+        }
 
-            public ballonEvent() {
-                // 초기화 작업
-            }
+        @Override
+        public void run() {
+            if (arrTMapPointPark.isEmpty()) {// 공원 정보 가져오기
+                mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 
-            public void run() {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("p_name").getValue().toString();
+                            String db_lat = messageData.child("p_lat").getValue().toString();
+                            String db_lon = messageData.child("p_lon").getValue().toString();
+                            String db_addr = messageData.child("p_addr").getValue().toString();
 
-                TMapData tmapdata = new TMapData();
-                tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
-                    //마커 정보를 여기서 가져와서
+                            arrParkName.add(db_name);
+                            arrParkLat.add(Double.valueOf(db_lat));
+                            arrParkLon.add(Double.valueOf(db_lon));
+                            arrParkAddr.add(db_addr);
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointPark.add(tMapPoint);
+                        }
+
+                    }
 
                     @Override
-                    public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
-                        tmap.removeAllTMapPolyLine();
-                        Log.d("아이템 확인 : " , s);
-                        location location = new location(getActivity());
-                        double lat = location.getLatitude();
-                        double lon = location.getLongitude();
-                        TMapPoint st_point = new TMapPoint(lat, lon);
-                        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
-                            @Override
-                            public void onFindPathData(TMapPolyLine polyLine) {
-                                polyLine.setID("movement");
-                                tmap.addTMapPath(polyLine);
-                            }
-                        });
+                    public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
             }
+            if (arrTMapPointHospital.isEmpty()) {// 병원 정보 가져오기
+                mReference = mDatabase.getReference("hospital"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("h_name").getValue().toString();
+                            String db_lat = messageData.child("h_lat").getValue().toString();
+                            String db_lon = messageData.child("h_lon").getValue().toString();
+                            String db_addr = messageData.child("h_addr").getValue().toString();
+
+                            arrHospitalName.add(db_name);
+                            arrHospitalLat.add(Double.valueOf(db_lat));
+                            arrHospitalLon.add(Double.valueOf(db_lon));
+                            arrHospitalAddr.add(db_addr);
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointHospital.add(tMapPoint);
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+            if (arrTMapPointShop.isEmpty()) {// 관련상점 정보 가져오기
+                mReference = mDatabase.getReference("shop"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_name = messageData.child("s_name").getValue().toString();
+                            String db_lat = messageData.child("s_lat").getValue().toString();
+                            String db_lon = messageData.child("s_lon").getValue().toString();
+                            String db_addr = messageData.child("s_addr").getValue().toString();
+
+                            arrShopName.add(db_name);
+                            arrShopLat.add(Double.valueOf(db_lat));
+                            arrShopLon.add(Double.valueOf(db_lon));
+                            arrShopAddr.add(db_addr);
+
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            arrTMapPointShop.add(tMapPoint);
+
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+        }
+    }
+
+    private class removeMarker extends Thread {
+        public removeMarker() {
+
         }
 
+        @Override
+        public void run() {
+
+            tmap.removeAllTMapPolyLine();
+            tmap.removeAllTMapCircle();
+            for (int c = 0; c < arrHospitalName.size(); c++) {
+                tmap.removeMarkerItem2(arrHospitalName.get(c));
+            }
+            for (int c = 0; c < arrShopName.size(); c++) {
+                tmap.removeMarkerItem2(arrShopName.get(c));
+            }
+            for (int c = 0; c < arrParkName.size(); c++) {
+                tmap.removeMarkerItem2(arrParkName.get(c));
+            }
+        }
+    }
+
+    private class ballonEvent extends Thread {
+        private static final String TAG = "ballonEvent";
+
+        public ballonEvent() {
+            // 초기화 작업
+        }
+
+        public void run() {
+
+            TMapData tmapdata = new TMapData();
+            tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
+                //마커 정보를 여기서 가져와서
+
+                @Override
+                public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
+                    tmap.removeAllTMapPolyLine();
+                    Log.d("아이템 확인 : ", s);
+                    location location = new location(getActivity());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    TMapPoint st_point = new TMapPoint(lat, lon);
+                    tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
+                        @Override
+                        public void onFindPathData(TMapPolyLine polyLine) {
+                            polyLine.setID("movement");
+                            tmap.addTMapPath(polyLine);
+                        }
+                    });
+
+                }
+            });
+        }
+    }
 
 
     @Override
@@ -747,7 +770,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
         tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
-                        MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
 
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_shop);
             int height = bitmap.getHeight();
@@ -787,7 +810,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     private void setBalloonView(TMapMarkerItem2 marker, String title, String address, TMapPoint point) {
 
 
-        marker.setPosition(0.2f,0.2f);
+        marker.setPosition(0.2f, 0.2f);
         marker.getTMapPoint();
         marker.setID(title);
         marker.setIcon(BitmapFactory.decodeResource(getResources(), R.drawable.balloon_overlay_focused));
@@ -796,26 +819,27 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.addMarkerItem2(title, marker);
         tmap.showCallOutViewWithMarkerItemID(title);
     }
+
     public void search(String charText) {
 
         // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
-        adapter.clear();
+        arrAllname.clear();
+
         // 문자 입력이 없을때는 모든 데이터를 보여준다.
         if (charText.length() == 0) {
-
+            arrAllname.addAll(arrTempAllname);
         }
         // 문자 입력을 할때..
-        else
-        {
+        else {
+            // 리스트의 모든 데이터를 검색한다.
+            for (int i = 0; i < arrTempAllname.size(); i++) {
 
-
-            // 필요한게 디비에서 주소 목록들 싹 불러와야 겠지 첨에 흠
-            // 띄어쓰기도 못할수도 있으니까 trim과 replace(" ")을 해주고 어레이 리스트에서 검색
-            // 디비에서 받아올 떄도 trim이랑 replace함
-
-            //만약 입력을 받았을 때 흠 시발 아닌데
-                //각 장소 별로 이름이랑 장소 같이 저장해서 값이 포함된 위치만 뿌려주기
-
+                // arraylist의 모든 데이터에 입력받은 단어(charText)가 포함되어 있으면 true를 반환한다.
+                if (arrTempAllname.get(i).toLowerCase().contains(charText)) {
+                    // 검색된 데이터를 리스트에 추가한다.
+                    arrAllname.add(arrTempAllname.get(i));
+                }
+            }
         }
         // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
         adapter.notifyDataSetChanged();
@@ -857,5 +881,25 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         mReference.addChildEventListener(mChild);
     }
 
+    public abstract class OnSingleClickListener implements View.OnClickListener {
+
+        //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
+        private static final long MIN_CLICK_INTERVAL = 600;
+        private long mLastClickTime = 0;
+
+        public abstract void onSingleClick(View v);
+
+        @Override
+        public final void onClick(View v) {
+            long currentClickTime = SystemClock.uptimeMillis();
+            long elapsedTime = currentClickTime - mLastClickTime;
+            mLastClickTime = currentClickTime;
+
+            // 중복클릭 아닌 경우
+            if (elapsedTime > MIN_CLICK_INTERVAL) {
+                onSingleClick(v);
+            }
+        }
+    }
 
 }
