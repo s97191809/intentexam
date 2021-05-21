@@ -3,6 +3,7 @@ package com.example.intentexam;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -35,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.database.ChildEventListener;
@@ -50,14 +52,18 @@ import com.skt.Tmap.TMapMarkerItem2;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
+
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.widget.Toast;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
-public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback {
+public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback, SensorEventListener {
     Button button3;
     Button button4;
     Button button5;
@@ -102,17 +108,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     ballonEvent ballonEventThread;
     dbLoad dbLoad;
     removeMarker removeMarker;
+
     TextView tv_sensor;
     SensorManager sm;
     Sensor sensor_step_detector;
+    int steps = 0;
 
     private searchAdapter adapter;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
     }
 
@@ -122,11 +128,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
         setGps();//위치 권한 요청.
+
+        if (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {//센서 권한 요청
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 0);
+        }
+
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
 
         LinearLayout linearLayoutTmap = (LinearLayout) v.findViewById(R.id.tmap);
-
 
         tmap = new TMapView(getActivity());
 
@@ -137,7 +149,6 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
         location location = new location(getActivity());
-
 
 
         TMapPolyLine polyline = new TMapPolyLine();
@@ -155,7 +166,12 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         dbLoad = new dbLoad();
         dbLoad.start();
 
-
+        tv_sensor = (TextView) v.findViewById(R.id.sensor);
+        sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        if (sensor_step_detector == null) {
+            Toast.makeText(getContext(), "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
+        }
 
         removeMarker = new removeMarker();
         button3 = v.findViewById(R.id.button3);// 공원 위치 표시
@@ -163,13 +179,13 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             @Override
             public void onSingleClick(View v) {
 
-                if(removeMarker.isAlive()){
+                if (removeMarker.isAlive()) {
 
                     removeMarker.interrupt();
 
                 }
-               removeMarker = new removeMarker();
-               removeMarker.start();
+                removeMarker = new removeMarker();
+                removeMarker.start();
                 makeMarkerPark(arrTMapPointPark, arrParkName, arrParkAddr);
             }
 
@@ -181,7 +197,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
             @Override
             public void onSingleClick(View v) {
-                if(removeMarker.isAlive()){
+                if (removeMarker.isAlive()) {
 
                     removeMarker.interrupt();
 
@@ -200,7 +216,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
             @Override
             public void onSingleClick(View v) {
-                if(removeMarker.isAlive()){
+                if (removeMarker.isAlive()) {
 
                     removeMarker.interrupt();
 
@@ -233,7 +249,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
 
                 if (selectDist.equals("거리 선택")) {
-                    if(removeMarker.isAlive()){
+                    if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
 
@@ -255,7 +271,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     tmap.removeAllMarkerItem();
                     tmap.removeAllTMapCircle();
                 } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
-                    if(removeMarker.isAlive()){
+                    if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
 
@@ -336,7 +352,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
                 } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
 
-                    if(removeMarker.isAlive()){
+                    if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
 
@@ -414,7 +430,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
                     makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
                 } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
-                    if(removeMarker.isAlive()){
+                    if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
 
@@ -511,25 +527,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         });
         // 리스트뷰에 아답터를 연결한다.
-        listView.setAdapter(adapter);
 
-        editText1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String text = editText1.getText().toString();
-                search(text);
-            }
-        });
 
         //주소로도 검색하고 이름으로도 검색할테니 둘다 필요하겠네 리스트가
         // 필요한게 디비에서 주소 목록들 싹 불러와야 겠지 첨에 흠
@@ -702,6 +700,35 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        sm.registerListener(this, sensor_step_detector, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sm.unregisterListener(this);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    // 센서값이 변할때
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
+        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+            tv_sensor.setText(String.valueOf(steps++));
+            Log.d("onSensorChanged: ", String.valueOf(steps));
+        }
+
     }
 
     private final LocationListener mLocationListener = new LocationListener() {

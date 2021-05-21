@@ -1,6 +1,8 @@
 package com.example.intentexam;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -31,6 +33,8 @@ public class loginActivity extends AppCompatActivity {
     private ChildEventListener mChild;
     EditText input_id;
     EditText input_pw;
+    String name;
+    String weight;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,11 +70,14 @@ public class loginActivity extends AppCompatActivity {
                         for (DataSnapshot messageData : dataSnapshot.getChildren()) {
                             String db_id = messageData.child("userId").getValue().toString().trim();
                             String db_pw = messageData.child("password").getValue().toString().trim();
+
                             Log.d("input_id: ", id + ", " +
                                     "input_pw: " + pw + ", " +
                                     "db_id: " + db_id + ", " +
                                     "db_pw: " + db_pw);
                             if (db_id.equals(id) && db_pw.equals(pw)) {
+                                name = messageData.child("userName").getValue().toString().trim();
+                                weight = messageData.child("weight").getValue().toString().trim();
                                 f_id = id;
                                 f_pw = pw;
                                 break;
@@ -78,6 +85,7 @@ public class loginActivity extends AppCompatActivity {
                         }
                         if (f_id.equals(id) && f_pw.equals(pw)) {
                             if (f_id != "" && f_pw != "") {
+
                                 startLoading();
                                 loading();
                             }
@@ -162,6 +170,14 @@ public class loginActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                //값 저장해주는 부분
+                SharedPreferences auto = getSharedPreferences("info", Activity.MODE_PRIVATE);
+                SharedPreferences.Editor autoLogin = auto.edit();
+                autoLogin.putString("inputId", input_id.getText().toString());
+                autoLogin.putString("inputPwd", input_pw.getText().toString());
+                autoLogin.putString("name", name);
+                autoLogin.putString("weight", weight);
+                autoLogin.commit();
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
