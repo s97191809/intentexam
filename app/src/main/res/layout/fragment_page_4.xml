@@ -5,36 +5,81 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:background="#EAEFF8">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="내 정보"
-        android:textSize="60dp" />
-
+        android:gravity="center_horizontal"
+        android:text="내정보"
+        android:textColor="#707070"
+        android:textSize="30sp"
+        android:layout_marginTop="100dp"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/background_round_blue"
+        android:orientation="vertical"
+        android:padding="15dp"
+        >
     <TextView
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp" />
+        android:textSize="15dp"
+        android:text="아이디"
+        android:textColor="#707070"/>
 
     <TextView
         android:id="@+id/pw"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp" />
+        android:textSize="15dp"
+        android:textColor="#707070"
+        android:text="비밀번호"
+
+        />
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp" />
+        android:textSize="15dp"
+        android:textColor="#707070"
+        android:text="이름"
+
+        />
 
     <TextView
         android:id="@+id/weight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="40dp" />
+        android:textSize="15dp"
+        android:textColor="#707070"
+        android:text="몸무게"
 
+        />
+
+    </LinearLayout>
+
+        <Button
+            android:id="@+id/logout"
+            android:layout_width="102dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_round_blue"
+            android:text="로그아웃"
+            android:textColor="#707070"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:layout_marginRight="108dp"
+            android:layout_marginStart="290dp"
+            android:layout_marginLeft="290dp" />
+
+    </LinearLayout>
 </LinearLayout>
