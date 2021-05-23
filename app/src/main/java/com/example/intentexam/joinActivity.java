@@ -98,14 +98,14 @@ public class joinActivity extends AppCompatActivity {
                 String pw = join_pw.getText().toString().trim();
                 String name = join_name.getText().toString().trim();
                 String weight = join_weight.getText().toString().trim();
-
+                int coin = 0;
 
                 if(arrId.contains(id)) {
                             Toast.makeText(joinActivity.this, "아이디를 확인해 주세요!.", Toast.LENGTH_SHORT).show();
                         }
                         else{
                             Toast.makeText(joinActivity.this, "회원 가입 성공", Toast.LENGTH_SHORT).show();
-                            writeNewUser(id, name, pw, weight);
+                            writeNewUser(id, name, pw, weight, String.valueOf(coin));
                             finish();
                         }
 
@@ -119,8 +119,8 @@ public class joinActivity extends AppCompatActivity {
         });
     }
 
-    private void writeNewUser(String userId, String name, String password, String weight) {
-        User user = new User(userId, name, password, weight);
+    private void writeNewUser(String userId, String name, String password, String weight, String coin) {
+        User user = new User(userId, name, password, weight, coin);
         // 중복 체크를 했을 때 트루면 가입 안되게 하고 펄스면 되게
         mReference.child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -156,7 +156,7 @@ public class joinActivity extends AppCompatActivity {
             // Default constructor required for calls to DataSnapshot.getValue(User.class)
         }
 
-        public User(String userId, String userName, String password, String weight) {
+        public User(String userId, String userName, String password, String weight, String coin) {
             this.userId = userId;
             this.userName = userName;
             this.password = password;
@@ -212,8 +212,8 @@ public class joinActivity extends AppCompatActivity {
         }
     }
 
-    private void readUser(String userId, String name, String password, String weight) {
-        User user = new User(userId, name, password, weight);
+    private void readUser(String userId, String name, String password, String weight, String coin) {
+        User user = new User(userId, name, password, weight, coin);
         mReference.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

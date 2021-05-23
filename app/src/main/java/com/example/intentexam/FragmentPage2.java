@@ -3,6 +3,8 @@ package com.example.intentexam;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +18,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,15 +54,25 @@ import com.skt.Tmap.TMapView;
 
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 
 public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocationChangedCallback, SensorEventListener {
     Button button3;
     Button button4;
     Button button5;
-    Button button6;
+    Button trailButton;
     EditText editText1;
+    TextView tv_sensor;
+    TextView dista;
+    TextView coinView;
+    TextView kcalView;
 
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
@@ -94,40 +107,47 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     final ArrayList<String> distTmapShopName = new ArrayList<>();
     final ArrayList<String> distTmapShopAddr = new ArrayList<>();
 
-    final ArrayList<TMapPoint> totaldistance = new ArrayList<>();
+    final ArrayList<String> trailInfo = new ArrayList<>();
+
+
 
     private TMapGpsManager tmapgps = null;
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
-    TMapView tmap;
-    ballonEvent ballonEventThread;
-    dbLoad dbLoad;
-    removeMarker removeMarker;
+    private TMapView tmap;
+    private ballonEvent ballonEventThread;
+    private dbLoad dbLoad;
+    private removeMarker removeMarker;
 
-    TextView tv_sensor;
-    TextView dista;
-    TextView coinView;
     int coin = 0;
-
+    double totalDistance =0;
+    double accDistance =0;
+    int steps = 0;
+    int totalSteps = 0;
+    int min;
+    long time1;
 
     SensorManager sm;
     Sensor sensor_step_detector;
-    movement movement;
-    int steps = 0;
+    SharedPreferences sf;
 
-    double distance=0;
+    calTime calTime;
 
-    int weight;
+
+
 
     private Location lastKnownLocation;
     private location endpoint;
 
     private searchAdapter adapter;
+    private int accMin;
+    private int sec;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setGps();//위치 권한 요청.
+        time1 = System.currentTimeMillis();
     }
 
     @Nullable
@@ -149,6 +169,9 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         LinearLayout linearLayoutTmap = (LinearLayout) v.findViewById(R.id.tmap);
 
+
+
+
         tmap = new TMapView(getActivity());
 
         tmap.setSKTMapApiKey(TMAP_API_KEY);
@@ -166,28 +189,28 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         TMapPoint polypoint = new TMapPoint(lat, lon);
         polyline.addLinePoint(polypoint);
 
-        Log.d("이동거리 : ", String.valueOf(distance));
-        //시작 위치를 첨에 출발과 도착으로 해서 리스트에 넣고 마지막 리스트 값만 바꿔서 계산하는 방식으로
         initDatabase();
         //칼로리계산
-        long time1 = System.currentTimeMillis() / 1000;
-        int min = (int) (time1 / 60 % 60);
-        // air= 3.5*몸무게*분 kcal=air*5/1000
-        double air = 3.5 * weight * min;
-        double kcal = air * 5 / 1000;
+
+
         dista = v.findViewById(R.id.distance);
-        dista.setText("이동거리 : " + distance);
-        
+        kcalView = v.findViewById(R.id.kcal);
+        Log.d("이동거리" , String.valueOf(totalDistance));
+
+        // 걸음 당 70cm
+        //코인은 2키로
         //코인 증가량 보기
-        if (distance >= 2000 && distance % 2000 == 0){
-            coin++;
-            Log.d("코인 수 ", String.valueOf(coin));
-        }
+
+
+
+        // 값 넘겨 받아오는 부분
+
+
         coinView = v.findViewById(R.id.coin);
         coinView.setText("코인 수 : " + coin);
 
-        movement = new movement();
-        movement.start();
+        calTime = new calTime();
+        calTime.start();
 
         ballonEventThread = new ballonEvent();
         ballonEventThread.start();
@@ -220,7 +243,25 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         });
 
+        trailButton = v.findViewById(R.id.trailButton);
+        trailButton.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                Intent intent = new Intent(getContext(), trailActivity.class);
+                startActivity(intent);
+            }
+        });
+        SharedPreferences prefs = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
 
+        int size = prefs.getInt("Status_size", 0);
+        for(int i=0;i<size;i++)
+        {
+            trailInfo.add(prefs.getString("Status_" + i, null));
+        }
+        for(String e : trailInfo) {
+            Log.d("받은 좌표 값 : ", e);
+        }
+        // 받은 값을 좌표를 이용해서 경로를 그려준다.
         button4 = v.findViewById(R.id.button4);// 병원 위치 표시
         button4.setOnClickListener(new OnSingleClickListener() {
 
@@ -670,6 +711,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         }
     }
 
+    private class calTime extends Thread{
+        public calTime(){
+
+        }
+
+        @Override
+        public void run() {
+            min = (int) (time1 / 60 % 60);
+            Log.d("시간 : ", String.valueOf(min));
+        }
+    }
     private class removeMarker extends Thread {
         public removeMarker() {
 
@@ -725,33 +777,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             });
         }
     }
-private class movement extends Thread{
-        public movement(){
 
-        }
-
-            public void run() {
-
-                Location location = new Location("");
-
-                //
-                double lat = location.getLatitude();
-                double lon = location.getLongitude();
-
-                Location location2 = new Location("");//현재위치
-                if (steps == 0){
-                    location2.setLatitude(lat);
-                    location2.setLongitude(lon);
-                }
-                Location location3 = new Location("");//현재위치
-                location3.setLatitude(lat);
-                location3.setLongitude(lon);
-                double totaldistance = location2.distanceTo(location3);
-
-
-            }
-
-}
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -778,11 +804,42 @@ private class movement extends Thread{
     // 센서값이 변할때
     @Override
     public void onSensorChanged(SensorEvent event) {
+        sf = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
+        String weight = sf.getString("weight", "");
+
+        long end = System.currentTimeMillis();
+        min = (int)(( end - time1 )/ 1000) / 60 % 60;
+        sec = (int)((end- time1) / 1000)%60;
+        // air= 3.5*몸무게*분 kcal=air*5/1000
+        //min = (time1 / 60 % 60);
+
+        Log.d("시간 : ", String.valueOf(min) + "분");
+        Log.d("시간 : ", String.valueOf(sec) + "초");
+
+        double air = 3.5 * Integer.parseInt(weight) * min;
+        double kcal = air * 5 / 1000;
+        kcalView.setText("kcal : " + (int) kcal);
 
         // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            tv_sensor.setText(String.valueOf(steps++));
-            Log.d("onSensorChanged: ", String.valueOf(steps));
+            tv_sensor.setText(String.valueOf(totalSteps++));
+            steps++;
+
+            Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
+            totalDistance = steps * 0.7; //m
+            Log.d("현재 걸음 수 ", String.valueOf(steps));
+
+            if (totalDistance >= 2000){
+                coin++;
+                accDistance = totalDistance;
+                totalDistance = totalDistance - 2000;
+                steps = 0;
+                dista.setText("이동거리 : " + (int)accDistance + " M");
+                Log.d("코인 수 ", String.valueOf(coin));
+
+            } else {
+                dista.setText("이동거리 : " + (int)totalDistance + " M");
+            }
         }
 
     }
@@ -798,17 +855,7 @@ private class movement extends Thread{
                 tmap.setLocationPoint(longitude, latitude);
                 tmap.setCenterPoint(longitude, latitude);
             }
-            LocationManager lm = (LocationManager)getContext().getSystemService(Context.LOCATION_SERVICE);
-            // Get the last location.
-            if(lastKnownLocation==null) {
-                lastKnownLocation = location;
-            }
-            else {
-                distance=lastKnownLocation.distanceTo(location);
-                Log.d("총이동거리 : ", String.valueOf(distance*1000)+"km");
-                Log.i("Distance","Distance:"+distance);
-                lastKnownLocation=location;
-            }
+
 
         }
 
@@ -920,8 +967,6 @@ private class movement extends Thread{
     }
 
     private void setBalloonView(TMapMarkerItem2 marker, String title, String address, TMapPoint point) {
-
-
         marker.setPosition(0.2f, 0.2f);
         marker.getTMapPoint();
         marker.setID(title);
