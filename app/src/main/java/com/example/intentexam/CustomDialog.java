@@ -84,12 +84,13 @@ public class CustomDialog extends AppCompatActivity {
 
                 String title = a_title.getText().toString();
                 String content = a_content.getText().toString();
+
                 String id = getloginInfo.getString("inputId", "");
 
-                String curYear = getDateInfo.getString("year", "");;
-                String curMonth = getDateInfo.getString("month", "");;
-                String day = getDateInfo.getString("day", "");;//---선택된 날짜 가져와야함함
-                // 커스텀 다이얼로그에서 입력한 메시지를 대입한다.
+                String curYear = getDateInfo.getString("year", "");
+                String curMonth = getDateInfo.getString("month", "");
+                String day = getDateInfo.getString("day", "");
+
 
                 //------------------일정추가:제목,내용/캘린더에서 년,월,일/로그인 정보에서 아이디 db에 추가, 제목은 달력에 보여주기
                 Toast.makeText(context, "일정 작성 성공", Toast.LENGTH_SHORT).show();

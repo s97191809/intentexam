@@ -120,7 +120,6 @@ public class CalendarMonthView extends GridView {
             if (selectionListener != null) {
                 selectionListener.onDataSelected(parent, v, position, id);
 
-                Log.v("시발련들아내가보자고", String.valueOf(id));
 
             }
 
