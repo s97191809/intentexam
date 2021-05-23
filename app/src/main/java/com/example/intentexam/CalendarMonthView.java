@@ -3,6 +3,7 @@ package com.example.intentexam;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -118,6 +119,9 @@ public class CalendarMonthView extends GridView {
 
             if (selectionListener != null) {
                 selectionListener.onDataSelected(parent, v, position, id);
+
+                Log.v("tag","here");
+
             }
 
 

@@ -2,10 +2,12 @@ package com.example.intentexam;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -30,13 +32,18 @@ import java.util.Calendar;
  */
 
 public class CustomDialog extends AppCompatActivity {
+
+    private OnDataSelectionListener selectionListener;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
-
-
+    EditText a_title;
+    EditText a_content;
+    SharedPreferences sf;
    // EditText join_name = (EditText) findViewById(R.id.join_name);
     //EditText join_weight = (EditText) findViewById(R.id.join_weight);
-   CalendarMonthAdapter monthViewAdapter;
+    private CalendarMonthView MonthView;
+    private CalendarMonthAdapter MonthAdapter;
+    private MonthItem m;
     private Context context;
 
     public CustomDialog(Context context) {
@@ -63,28 +70,37 @@ public class CustomDialog extends AppCompatActivity {
 
 
         // 커스텀 다이얼로그의 각 위젯들을 정의한다.
-        final EditText a_title = (EditText) dlg.findViewById(R.id.a_title);
-        final EditText a_content = (EditText) dlg.findViewById(R.id.a_content);
+          a_title = (EditText) dlg.findViewById(R.id.a_title);
+          a_content = (EditText) dlg.findViewById(R.id.a_content);
         final Button okButton = (Button) dlg.findViewById(R.id.okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.cancelButton);
 
         okButton.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View view) {
-                //db-----------
                 Calendar mCalendar = Calendar.getInstance();
-                mDatabase = FirebaseDatabase.getInstance();
-                mReference = mDatabase.getReference("calender");
 
-                // '확인' 버튼 클릭시 메인 액티비티에서 설정한 main_label에
-                // 커스텀 다이얼로그에서 입력한 메시지를 대입한다.
+                //db-----------
+
+                mReference = mDatabase.getReference("calender");
+                sf = getSharedPreferences("info", MODE_PRIVATE);
+
+                String title = a_title.getText().toString();
+                String content = a_content.getText().toString();
+                String id = sf.getString("inputId", "");
+
+                String curYear =""+mCalendar.get(Calendar.YEAR);
+                String curMonth = ""+mCalendar.get(Calendar.MONTH);
+                String day = ""+mCalendar.get(Calendar.DAY_OF_MONTH);//---선택된 날짜 가져와야함함
+                        // 커스텀 다이얼로그에서 입력한 메시지를 대입한다.
 
                 //------------------일정추가:제목,내용/캘린더에서 년,월,일/로그인 정보에서 아이디 db에 추가, 제목은 달력에 보여주기
-
-
+                Toast.makeText(CustomDialog.this, "일정 작성 성공", Toast.LENGTH_SHORT).show();
+                writeMemo(title, content, id, curYear, curMonth, day);
+                finish();
 
                 //------------------일정추가
+
                 // 커스텀 다이얼로그를 종료한다.
                 // 종료 조건은 타이틀이나 내용이 빈칸이 아닌 경우에만 종료.
                 dlg.dismiss();
@@ -109,16 +125,9 @@ public class CustomDialog extends AppCompatActivity {
                     public void onSuccess(Void aVoid) {
                         // Write was successful!
                         Toast.makeText(CustomDialog.this, "일정을 작성했습니다.", Toast.LENGTH_SHORT).show();
-                        // 로그인 화면으로 이동
+
                         toString();
                         finish();//종료와 함께 넘어가짐
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Write failed
-                        Toast.makeText(CustomDialog.this, "일정을 작성을 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -205,4 +214,6 @@ public class CustomDialog extends AppCompatActivity {
     private void notEnoughInfo() {
         Toast.makeText(this, "내용을 입력해주세요.", Toast.LENGTH_SHORT).show();
     }
+
+
 }

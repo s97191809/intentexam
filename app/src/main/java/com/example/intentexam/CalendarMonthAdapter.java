@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -30,7 +31,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
     private int selectedPosition = -1;
 
-    private MonthItem[] items;
+    public MonthItem[] items;
 
     private int countColumn = 7;
 
@@ -181,7 +182,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
 
         // create a params--------------------------
         GridView.LayoutParams params = new GridView.LayoutParams(
-                GridView.LayoutParams.MATCH_PARENT, 242);//그리드뷰 크기
+                GridView.LayoutParams.MATCH_PARENT, 290);//그리드뷰 크기
 
         // calculate row and column
         int rowIndex = position / countColumn;
