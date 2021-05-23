@@ -3,7 +3,6 @@ package com.example.intentexam;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,8 +16,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +31,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -53,13 +49,8 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -69,6 +60,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     Button button5;
     Button button6;
     EditText editText1;
+
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     private ChildEventListener mChild;
@@ -101,6 +93,9 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     final ArrayList<TMapPoint> distTmapShopPoint = new ArrayList<>();
     final ArrayList<String> distTmapShopName = new ArrayList<>();
     final ArrayList<String> distTmapShopAddr = new ArrayList<>();
+
+    final ArrayList<TMapPoint> totaldistance = new ArrayList<>();
+
     private TMapGpsManager tmapgps = null;
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
@@ -110,16 +105,29 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     removeMarker removeMarker;
 
     TextView tv_sensor;
+    TextView dista;
+    TextView coinView;
+    int coin = 0;
+
+
     SensorManager sm;
     Sensor sensor_step_detector;
+    movement movement;
     int steps = 0;
+
+    double distance=0;
+
+    int weight;
+
+    private Location lastKnownLocation;
+    private location endpoint;
 
     private searchAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setGps();//위치 권한 요청.
     }
 
     @Nullable
@@ -127,13 +135,14 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
-        setGps();//위치 권한 요청.
+
 
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {//센서 권한 요청
             //ask for permission
             requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 0);
         }
+
 
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
@@ -149,7 +158,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
         location location = new location(getActivity());
-
+        //
 
         TMapPolyLine polyline = new TMapPolyLine();
         double lat = location.getLatitude();
@@ -157,8 +166,28 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         TMapPoint polypoint = new TMapPoint(lat, lon);
         polyline.addLinePoint(polypoint);
 
-
+        Log.d("이동거리 : ", String.valueOf(distance));
+        //시작 위치를 첨에 출발과 도착으로 해서 리스트에 넣고 마지막 리스트 값만 바꿔서 계산하는 방식으로
         initDatabase();
+        //칼로리계산
+        long time1 = System.currentTimeMillis() / 1000;
+        int min = (int) (time1 / 60 % 60);
+        // air= 3.5*몸무게*분 kcal=air*5/1000
+        double air = 3.5 * weight * min;
+        double kcal = air * 5 / 1000;
+        dista = v.findViewById(R.id.distance);
+        dista.setText("이동거리 : " + distance);
+        
+        //코인 증가량 보기
+        if (distance >= 2000 && distance % 2000 == 0){
+            coin++;
+            Log.d("코인 수 ", String.valueOf(coin));
+        }
+        coinView = v.findViewById(R.id.coin);
+        coinView.setText("코인 수 : " + coin);
+
+        movement = new movement();
+        movement.start();
 
         ballonEventThread = new ballonEvent();
         ballonEventThread.start();
@@ -548,6 +577,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
 
         @Override
         public void run() {
+
             if (arrTMapPointPark.isEmpty()) {// 공원 정보 가져오기
                 mReference = mDatabase.getReference("park"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
@@ -686,7 +716,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
                         @Override
                         public void onFindPathData(TMapPolyLine polyLine) {
-                            polyLine.setID("movement");
+                            polyLine.setID("pedLine");
                             tmap.addTMapPath(polyLine);
                         }
                     });
@@ -695,7 +725,33 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             });
         }
     }
+private class movement extends Thread{
+        public movement(){
 
+        }
+
+            public void run() {
+
+                Location location = new Location("");
+
+                //
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
+
+                Location location2 = new Location("");//현재위치
+                if (steps == 0){
+                    location2.setLatitude(lat);
+                    location2.setLongitude(lon);
+                }
+                Location location3 = new Location("");//현재위치
+                location3.setLatitude(lat);
+                location3.setLongitude(lon);
+                double totaldistance = location2.distanceTo(location3);
+
+
+            }
+
+}
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -732,6 +788,8 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
     }
 
     private final LocationListener mLocationListener = new LocationListener() {
+
+
         public void onLocationChanged(Location location) {
 
             if (location != null) {
@@ -739,6 +797,17 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
                 double longitude = location.getLongitude();
                 tmap.setLocationPoint(longitude, latitude);
                 tmap.setCenterPoint(longitude, latitude);
+            }
+            LocationManager lm = (LocationManager)getContext().getSystemService(Context.LOCATION_SERVICE);
+            // Get the last location.
+            if(lastKnownLocation==null) {
+                lastKnownLocation = location;
+            }
+            else {
+                distance=lastKnownLocation.distanceTo(location);
+                Log.d("총이동거리 : ", String.valueOf(distance*1000)+"km");
+                Log.i("Distance","Distance:"+distance);
+                lastKnownLocation=location;
             }
 
         }
@@ -750,6 +819,7 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
         }
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
+
         }
     };
 
@@ -769,8 +839,8 @@ public class FragmentPage2 extends Fragment implements TMapGpsManager.onLocation
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                10000000, // 통지사이의 최소 시간간격 (miliSecond)
-                5, // 통지사이의 최소 변경거리 (m)
+                5000, // 통지사이의 최소 시간간격 (miliSecond)
+                1, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
 

@@ -150,6 +150,7 @@ public class joinActivity extends AppCompatActivity {
         public String userName;
         public String password;
         public String weight;
+        public String coin;
 
         public User() {
             // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -160,6 +161,7 @@ public class joinActivity extends AppCompatActivity {
             this.userName = userName;
             this.password = password;
             this.weight = weight;
+            this.coin = coin;
         }
 
         public String getUserId() {
@@ -194,6 +196,10 @@ public class joinActivity extends AppCompatActivity {
             this.weight = weight;
         }
 
+        public void setCoin(String coin) {
+            this.coin = coin;
+        }
+
         @Override
         public String toString() {
             return "User{" +
@@ -201,6 +207,7 @@ public class joinActivity extends AppCompatActivity {
                     "name='" + userName + '\'' +
                     ", pw='" + password + '\'' +
                     ", kg='" + weight + '\'' +
+                    ", coin='" + coin + '\'' +
                     '}';
         }
     }
@@ -265,5 +272,6 @@ public class joinActivity extends AppCompatActivity {
     }
        
 }
+
 
 

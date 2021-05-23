@@ -3,27 +3,17 @@ package com.example.intentexam;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 
@@ -38,13 +28,15 @@ public class CustomDialog extends AppCompatActivity {
     private DatabaseReference mReference;
     EditText a_title;
     EditText a_content;
-    SharedPreferences sf;
-   // EditText join_name = (EditText) findViewById(R.id.join_name);
+    SharedPreferences getloginInfo;
+    SharedPreferences getDateInfo;
+    // EditText join_name = (EditText) findViewById(R.id.join_name);
     //EditText join_weight = (EditText) findViewById(R.id.join_weight);
     private CalendarMonthView MonthView;
     private CalendarMonthAdapter MonthAdapter;
     private MonthItem m;
     private Context context;
+    CalendarMonthAdapter monthViewAdapter;
 
     public CustomDialog(Context context) {
         this.context = context;
@@ -56,24 +48,29 @@ public class CustomDialog extends AppCompatActivity {
 
         // 커스텀 다이얼로그를 정의하기위해 Dialog클래스를 생성한다.
 
-            Dialog dlg = new Dialog(this.context);
+        Dialog dlg = new Dialog(this.context);
 
-            // 액티비티의 타이틀바를 숨긴다.
-           dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        // 액티비티의 타이틀바를 숨긴다.
+        dlg.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-            // 커스텀 다이얼로그의 레이아웃을 설정한다.
-            dlg.setContentView(R.layout.alert_layout);
+        // 커스텀 다이얼로그의 레이아웃을 설정한다.
+        dlg.setContentView(R.layout.alert_layout);
 
-            // 커스텀 다이얼로그를 노출한다.
+        // 커스텀 다이얼로그를 노출한다.
 
-            dlg.show();
+        dlg.show();
 
+        getDateInfo = context.getSharedPreferences("dateInfo", context.MODE_PRIVATE);
 
         // 커스텀 다이얼로그의 각 위젯들을 정의한다.
-          a_title = (EditText) dlg.findViewById(R.id.a_title);
-          a_content = (EditText) dlg.findViewById(R.id.a_content);
+        a_title = (EditText) dlg.findViewById(R.id.a_title);
+        a_content = (EditText) dlg.findViewById(R.id.a_content);
+
         final Button okButton = (Button) dlg.findViewById(R.id.okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.cancelButton);
+
+        mDatabase = FirebaseDatabase.getInstance();
+        getloginInfo = context.getSharedPreferences("info", context.MODE_PRIVATE);
 
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,19 +80,19 @@ public class CustomDialog extends AppCompatActivity {
                 //db-----------
 
                 mReference = mDatabase.getReference("calender");
-                sf = getSharedPreferences("info", MODE_PRIVATE);
+
 
                 String title = a_title.getText().toString();
                 String content = a_content.getText().toString();
-                String id = sf.getString("inputId", "");
+                String id = getloginInfo.getString("inputId", "");
 
-                String curYear =""+mCalendar.get(Calendar.YEAR);
-                String curMonth = ""+mCalendar.get(Calendar.MONTH);
-                String day = ""+mCalendar.get(Calendar.DAY_OF_MONTH);//---선택된 날짜 가져와야함함
-                        // 커스텀 다이얼로그에서 입력한 메시지를 대입한다.
+                String curYear = getDateInfo.getString("year", "");;
+                String curMonth = getDateInfo.getString("month", "");;
+                String day = getDateInfo.getString("day", "");;//---선택된 날짜 가져와야함함
+                // 커스텀 다이얼로그에서 입력한 메시지를 대입한다.
 
                 //------------------일정추가:제목,내용/캘린더에서 년,월,일/로그인 정보에서 아이디 db에 추가, 제목은 달력에 보여주기
-                Toast.makeText(CustomDialog.this, "일정 작성 성공", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "일정 작성 성공", Toast.LENGTH_SHORT).show();
                 writeMemo(title, content, id, curYear, curMonth, day);
                 finish();
 
@@ -119,12 +116,12 @@ public class CustomDialog extends AppCompatActivity {
     private void writeMemo(String title, String content, String id, String curYear, String curMonth, String day) {
         Memo memo = new Memo(title, content, id, curYear, curMonth, day);
 
-        mReference.child(title).setValue(title)
+        mReference.child(title).setValue(memo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         // Write was successful!
-                        Toast.makeText(CustomDialog.this, "일정을 작성했습니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "일정을 작성했습니다.", Toast.LENGTH_SHORT).show();
 
                         toString();
                         finish();//종료와 함께 넘어가짐
@@ -157,6 +154,7 @@ public class CustomDialog extends AppCompatActivity {
         public String getTitle() {
             return title;
         }
+
         public void setTitle(String title) {
             this.title = title;
         }
@@ -164,15 +162,16 @@ public class CustomDialog extends AppCompatActivity {
         public String getContent() {
             return content;
         }
+
         public void setContent(String content) {
             this.content = content;
         }
 
 
-
         public String getId() {
             return id;
         }
+
         public void setId(String Id) {
             this.id = id;
         }
@@ -180,6 +179,7 @@ public class CustomDialog extends AppCompatActivity {
         public String getCurYear() {
             return curYear;
         }
+
         public void setCurYear(String curYear) {
             this.curYear = curYear;
         }
@@ -187,6 +187,7 @@ public class CustomDialog extends AppCompatActivity {
         public String getCurMonth() {
             return curMonth;
         }
+
         public void setCurMonth(String curMonth) {
             this.curMonth = curMonth;
         }
@@ -194,6 +195,7 @@ public class CustomDialog extends AppCompatActivity {
         public String getDay() {
             return day;
         }
+
         public void setDay(String day) {
             this.day = day;
         }

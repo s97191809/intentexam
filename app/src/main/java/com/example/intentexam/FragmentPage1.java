@@ -1,6 +1,8 @@
 package com.example.intentexam;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -91,12 +93,23 @@ public class FragmentPage1 extends Fragment {
 
                 MonthItem curItem = (MonthItem) monthViewAdapter.getItem(position);
                 int day = curItem.getDay();
+
+                int month = monthViewAdapter.getCurMonth();
+                int year = monthViewAdapter.getCurYear();
+
                 CustomDialog customDialog = new CustomDialog(getContext());
                 // 커스텀 다이얼로그를 호출한다.
 
                 customDialog.callFunction();
                 Log.d("CalendarMonthViewAct", "Selected : " + day);
-
+                Log.d("CalendarMonthViewAct", "Selected : " + month);
+                Log.d("CalendarMonthViewAct", "Selected : " + year);
+                SharedPreferences auto = getContext().getSharedPreferences("dateInfo", getContext().MODE_PRIVATE);
+                SharedPreferences.Editor getDate = auto.edit();
+                getDate.putString("day", String.valueOf(day));
+                getDate.putString("month", String.valueOf(month));
+                getDate.putString("year", String.valueOf(year));
+                getDate.commit();
             }
         });
         monthText = (TextView) v.findViewById(R.id.monthText);

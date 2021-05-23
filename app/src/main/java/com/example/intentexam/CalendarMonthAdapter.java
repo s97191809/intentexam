@@ -150,7 +150,7 @@ public class CalendarMonthAdapter extends BaseAdapter {
     }
 
     public int getCurMonth() {
-        return curMonth;
+        return curMonth+1;
     }
 
 
