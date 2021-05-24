@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 public class FragmentPage4 extends Fragment {
     //객체 선언
@@ -49,6 +51,24 @@ public class FragmentPage4 extends Fragment {
         textView3.setText("이름 : " + name);
         textView4.setText("몸무게(kg) : " + weight);
 
+        button4 = v.findViewById(R.id.logout);
+        button4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), loginActivity.class);
+                startActivity(intent);
+
+                SharedPreferences.Editor editor = sf.edit();
+                //editor.clear()는 auto에 들어있는 모든 정보를 기기에서 지웁니다.
+                editor.clear();
+                editor.commit();
+                Toast.makeText(getActivity(), "로그아웃.", Toast.LENGTH_SHORT).show();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction().remove(FragmentPage4.this).commit();
+                fragmentManager.popBackStack();
+
+            }
+        });
 
         return v;
     }

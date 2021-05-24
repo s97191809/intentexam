@@ -20,11 +20,7 @@
         android:layout_height="wrap_content"
         android:background="#BFD0E6"
         />
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        </ListView>
+
 </LinearLayout>
     <LinearLayout
         android:id="@+id/tmap"
@@ -44,7 +40,7 @@
         android:id="@+id/sensor"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="걸음 수 : 0"
         android:textSize="15dp"
         android:textColor="#ffffff"
 
@@ -53,7 +49,7 @@
         android:id="@+id/distance"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="이동거리 : 0"
         android:textSize="15dp"
         android:textColor="#ffffff"
 
@@ -62,7 +58,7 @@
         android:id="@+id/coin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="코인수 : 0"
         android:textSize="15dp"
         android:textColor="#ffffff"
 
@@ -71,7 +67,7 @@
         android:id="@+id/kcal"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="kcal : 0"
         android:textSize="15dp"
         android:textColor="#ffffff"
 

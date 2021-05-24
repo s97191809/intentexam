@@ -89,6 +89,7 @@ public class CustomDialog extends AppCompatActivity {
 
                 String curYear = getDateInfo.getString("year", "");
                 String curMonth = getDateInfo.getString("month", "");
+                curMonth = String.valueOf(Integer.parseInt(curMonth)+1);
                 String day = getDateInfo.getString("day", "");
 
 

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -50,7 +51,7 @@ public class trailActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot messageData : snapshot.getChildren()) {
                     String key = messageData.child("name").getValue(String.class);
-                    Log.d("키 값 : ", key);
+                //    Log.d("키 값 : ", key);
                     trailName.add(key);
                  //   HashMap<String, HashMap<String, Object>> userInfo = (HashMap<String, HashMap<String, Object>>) messageData.getValue();
                   //  for (String u : userInfo.keySet()) {
@@ -74,13 +75,18 @@ public class trailActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                         String data = (String) adapterView.getItemAtPosition(position);
-                        Log.d("선택한 값", data);
+                        Intent intent = new Intent() ;
+
+                        //    Log.d("선택한 값", data);
                         mReference = mDatabase.getReference("trail");
                         mReference.addValueEventListener(new ValueEventListener() {
 
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 for (DataSnapshot messageData : snapshot.getChildren()) {
+
+                                    Log.d(":시발제발부ㅜ : ", String.valueOf(messageData.child("Start").getValue()));
+
                                     HashMap<String, HashMap<String, Object>> userInfo = (HashMap<String, HashMap<String, Object>>) messageData.getValue();
                                     for (String u : userInfo.keySet()) {
 
@@ -89,19 +95,24 @@ public class trailActivity extends AppCompatActivity {
 
                                     }
                                     if(trailInfo.contains(data)){
-                                        for(String s : trailInfo){
+                                        //SharedPreferences sp= getSharedPreferences("trailInfo", MODE_PRIVATE);
+                                        //SharedPreferences.Editor mEdit1= sp.edit();
+                                        String key = messageData.child("name").getValue(String.class);
+                                        intent.putExtra("name", String.valueOf(key)) ;
+                                        intent.putExtra("start", String.valueOf(messageData.child("Start").getValue())) ;
 
-                                        }
-                                        SharedPreferences sp= getSharedPreferences("trailInfo", MODE_PRIVATE);
-                                        SharedPreferences.Editor mEdit1= sp.edit();
-                                        mEdit1.putInt("Status_size",trailInfo.size()); /*sKey is an array*/
-                                        for(int i=0;i<trailInfo.size();i++)
+                                        intent.putExtra("end", String.valueOf(messageData.child("End").getValue())) ;
+
+                                        //mEdit1.putInt("Status_size",trailInfo.size()); /*sKey is an array*/
+                                       /* for(int i=0;i<trailInfo.size();i++)
                                         {
                                             mEdit1.remove("Status_" +trailInfo.get(i) );
                                             mEdit1.putString("Status_" + i, trailInfo.get(i));
-                                        }
-                                        mEdit1.commit();
-                                        Log.d("일치하는 값", data);
+                                        }*/
+
+                                        //mEdit1.commit();
+                             //           Log.d("일치하는 값", data);
+                                        setResult(RESULT_OK, intent) ;
                                         finish();
                                         break;
                                     }else{
@@ -125,7 +136,6 @@ public class trailActivity extends AppCompatActivity {
 
             }
         });
-
 
 
 
