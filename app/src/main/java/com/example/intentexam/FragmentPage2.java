@@ -310,9 +310,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         //  listView = (ListView) v.findViewById(R.id.listView);
         editText1 = v.findViewById(R.id.search_edit);
         arrTempAllname.addAll(arrAllname);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+
                 adapter = new searchAdapter(arrAllname, getContext());
                 Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
                 ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
@@ -602,8 +600,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     }
 
                 });
-            }
-        });
+
         // 리스트뷰에 아답터를 연결한다.
 
 
