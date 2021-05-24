@@ -22,14 +22,14 @@
         android:paddingLeft="10dp"
         android:orientation="horizontal"
         >
-    <Spinner
-        android:id="@+id/select_hospital_b"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="right"
-        android:spinnerMode="dropdown"
-        android:hint="병원 선택"
-        /><!--화면에 맞게 안되면 android:layout_width="320dp" 이거로 바꿔조-->
+
+        <Spinner
+            android:id="@+id/select_hospital_b"
+            android:layout_width="320dp"
+            android:layout_height="40dp"
+            android:gravity="right"
+            android:hint="병원 선택"
+            android:spinnerMode="dropdown" /><!--화면에 맞게 안되면 android:layout_width="320dp" 이거로 바꿔조-->
         <Button
             android:id="@+id/write_r"
             android:layout_width="wrap_content"

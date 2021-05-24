@@ -17,6 +17,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -47,6 +48,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.skt.Tmap.TMapCircle;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
+import com.skt.Tmap.TMapInfo;
 import com.skt.Tmap.TMapMarkerItem2;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
@@ -65,6 +67,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
+import static java.lang.Thread.sleep;
 
 
 public class FragmentPage2 extends Fragment implements SensorEventListener {
@@ -202,6 +205,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         double lon = location.getLongitude();
         TMapPoint polypoint = new TMapPoint(lat, lon);
         polyline.addLinePoint(polypoint);
+
 
         initDatabase();
         //칼로리계산
@@ -811,6 +815,15 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 @Override
                 public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
                     tmap.removeAllTMapPolyLine();
+                    if(arrHospitalName.contains(tMapMarkerItem2.getID())){
+                        Intent intent = new Intent(getActivity(), hospitalReview.class);
+                        intent.putExtra("hpName", String.valueOf(tMapMarkerItem2.getID())) ;
+
+                        startActivity(intent);
+
+
+                        Log.d("병원이름 : ", tMapMarkerItem2.getID());
+                    }
                     Log.d("아이템 확인 : ", s);
                     location location = new location(getActivity());
                     double lat = location.getLatitude();
@@ -819,6 +832,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
                         @Override
                         public void onFindPathData(TMapPolyLine polyLine) {
+
                             polyLine.setID("pedLine");
                             tmap.addTMapPath(polyLine);
                         }
@@ -874,7 +888,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            tv_sensor.setText(String.valueOf(totalSteps++));
+            tv_sensor.setText("걸음 수 :" +String.valueOf(totalSteps++));
             steps++;
 
             Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
@@ -904,9 +918,11 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                tmap.setLocationPoint(longitude, latitude);
                 //여기 고치면 위치이동 될듯
+
                 tmap.setCenterPoint(longitude, latitude);
+                tmap.setLocationPoint(longitude, latitude);
+
             }
 
 
@@ -932,7 +948,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 100000, // 통지사이의 최소 시간간격 (miliSecond)
-                5, // 통지사이의 최소 변경거리 (m)
+                50000, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
 
@@ -1031,15 +1047,24 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                        // passList.add(new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1])));
                         TMapPoint stpt = new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1]));
                         TMapPoint edpt = new TMapPoint(Double.valueOf(tsend[0]), Double.valueOf(tsend[1]));
+
                         Log.d("이름 시작 도착 ", trailName + ", " + trailStart + ", " + trailEnd);
                         TMapData tmapdata = new TMapData();
                         tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, stpt, edpt, passList, 0, new TMapData.FindPathDataListenerCallback() {
                             @Override
                             public void onFindPathData(TMapPolyLine tMapPolyLine) {
-                                tmap.setCenterPoint(stpt.getLatitude(), stpt.getLongitude());
+
                                 tMapPolyLine.setLineWidth(5);
                                 tMapPolyLine.setLineColor(Color.BLUE);
                                 tmap.addTMapPath(tMapPolyLine);
+                                TMapInfo info = tmap.getDisplayTMapInfo(tMapPolyLine.getLinePoint());
+
+                                int zoom = info.getTMapZoomLevel();
+                                if (zoom > 14) {
+                                    zoom = 14;
+                                }
+                                tmap.setZoomLevel(zoom);
+                                tmap.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
                             }
                         });
                     }

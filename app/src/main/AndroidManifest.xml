@@ -20,7 +20,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
-        <activity android:name=".trailActivity"></activity>
+        <activity android:name=".hospitalWrite"></activity>
+        <activity android:name=".hospitalReview" />
+        <activity android:name=".trailActivity" />
         <activity
             android:name=".introActivity"
             android:label="@string/app_name"
@@ -36,7 +38,7 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat" />
-        <activity android:name=".trailActivity"/>
+        <activity android:name=".trailActivity" />
     </application>
 
 </manifest>
