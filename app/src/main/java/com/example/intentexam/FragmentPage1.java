@@ -66,7 +66,7 @@ public class FragmentPage1 extends Fragment {
     /**
      * 현재 월
      */
-    int curMonth;
+    static int curMonth;
 
 
 
