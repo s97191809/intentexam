@@ -159,7 +159,7 @@ public class hospitalWrite extends AppCompatActivity {
         public String toString() {
             return "User{" +
                     "content='" + content + '\'' +
-                    "writer='" + writer + '\'' +
+                    "id='" + writer + '\'' +
                     ", date='" + date + '\'' +
                     '}';
         }
