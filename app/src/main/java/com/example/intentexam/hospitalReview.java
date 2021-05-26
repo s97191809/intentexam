@@ -64,7 +64,7 @@ public class hospitalReview extends AppCompatActivity {
                     // 리스트뷰 참조 및 Adapter달기
                   }
 
-                // 데이터 1000개 생성--------------------------------.
+
 
                 int nDatCnt=0;
                 for (int i = 0; i < reviewContent.size(); i++)
@@ -72,6 +72,7 @@ public class hospitalReview extends AppCompatActivity {
                     ItemData oItem = new ItemData();
                     oItem.strTitle = reviewContent.get(i);
                     oItem.strDate = subContent.get(i);
+                    Log.d("작성자 확인:", subContent.get(i));
                     oData.add(oItem);
 
                 }

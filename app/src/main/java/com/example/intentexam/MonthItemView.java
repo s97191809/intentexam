@@ -99,7 +99,7 @@ public class MonthItemView extends androidx.appcompat.widget.AppCompatTextView {
                         db_day = messageData.child("day").getValue().toString().trim();
                         db_title  = messageData.child("title").getValue().toString().trim();
                       //  Log.d("오긴하니 : ", db_title);
-                        Log.d("오긴하니 curMonth: ", curMonth);
+                    //    Log.d("오긴하니 curMonth: ", curMonth);
                         if (db_id.equals(id)&&db_curYear.equals(curYear)&& db_curMonth.equals(curMonth) && db_day.equals(String.valueOf(day))) {
                             setText(day + "\n" +db_title);
 

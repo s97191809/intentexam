@@ -1,11 +1,8 @@
 package com.example.intentexam;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +17,13 @@ import androidx.fragment.app.FragmentManager;
 
 public class FragmentPage4 extends Fragment {
     //객체 선언
-    Button button4;
-    TextView textView1;
-    TextView textView2;
-    TextView textView3;
-    TextView textView4;
+    Button logoutButton;
+    Button withdrawalButton;
+    Button my_listButton;
+    TextView idView;
+    TextView pwView;
+    TextView nameView;
+    TextView weightView;
     SharedPreferences sf;
     private TextView txt_preferences;
 
@@ -41,18 +40,18 @@ public class FragmentPage4 extends Fragment {
         String name = sf.getString("name", "");
         String weight = sf.getString("weight", "");
 
-        textView1 = v.findViewById(R.id.id);
-        textView2 = v.findViewById(R.id.pw);
-        textView3 = v.findViewById(R.id.name);
-        textView4 = v.findViewById(R.id.weight);
+        idView = v.findViewById(R.id.id);
+        pwView = v.findViewById(R.id.pw);
+        nameView = v.findViewById(R.id.name);
+        weightView = v.findViewById(R.id.weight);
 
-        textView1.setText("아이디 : " + id);
-        textView2.setText("비번 : " + pw);
-        textView3.setText("이름 : " + name);
-        textView4.setText("몸무게(kg) : " + weight);
+        idView.setText("아이디 : " + id);
+        pwView.setText("비번 : " + pw);
+        nameView.setText("이름 : " + name);
+        weightView.setText("몸무게(kg) : " + weight);
 
-        button4 = v.findViewById(R.id.logout);
-        button4.setOnClickListener(new View.OnClickListener() {
+        logoutButton = v.findViewById(R.id.logout);
+        logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), loginActivity.class);
@@ -67,6 +66,24 @@ public class FragmentPage4 extends Fragment {
                 fragmentManager.beginTransaction().remove(FragmentPage4.this).commit();
                 fragmentManager.popBackStack();
 
+            }
+        });
+
+        withdrawalButton = v.findViewById(R.id.withdrawal);
+        withdrawalButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), drawalActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        my_listButton = v.findViewById(R.id.my_list_button);
+        my_listButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), myListActivity.class);
+                startActivity(intent);
             }
         });
 

@@ -78,7 +78,7 @@ public class FragmentPage1 extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_page_1, container, false);
 
-        setGps();//위치 권한 요청.
+
         // 월별 캘린더 뷰 객체 참조
         monthView = (CalendarMonthView) v.findViewById(R.id.monthView);
         monthViewAdapter = new CalendarMonthAdapter(getContext());
