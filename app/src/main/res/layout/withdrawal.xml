@@ -5,13 +5,13 @@
     android:background="#EAEFF8">
 
     <TextView
-        android:id="@+id/review_h_title"
+        android:id="@+id/withdrawal_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="center"
         android:textColor="#707070"
         android:textSize="16dp"
-        android:text="리뷰 작성"
+        android:text="알림"
         android:background="#BFD0E6"
         />
 
@@ -19,15 +19,15 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#000000"/>
-
-    <EditText
-        android:id="@+id/r_content"
+    <TextView
+        android:id="@+id/a_title"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="50dp"
         android:gravity="center"
-        android:textColor="#000000"
+        android:textColor="#707070"
         android:textSize="16dp"
-        android:hint="내용을 입력하세요."/>
+        android:text="탈퇴하시겠습니까?"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -39,12 +39,12 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/review_Button"
+            android:id="@+id/withdrawal_ok_Button"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="작성"
+            android:text="확인"
             android:textColor="#707070"
             android:textSize="16dp"
             android:background="#ffffff"/>
@@ -55,7 +55,7 @@
             android:background="#000000" />
 
         <Button
-            android:id="@+id/r_cancelButton"
+            android:id="@+id/withdrawal_cancelButton"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_weight="1"

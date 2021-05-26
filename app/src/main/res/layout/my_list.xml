@@ -6,35 +6,15 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/rb_h_title"
+        android:id="@+id/my_h_title"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="center"
         android:textColor="#707070"
         android:textSize="16dp"
-        android:text="동물병원 리뷰"
+        android:text="내 글 목록"
         android:background="#BFD0E6"
         />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:orientation="horizontal"
-
-        >
-
-        <Button
-            android:id="@+id/write_r"
-            android:layout_width="80dp"
-            android:layout_height="40dp"
-            android:background="@drawable/button"
-
-            android:text="리뷰 작성"
-            android:textColor="#707070"
-            android:textSize="15dp"
-            />
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,11 +24,11 @@
         >
 
 
-    <ListView
-            android:id="@+id/review_list"
+        <ListView
+            android:id="@+id/my_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-    </ListView>
+        </ListView>
     </LinearLayout>
 </LinearLayout>
