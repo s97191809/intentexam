@@ -37,12 +37,12 @@ public class drawalActivity extends AppCompatActivity {
         mReference = mDatabase.getReference().child("user"); // 변경값을 확인할 child 이름
         
         // user는 그냥 id로 바로하면 되는데 캘린더랑 병원 리뷰는 한번 더 내려가서 포함하는 값을 찾아야함
-        mReference.setValue(null)
+        /*mReference.setValue(null)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-/*                        Intent intent = new Intent(drawalActivity.this, loginActivity.class);
-                        startActivity(intent);*/
+*//*                        Intent intent = new Intent(drawalActivity.this, loginActivity.class);
+                        startActivity(intent);*//*
                         Toast.makeText(drawalActivity.this,"회원 탈퇴 완료.",Toast.LENGTH_SHORT);
                         finish();
                     }
@@ -55,6 +55,6 @@ public class drawalActivity extends AppCompatActivity {
                 Toast.makeText(drawalActivity.this,"회원 탈퇴 실패.",Toast.LENGTH_SHORT);
 
             }
-        });
+        });*/
     }
 }
