@@ -71,6 +71,20 @@
             android:textColor="#707070"
             android:textSize="16dp"
             android:background="#ffffff"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#000000" />
+        <Button
+            android:id="@+id/daylist"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="목록"
+            android:textColor="#707070"
+            android:textSize="16dp"
+            android:background="#ffffff"/>
     </LinearLayout>
 
     <View
