@@ -153,7 +153,7 @@ public class drawalActivity extends AppCompatActivity {
 
     public void delUser(String id){
         mReference = mDatabase.getReference().child("user"); // 변경값을 확인할 child 이름
-        // user는 그냥 id로 바로하면 되는데 캘린더랑 병원 리뷰는 한번 더 내려가서 포함하는 값을 찾아야함
+        // user는 그냥 id로 바로하면 되는데 캘린더랑 병원 리뷰는 한번 더 내려가서 포함하는 값을 찾아야함ㅋㅋ
         mReference.child(id).setValue(null)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
