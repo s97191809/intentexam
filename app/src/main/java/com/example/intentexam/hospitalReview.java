@@ -49,8 +49,9 @@ public class hospitalReview extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
                         String db_content = messageData.child("content").getValue().toString();
-                        String db_writer = messageData.child("writer").getValue().toString();
+                        String db_writer = messageData.child("id").getValue().toString();
                         String db_date = messageData.child("date").getValue().toString();
                         if(reviewContent.contains(db_content)){
                             reviewContent.remove(db_content);

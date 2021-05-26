@@ -2,33 +2,23 @@ package com.example.intentexam;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicMarkableReference;
 
 public class hospitalWrite extends AppCompatActivity {
 
@@ -114,7 +104,7 @@ public class hospitalWrite extends AppCompatActivity {
 
     public class User {
         public String content;
-        public String writer;
+        public String id;
         public String date;
 
 
@@ -124,7 +114,7 @@ public class hospitalWrite extends AppCompatActivity {
 
         public User(String content, String writer, String date) {
             this.content = content;
-            this.writer = writer;
+            this.id = writer;
             this.date = date;
 
         }
@@ -137,12 +127,12 @@ public class hospitalWrite extends AppCompatActivity {
             this.content = content;
         }
 
-        public String getWriter() {
-            return writer;
+        public String getId() {
+            return id;
         }
 
-        public void setWriter(String id) {
-            this.writer = id;
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getDate() {
@@ -159,7 +149,7 @@ public class hospitalWrite extends AppCompatActivity {
         public String toString() {
             return "User{" +
                     "content='" + content + '\'' +
-                    "id='" + writer + '\'' +
+                    "id='" + id + '\'' +
                     ", date='" + date + '\'' +
                     '}';
         }

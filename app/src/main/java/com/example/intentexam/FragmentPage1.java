@@ -75,7 +75,7 @@ public class FragmentPage1 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-
+        setGps();//위치 권한 요청.
         View v = inflater.inflate(R.layout.fragment_page_1, container, false);
 
 

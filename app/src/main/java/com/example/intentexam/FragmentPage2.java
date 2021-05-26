@@ -175,7 +175,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
 
-        setGps();//위치 권한 요청.
+
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {//센서 권한 요청
             //ask for permission
@@ -941,15 +941,15 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
 
     public void setGps() {
-
+        final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
-        final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                100000, // 통지사이의 최소 시간간격 (miliSecond)
-                50000, // 통지사이의 최소 변경거리 (m)
+                10000, // 통지사이의 최소 시간간격 (miliSecond)
+                5000, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
 
