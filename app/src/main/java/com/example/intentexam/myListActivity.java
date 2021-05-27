@@ -1,8 +1,11 @@
 package com.example.intentexam;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,8 +33,11 @@ public class myListActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     SharedPreferences sf;
 
+
     final ArrayList<String> reviewContent = new ArrayList<>();
     final ArrayList<String> subContent = new ArrayList<>();
+    final ArrayList<String> hosList = new ArrayList<>();
+
     final ArrayList<ItemData> oData = new ArrayList<>();
 
     @Override
@@ -44,7 +51,13 @@ public class myListActivity extends AppCompatActivity {
         String id = sf.getString("inputId", "");
 
         mDatabase = FirebaseDatabase.getInstance();
-
+        new Runnable() {
+            @Override
+            public void run() {
+                ListViewAdapter oAdapter = new ListViewAdapter(oData);
+                oAdapter.notifyDataSetChanged();
+            }
+        };
         myList = findViewById(R.id.my_list);
 
         rvListButton = findViewById(R.id.rv_list);
@@ -68,17 +81,22 @@ public class myListActivity extends AppCompatActivity {
                                         String db_content = messageData.child("content").getValue().toString();
                                         String db_id = messageData.child("id").getValue().toString();
                                         String db_date = messageData.child("date").getValue().toString();
+
                                         if (db_id.equals(id)) {//로그인한 id와 내용의 id가 같으면
+
                                             Log.d("이계정이 가진 글목록", db_content);
-                                  /*          if (reviewContent.contains(db_content)) {
-                                  //              reviewContent.remove(db_content);
+                                            String subCon = db_id + "        " + db_date + "         " + dbHosList;
+                                            // 한 병원에 계정 하나가 하나의 리뷰만 등록가능
+                                            if (reviewContent.contains(db_content) && subContent.contains(subCon)) {
+
                                                 // 같은 내용도 생각하기
                                                 // 같은날 같은제목 일수도
-                                               // 리뷰 번호가 필요한가 필요하겠다//
-                                            } else {*/
+                                                // 리뷰 번호가 필요한가 필요하겠다//
+                                            } else {
+                                                hosList.add(dbHosList);
                                                 reviewContent.add(db_content);
-                                                subContent.add(db_id + "        " + db_date + "         " + dbHosList);
-                                            /*}*/
+                                                subContent.add(subCon);
+                                            }
 
 
                                         }
@@ -94,12 +112,16 @@ public class myListActivity extends AppCompatActivity {
                             });
                         }
                         Log.d("리스트 길이 : ", String.valueOf(reviewContent.size()));
+
                         for (int i = 0; i < reviewContent.size(); i++) {
                             ItemData oItem = new ItemData();
-                            oItem.strTitle = reviewContent.get(i);
-                            oItem.strDate = subContent.get(i);
-                            Log.d("작성자 확인:", subContent.get(i));
-                            oData.add(oItem);
+                            if (oData.size() != reviewContent.size()) {
+                                oItem.strTitle = reviewContent.get(i);
+                                oItem.strDate = subContent.get(i);
+                                Log.d("작성자 확인:", subContent.get(i));
+                                oData.add(oItem);
+                            }
+
 
                         }
 // ListView, Adapter 생성 및 연결 ------------------------
@@ -117,9 +139,70 @@ public class myListActivity extends AppCompatActivity {
                 });
             }
         });
+        myList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(myListActivity.this);
+
+                builder.setTitle("해당 리뷰를 삭제 하시겠습니까?").setMessage("삭제 후 리뷰 버튼을 터치해 갱신해 주세요ㅎ;");
+
+
+                builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        ListViewAdapter oAdapter = new ListViewAdapter(oData);
+                        String data = oData.get(position).toString();
+
+
+                        Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position))+","+hosList.get(position));
+                        Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
+                        // 아이템 삭제
+                        oData.remove(position);
+                        //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
+
+                        mReference = mDatabase.getReference().child("hospitalreview").child(hosList.get(position)); // 지워야할 내용에 해당되는 부분 지우기
+                        mReference.child(reviewContent.get(position)).setValue(null)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                        reviewContent.clear();
+                                        subContent.clear();
+                                        oData.clear();
+                                        oAdapter.notifyDataSetChanged();
+                                    }
+
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+
+                            }
+                        });
+                        // listview 갱신.
+
+
+
+
+                    }
+                });
+
+                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+                return true;
+            }
+        });
 
     }
+
     public abstract class OnSingleClickListener implements View.OnClickListener {
 
         //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )

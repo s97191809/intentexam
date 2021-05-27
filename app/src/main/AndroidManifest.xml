@@ -39,10 +39,7 @@
         <activity android:name=".hospitalWrite" />
         <activity android:name=".hospitalReview" />
         <activity android:name=".trailActivity" />
-        <activity android:name=".myListActivity"/>
-
-
-
+        <activity android:name=".myListActivity" />
     </application>
 
 </manifest>

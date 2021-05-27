@@ -60,6 +60,7 @@ public class ListViewAdapter extends BaseAdapter
 
         oTextTitle.setText(m_oData.get(position).strTitle);
         oTextDate.setText(m_oData.get(position).strDate);
+
         return convertView;
     }
 }
