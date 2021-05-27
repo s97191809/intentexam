@@ -41,7 +41,7 @@ public class drawalActivity extends AppCompatActivity {
         // 지울 아디를 인자로 받아와서 삭제 키는id로 지정해서 remove
         mDatabase = FirebaseDatabase.getInstance();
 
-            Log.d("d확인 : ", String.valueOf(reviewList.size()));
+            Log.d("확인 : ", String.valueOf(reviewList.size()));
 
         //가져온 동물병원들 리스트를 차일드에 넣어서 id값을 포함한 녀석들을 발견하면 그자식들을 null로 바꿔버리는거지!
 
@@ -110,7 +110,7 @@ public class drawalActivity extends AppCompatActivity {
 
                                 String db_content = messageData.child("content").getValue().toString();
                                 String db_id = messageData.child("id").getValue().toString();
-                                if(db_id.equals(id)){//내용 뭔지 체크하고
+                                if(db_id.equals(id)){//로그인한 id와 내용의 id가 같으면
                                     Log.d("이계정이 가진 글목록", db_content);
 
                                     mReference = mDatabase.getReference().child("hospitalreview").child(dbHosList); // 지워야할 병원에 해당되는 병원

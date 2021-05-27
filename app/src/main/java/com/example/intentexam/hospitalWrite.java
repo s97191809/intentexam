@@ -84,6 +84,8 @@ public class hospitalWrite extends AppCompatActivity {
             public void onSuccess(Void aVoid) {
 
                 toString();
+
+
                 finish();
                 // 리스트뷰 참조 및 Adapter달기
 

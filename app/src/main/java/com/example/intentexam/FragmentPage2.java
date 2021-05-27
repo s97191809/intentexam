@@ -154,7 +154,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setGps();
         time1 = System.currentTimeMillis();
         try {
             SharedPreferences prefs = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
@@ -919,7 +919,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 //여기 고치면 위치이동 될듯
-
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
 
@@ -949,7 +948,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 10000, // 통지사이의 최소 시간간격 (miliSecond)
-                5000, // 통지사이의 최소 변경거리 (m)
+                5, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
 

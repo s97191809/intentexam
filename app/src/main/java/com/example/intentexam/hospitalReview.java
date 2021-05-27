@@ -67,7 +67,7 @@ public class hospitalReview extends AppCompatActivity {
 
 
 
-                int nDatCnt=0;
+
                 for (int i = 0; i < reviewContent.size(); i++)
                 {
                     ItemData oItem = new ItemData();
@@ -96,6 +96,7 @@ public class hospitalReview extends AppCompatActivity {
                 intent.putExtra("hpName", name);
 
                 startActivity(intent);
+
             }
         });
 
