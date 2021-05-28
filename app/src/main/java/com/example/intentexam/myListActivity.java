@@ -29,6 +29,7 @@ import java.util.ArrayList;
 public class myListActivity extends AppCompatActivity {
     Button rvListButton;
     ListView myList;
+    Button bdListButton;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     SharedPreferences sf;
@@ -155,7 +156,7 @@ public class myListActivity extends AppCompatActivity {
                         String data = oData.get(position).toString();
 
 
-                        Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position))+","+hosList.get(position));
+                        Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
                         Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
                         // 아이템 삭제
                         oData.remove(position);
@@ -182,8 +183,6 @@ public class myListActivity extends AppCompatActivity {
                         // listview 갱신.
 
 
-
-
                     }
                 });
 
@@ -198,6 +197,14 @@ public class myListActivity extends AppCompatActivity {
                 alertDialog.show();
 
                 return true;
+            }
+        });
+        bdListButton = findViewById(R.id.bd_list);
+        bdListButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
             }
         });
 

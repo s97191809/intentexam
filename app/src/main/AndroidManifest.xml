@@ -20,6 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar">
+        <activity android:name=".showBoardDetail"></activity>
+        <activity android:name=".writeBoardActivity" />
         <activity
             android:name=".introActivity"
             android:label="@string/app_name"

@@ -21,7 +21,7 @@ public class FragmentPage4 extends Fragment {
     Button withdrawalButton;
     Button my_listButton;
     TextView idView;
-    TextView pwView;
+
     TextView nameView;
     TextView weightView;
     SharedPreferences sf;
@@ -36,17 +36,17 @@ public class FragmentPage4 extends Fragment {
         // 값 넘겨 받아오는 부분
         sf = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
         String id = sf.getString("inputId", "");
-        String pw = sf.getString("inputPwd", "");
+
         String name = sf.getString("name", "");
         String weight = sf.getString("weight", "");
 
         idView = v.findViewById(R.id.id);
-        pwView = v.findViewById(R.id.pw);
+
         nameView = v.findViewById(R.id.name);
         weightView = v.findViewById(R.id.weight);
 
         idView.setText("아이디 : " + id);
-        pwView.setText("비번 : " + pw);
+
         nameView.setText("이름 : " + name);
         weightView.setText("몸무게(kg) : " + weight);
 

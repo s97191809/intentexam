@@ -28,6 +28,7 @@ public class drawalActivity extends AppCompatActivity {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     SharedPreferences sf;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +42,7 @@ public class drawalActivity extends AppCompatActivity {
         // 지울 아디를 인자로 받아와서 삭제 키는id로 지정해서 remove
         mDatabase = FirebaseDatabase.getInstance();
 
-            Log.d("확인 : ", String.valueOf(reviewList.size()));
+        Log.d("확인 : ", String.valueOf(reviewList.size()));
 
         //가져온 동물병원들 리스트를 차일드에 넣어서 id값을 포함한 녀석들을 발견하면 그자식들을 null로 바꿔버리는거지!
 
@@ -57,7 +58,8 @@ public class drawalActivity extends AppCompatActivity {
         });
 
     }
-    public void delCalender(String id){
+
+    public void delCalender(String id) {
         mReference = mDatabase.getReference("calender"); // 캘린더 정보 불러오기
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -67,7 +69,7 @@ public class drawalActivity extends AppCompatActivity {
                     String db_content = messageData.child("content").getValue().toString();
                     String db_id = messageData.child("id").getValue().toString();
                     Log.d("컨텐츠 : ", db_content);
-                    if(db_id.equals(id)){
+                    if (db_id.equals(id)) {
                         mReference = mDatabase.getReference().child("calender"); // 지워야할 내용에 해당되는 부분 지우기
                         mReference.child(db_content).setValue(null)
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -87,13 +89,15 @@ public class drawalActivity extends AppCompatActivity {
 
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                finish();
             }
         });
     }
-    public void delHospitalReview(String id){
+
+    public void delHospitalReview(String id) {
         mReference = mDatabase.getReference("hospitalreview"); // 변경값을 확인할 child 이름
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -110,7 +114,7 @@ public class drawalActivity extends AppCompatActivity {
 
                                 String db_content = messageData.child("content").getValue().toString();
                                 String db_id = messageData.child("id").getValue().toString();
-                                if(db_id.equals(id)){//로그인한 id와 내용의 id가 같으면
+                                if (db_id.equals(id)) {//로그인한 id와 내용의 id가 같으면
                                     Log.d("이계정이 가진 글목록", db_content);
 
                                     mReference = mDatabase.getReference().child("hospitalreview").child(dbHosList); // 지워야할 병원에 해당되는 병원
@@ -151,7 +155,7 @@ public class drawalActivity extends AppCompatActivity {
         });
     }
 
-    public void delUser(String id){
+    public void delUser(String id) {
         mReference = mDatabase.getReference().child("user"); // 변경값을 확인할 child 이름
         // user는 그냥 id로 바로하면 되는데 캘린더랑 병원 리뷰는 한번 더 내려가서 포함하는 값을 찾아야함ㅋㅋ
         mReference.child(id).setValue(null)
@@ -160,7 +164,7 @@ public class drawalActivity extends AppCompatActivity {
                     public void onSuccess(Void unused) {
                         Intent intent = new Intent(drawalActivity.this, loginActivity.class);
                         startActivity(intent);
-                        Toast.makeText(drawalActivity.this,"회원 탈퇴 완료.",Toast.LENGTH_SHORT);
+                        Toast.makeText(drawalActivity.this, "회원 탈퇴 완료.", Toast.LENGTH_SHORT);
                         finish();
                     }
                     // id를 포함한 값들 삭제 먼저 다 읽어지는지 보기;
@@ -169,7 +173,7 @@ public class drawalActivity extends AppCompatActivity {
                 }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(drawalActivity.this,"회원 탈퇴 실패.",Toast.LENGTH_SHORT);
+                Toast.makeText(drawalActivity.this, "회원 탈퇴 실패.", Toast.LENGTH_SHORT);
 
             }
         });
