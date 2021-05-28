@@ -133,7 +133,7 @@
             android:id="@+id/startbutton"
             android:layout_width="59dp"
             android:layout_height="59dp"
-            android:background="@drawable/narangicon"
+            android:background="@drawable/start"
             android:textColor="#707070"
             android:gravity="center"
             android:layout_marginLeft="10dp"
