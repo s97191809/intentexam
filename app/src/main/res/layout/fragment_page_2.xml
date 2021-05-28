@@ -3,41 +3,112 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="#EAEFF8">
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:background="#EAEFF8"
+    android:layout_weight="9"
     >
 
-
-</LinearLayout>
     <LinearLayout
         android:id="@+id/tmap"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="10"
+        android:layout_marginBottom="5dp"
+        android:layout_weight="5"
         android:orientation="horizontal">
+
     </LinearLayout>
 
+
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+
+        >
+
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="59dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/button"
+            android:text="공원"
+            android:textColor="#707070"
+            app:layout_constraintStart_toEndOf="@+id/button4"
+            tools:layout_editor_absoluteY="0dp"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="59dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/button"
+            android:text="병원"
+            android:textColor="#707070"
+            app:layout_constraintStart_toEndOf="@+id/button5"
+            tools:layout_editor_absoluteY="0dp"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="59dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/button"
+            android:text="상점"
+            android:textColor="#707070"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints" />
+
+
+        <Spinner
+            android:id="@+id/select_distance"
+            android:layout_width="100dp"
+            android:layout_height="38dp"
+
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/background_round_blue"
+            android:gravity="right"
+            android:spinnerMode="dropdown"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="MissingConstraints" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
+
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/background_round_blue"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp">
     <TextView
         android:id="@+id/sensor"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="걸음 수 : 0"
+        android:text="걸음 수"
         android:textSize="15dp"
         android:textColor="#ffffff"
         android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+
         />
         <View
             android:layout_width="1dp"
@@ -45,25 +116,45 @@
             android:background="#ffffff"/>
     <TextView
         android:id="@+id/distance"
-        android:layout_width="65dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="이동거리 : 0"
+        android:text="이동거리"
         android:textSize="15dp"
         android:textColor="#ffffff"
         android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         />
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:background="#ffffff"/>
+        <Button
+            android:id="@+id/startbutton"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:background="@drawable/narangicon"
+            android:textColor="#707070"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#ffffff"/>
+
     <TextView
         android:id="@+id/coin"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="코인수 : 0"
+        android:text="코인수"
         android:textSize="15dp"
         android:textColor="#ffffff"
         android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         />
         <View
             android:layout_width="1dp"
@@ -71,83 +162,36 @@
             android:background="#ffffff"/>
     <TextView
         android:id="@+id/kcal"
-        android:layout_width="45dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="kcal : 0"
+        android:text="kcal"
         android:textSize="15dp"
         android:textColor="#ffffff"
         android:gravity="center"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         />
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#ffffff"/>
-        <Spinner
-            android:id="@+id/select_distance"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="right"
-            android:spinnerMode="dropdown"
-            android:layout_weight="1"
-
-            />
 
     </LinearLayout>
 
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
-
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="right"
         android:orientation="horizontal">
 
-
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="59dp"
-            android:layout_height="38dp"
-            android:background="@drawable/button"
-            android:text="공원"
-            android:textColor="#707070"
-            />
-        <View
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-           />
-
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="59dp"
-            android:layout_height="38dp"
-            android:background="@drawable/button"
-            android:text="병원"
-            android:textColor="#707070"
-            />
-        <View
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            />
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="59dp"
-            android:layout_height="39dp"
-            android:background="@drawable/button"
-            android:text="상점"
-            android:textColor="#707070"
-            />
-        <View
-            android:layout_width="1dp"
-            android:layout_height="1dp"
-            />
         <Button
             android:id="@+id/trailButton"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="39dp"
             android:background="@drawable/button"
             android:text="산책로"
-            android:textColor="#707070">
+            android:textColor="#707070"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            >
 
         </Button>
 
