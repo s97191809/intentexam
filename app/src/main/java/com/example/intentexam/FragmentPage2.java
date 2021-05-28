@@ -224,7 +224,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
 
         coinView = v.findViewById(R.id.coin);
-        coinView.setText("코인 수 : " + coin);
+        coinView.setText("코인 수  " + coin);
 
         calTime = new calTime();
         calTime.start();
@@ -312,7 +312,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         arrAllname.addAll(arrHospitalName);
         Log.d("총길이 : ", String.valueOf(arrParkName.size()));
         //  listView = (ListView) v.findViewById(R.id.listView);
-        editText1 = v.findViewById(R.id.search_edit);
+
         arrTempAllname.addAll(arrAllname);
 
                 adapter = new searchAdapter(arrAllname, getContext());
@@ -884,7 +884,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         double air = 3.5 * Integer.parseInt(weight) * min;
         double kcal = air * 5 / 1000;
-        kcalView.setText("kcal : " + (int) kcal);
+        kcalView.setText("kcal  " + (int) kcal);
 
         // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
@@ -900,11 +900,11 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 accDistance = totalDistance;
                 totalDistance = totalDistance - 2000;
                 steps = 0;
-                dista.setText("이동거리 : " + (int) accDistance + " M");
+                dista.setText("이동거리  " + (int) accDistance + " M");
                 Log.d("코인 수 ", String.valueOf(coin));
 
             } else {
-                dista.setText("이동거리 : " + (int) totalDistance + " M");
+                dista.setText("이동거리  " + (int) totalDistance + " M");
             }
         }
 
