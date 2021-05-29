@@ -43,7 +43,7 @@
             android:layout_marginLeft="2dp"
             android:background="@drawable/button"
             android:text="공원"
-            android:textColor="#707070"
+            android:textColor="#ffffff"
             app:layout_constraintStart_toEndOf="@+id/button4"
             tools:layout_editor_absoluteY="0dp"
             tools:ignore="MissingConstraints" />
@@ -56,7 +56,7 @@
             android:layout_marginLeft="2dp"
             android:background="@drawable/button"
             android:text="병원"
-            android:textColor="#707070"
+            android:textColor="#ffffff"
             app:layout_constraintStart_toEndOf="@+id/button5"
             tools:layout_editor_absoluteY="0dp"
             tools:ignore="MissingConstraints" />
@@ -69,7 +69,7 @@
             android:layout_marginLeft="10dp"
             android:background="@drawable/button"
             android:text="상점"
-            android:textColor="#707070"
+            android:textColor="#ffffff"
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="MissingConstraints" />
 
@@ -134,7 +134,7 @@
             android:layout_width="59dp"
             android:layout_height="59dp"
             android:background="@drawable/start"
-            android:textColor="#707070"
+
             android:gravity="center"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
@@ -188,7 +188,7 @@
             android:layout_height="39dp"
             android:background="@drawable/button"
             android:text="산책로"
-            android:textColor="#707070"
+            android:textColor="#ffffff"
             android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
             >
