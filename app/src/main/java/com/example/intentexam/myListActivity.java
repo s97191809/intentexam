@@ -5,7 +5,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -36,8 +35,12 @@ public class myListActivity extends AppCompatActivity {
 
 
     final ArrayList<String> reviewContent = new ArrayList<>();
-    final ArrayList<String> subContent = new ArrayList<>();
+    final ArrayList<String> reviewSubContent = new ArrayList<>();
     final ArrayList<String> hosList = new ArrayList<>();
+
+    final ArrayList<String> boardTitle = new ArrayList<>();
+    final ArrayList<String> boardContent = new ArrayList<>();
+    final ArrayList<String> boardSubContent = new ArrayList<>();
 
     final ArrayList<ItemData> oData = new ArrayList<>();
 
@@ -65,6 +68,7 @@ public class myListActivity extends AppCompatActivity {
         rvListButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+                oData.clear();
                 mReference = mDatabase.getReference("hospitalreview"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -88,7 +92,7 @@ public class myListActivity extends AppCompatActivity {
                                             Log.d("이계정이 가진 글목록", db_content);
                                             String subCon = db_id + "        " + db_date + "         " + dbHosList;
                                             // 한 병원에 계정 하나가 하나의 리뷰만 등록가능
-                                            if (reviewContent.contains(db_content) && subContent.contains(subCon)) {
+                                            if (reviewContent.contains(db_content) && reviewSubContent.contains(subCon)) {
 
                                                 // 같은 내용도 생각하기
                                                 // 같은날 같은제목 일수도
@@ -96,7 +100,7 @@ public class myListActivity extends AppCompatActivity {
                                             } else {
                                                 hosList.add(dbHosList);
                                                 reviewContent.add(db_content);
-                                                subContent.add(subCon);
+                                                reviewSubContent.add(subCon);
                                             }
 
 
@@ -118,8 +122,8 @@ public class myListActivity extends AppCompatActivity {
                             ItemData oItem = new ItemData();
                             if (oData.size() != reviewContent.size()) {
                                 oItem.strTitle = reviewContent.get(i);
-                                oItem.strDate = subContent.get(i);
-                                Log.d("작성자 확인:", subContent.get(i));
+                                oItem.strDate = reviewSubContent.get(i);
+                                Log.d("작성자 확인:", reviewSubContent.get(i));
                                 oData.add(oItem);
                             }
 
@@ -140,13 +144,14 @@ public class myListActivity extends AppCompatActivity {
                 });
             }
         });
+
         myList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(myListActivity.this);
 
-                builder.setTitle("해당 리뷰를 삭제 하시겠습니까?").setMessage("삭제 후 리뷰 버튼을 터치해 갱신해 주세요ㅎ;");
+                builder.setTitle("해당 글을 삭제 하시겠습니까?").setMessage("삭제 후 버튼을 터치해 갱신해 주세요ㅎ;");
 
 
                 builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
@@ -155,7 +160,10 @@ public class myListActivity extends AppCompatActivity {
                         ListViewAdapter oAdapter = new ListViewAdapter(oData);
                         String data = oData.get(position).toString();
 
+                        if (reviewContent != null) {
 
+
+                        // 게시판 경우도 추가
                         Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
                         Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
                         // 아이템 삭제
@@ -169,7 +177,7 @@ public class myListActivity extends AppCompatActivity {
                                     public void onSuccess(Void unused) {
                                         Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
                                         reviewContent.clear();
-                                        subContent.clear();
+                                        reviewSubContent.clear();
                                         oData.clear();
                                         oAdapter.notifyDataSetChanged();
                                     }
@@ -180,6 +188,30 @@ public class myListActivity extends AppCompatActivity {
 
                             }
                         });
+                        } else{
+                            oData.remove(position);
+                            //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
+
+                            mReference = mDatabase.getReference().child("board"); // 지워야할 내용에 해당되는 부분 지우기
+                            mReference.child(boardContent.get(position)).setValue(null)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                            boardContent.clear();
+                                            boardTitle.clear();
+                                            boardSubContent.clear();
+                                            oData.clear();
+                                            oAdapter.notifyDataSetChanged();
+                                        }
+
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                }
+                            });
+                        }
                         // listview 갱신.
 
 
@@ -203,9 +235,83 @@ public class myListActivity extends AppCompatActivity {
         bdListButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                oData.clear();
+                mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
+                            String dbKey = messageData.getKey();//병원이름받고
+                            //Log.d("이계정이 가진 글목록 를! 불러올 병원들", db_content);
+                            mReference = mDatabase.getReference("board"); // 병원이름들 하나하나 넣음
+                            mReference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
+                                        String db_title = messageData.child("title").getValue().toString();
+                                        String db_content = messageData.child("content").getValue().toString();
+                                        String db_id = messageData.child("id").getValue().toString();
+                                        String db_date = messageData.child("date").getValue().toString();
+
+                                        if (db_id.equals(id)) {//로그인한 id와 내용의 id가 같으면
+
+                                            Log.d("이계정이 가진 글목록", db_content);
+                                            String subCon = db_id + "        " + db_date;
+                                            // 한 병원에 계정 하나가 하나의 리뷰만 등록가능
+                                            if (boardTitle.contains(db_title) && boardSubContent.contains(subCon)) {
+
+                                                // 같은 내용도 생각하기
+                                                // 같은날 같은제목 일수도
+                                                // 리뷰 번호가 필요한가 필요하겠다//
+                                            } else {
+                                                boardTitle.add(db_title);
+                                                boardContent.add(db_content);
+                                                boardSubContent.add(subCon);
+                                            }
 
 
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+
+                            });
+                        }
+                        Log.d("리스트 길이 : ", String.valueOf(boardTitle.size()));
+
+                        for (int i = 0; i < boardTitle.size(); i++) {
+                            ItemData oItem = new ItemData();
+                            if (oData.size() != boardTitle.size()) {
+                                oItem.strTitle = boardTitle.get(i);
+                                oItem.strDate = boardSubContent.get(i);
+                                Log.d("작성자 확인:", boardSubContent.get(i));
+                                oData.add(oItem);
+                            }
+
+
+                        }
+// ListView, Adapter 생성 및 연결 ------------------------
+
+                        ListViewAdapter oAdapter = new ListViewAdapter(oData);
+                        myList.setAdapter(oAdapter);
+
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
+
         });
 
     }

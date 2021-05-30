@@ -14,7 +14,7 @@
         android:gravity="center"
         android:textColor="#707070"
         android:textSize="16dp"
-        android:text="글 작성"
+        android:text="글 상세보기"
         android:background="#BFD0E6"
         />
     <LinearLayout

@@ -62,7 +62,7 @@ public class loginActivity extends AppCompatActivity {
                 String pw = input_pw.getText().toString().trim();
 
                 checkEmpty(id, pw);
-                mReference.addValueEventListener(new ValueEventListener() {
+                mReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         String f_id = "";

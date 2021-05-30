@@ -136,6 +136,7 @@ public class writeBoardActivity extends AppCompatActivity {
         public String date;
         public String title;
         public String num;
+        public String gPoint;
 
 
         public User() {
@@ -148,6 +149,7 @@ public class writeBoardActivity extends AppCompatActivity {
             this.date = date;
             this.title = title;
             this.num = num;
+            this.gPoint = gPoint;
 
         }
 
@@ -189,6 +191,13 @@ public class writeBoardActivity extends AppCompatActivity {
         public void setNum(String num) {
             this.num = num;
         }
+        public String getgPoint() {
+            return "0";
+        }
+
+        public void setgPoint(String num) {
+            this.gPoint = "0";
+        }
 
 
         @Override
@@ -199,6 +208,7 @@ public class writeBoardActivity extends AppCompatActivity {
                     ", date='" + date + '\'' +
                     ", title='" + title + '\'' +
                     ", num='" + num + '\'' +
+                    ", gPoint='" + gPoint + '\'' +
                     '}';
         }
     }

@@ -38,9 +38,7 @@ public class FragmentPage3 extends Fragment {
     @Override
     public void onPause() {//리스트 초기화
         super.onPause();
-        boardTitle.clear();
-        subContent.clear();
-        oData.clear();
+
     }
 
     @Nullable
@@ -48,7 +46,9 @@ public class FragmentPage3 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_3, container, false);
-
+        boardTitle.clear();
+        subContent.clear();
+        oData.clear();
         board_write_button = v.findViewById(R.id.board_write_button);
         board_write_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +118,7 @@ public class FragmentPage3 extends Fragment {
 
                 Log.d("위치를 찾아봅시다 : ", boardTitle.get(position) + "," + boardContent.get(position));
                 Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
+
 
                 startActivity(intent);
 

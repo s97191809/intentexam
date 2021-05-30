@@ -3,6 +3,7 @@ package com.example.intentexam;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,10 +37,13 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -74,6 +79,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     Button button3;
     Button button4;
     Button button5;
+    Button startbutton;
     Button trailButton;
     EditText editText1;
     TextView tv_sensor;
@@ -133,6 +139,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     int totalSteps = 0;
     int min;
     long time1;
+    boolean start = false;
 
     SensorManager sm;
     Sensor sensor_step_detector;
@@ -221,7 +228,15 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
 
         // 값 넘겨 받아오는 부분
+        startbutton = v.findViewById(R.id.startbutton);
+        startbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 여기서 화면 이동
 
+                start = true;
+            }
+        });
 
         coinView = v.findViewById(R.id.coin);
         coinView.setText("코인 수\n" + coin);
@@ -238,6 +253,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         tv_sensor = (TextView) v.findViewById(R.id.sensor);
         sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        // 버튼 누르기 전까지 NULL 이였다가 누르면 0으로 셋팅
+        //센서 거기에 NULL 이면 동작 안하게끔 만듬
         if (sensor_step_detector == null) {
             Toast.makeText(getContext(), "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
         }
@@ -315,295 +332,295 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         arrTempAllname.addAll(arrAllname);
 
-                adapter = new searchAdapter(arrAllname, getContext());
-                Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
-                ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
-                sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spiner.setAdapter(sAdapter);
-                spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        String selectDist = (String) spiner.getSelectedItem();
+        adapter = new searchAdapter(arrAllname, getContext());
+        Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
+        ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
+        sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spiner.setAdapter(sAdapter);
+        spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectDist = (String) spiner.getSelectedItem();
 
 
-                        if (selectDist.equals("거리 선택")) {
-                            if (removeMarker.isAlive()) {
+                if (selectDist.equals("거리 선택")) {
+                    if (removeMarker.isAlive()) {
 
-                                removeMarker.interrupt();
+                        removeMarker.interrupt();
 
-                            }
-                            removeMarker = new removeMarker();
-                            removeMarker.start();
-                            // 배열 초기화
-                            distTmapParkPoint.clear();
-                            distTmapParkName.clear();
-                            distTmapParkAddr.clear();
-                            distTmapHospitalPoint.clear();
-                            distTmapHospitalName.clear();
-                            distTmapHospitalName.clear();
-                            distTmapShopPoint.clear();
-                            distTmapShopName.clear();
-                            distTmapShopAddr.clear();
+                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
+                    // 배열 초기화
+                    distTmapParkPoint.clear();
+                    distTmapParkName.clear();
+                    distTmapParkAddr.clear();
+                    distTmapHospitalPoint.clear();
+                    distTmapHospitalName.clear();
+                    distTmapHospitalName.clear();
+                    distTmapShopPoint.clear();
+                    distTmapShopName.clear();
+                    distTmapShopAddr.clear();
 
-                            // 마커와 원 삭제
-                            tmap.removeAllMarkerItem();
-                            tmap.removeAllTMapCircle();
-                        } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
-                            if (removeMarker.isAlive()) {
+                    // 마커와 원 삭제
+                    tmap.removeAllMarkerItem();
+                    tmap.removeAllTMapCircle();
+                } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
+                    if (removeMarker.isAlive()) {
 
-                                removeMarker.interrupt();
+                        removeMarker.interrupt();
 
-                            }
-                            removeMarker = new removeMarker();
-                            removeMarker.start();
-                            distTmapParkPoint.clear();
-                            tmap.removeAllMarkerItem();
-                            location location = new location(getContext());
-                            double lat = location.getLatitude();
-                            double lon = location.getLongitude();
-                            point = new TMapPoint(lat, lon);
-                            TMapCircle tMapCircle = new TMapCircle();
-                            tMapCircle.setCenterPoint(point);
-                            tMapCircle.setRadius(500);
-                            tMapCircle.setCircleWidth(2);
-                            tMapCircle.setLineColor(Color.BLUE);
-                            tMapCircle.setAreaColor(Color.GRAY);
-                            tMapCircle.setAreaAlpha(100);
-                            tmap.addTMapCircle("circle1", tMapCircle);
-                            Location location2 = new Location("");//현재위치
-                            location2.setLatitude(lat);
-                            location2.setLongitude(lon);
-                            // 리스트 크기만큼 반복문
+                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
+                    distTmapParkPoint.clear();
+                    tmap.removeAllMarkerItem();
+                    location location = new location(getContext());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(500);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
+                    Location location2 = new Location("");//현재위치
+                    location2.setLatitude(lat);
+                    location2.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
 
-                            for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
-                                Location parkDestination1Km = new Location("");
-                                parkDestination1Km.setLatitude(arrParkLat.get(i));
-                                parkDestination1Km.setLongitude(arrParkLon.get(i));
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location parkDestination1Km = new Location("");
+                        parkDestination1Km.setLatitude(arrParkLat.get(i));
+                        parkDestination1Km.setLongitude(arrParkLon.get(i));
 
-                                double distance = location2.distanceTo(parkDestination1Km);
+                        double distance = location2.distanceTo(parkDestination1Km);
 
-                                //걸러진 어레이 리스트도 필요함
-                                if (distance <= 500) {// 단위 (M)
-                                    TMapPoint dtpoint = new TMapPoint(parkDestination1Km.getLatitude(), parkDestination1Km.getLongitude());
-                                    String dtname = arrParkName.get(i);
-                                    String dtaddr = arrParkAddr.get(i);
-                                    distTmapParkName.add(dtname);
-                                    distTmapParkAddr.add(dtaddr);
-                                    distTmapParkPoint.add(dtpoint);
-                                }
-                            }
-                            for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
-                                Location hospitalDestination1Km = new Location("");
-                                hospitalDestination1Km.setLatitude(arrHospitalLat.get(j));
-                                hospitalDestination1Km.setLongitude(arrHospitalLon.get(j));
+                        //걸러진 어레이 리스트도 필요함
+                        if (distance <= 500) {// 단위 (M)
+                            TMapPoint dtpoint = new TMapPoint(parkDestination1Km.getLatitude(), parkDestination1Km.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
+                            distTmapParkPoint.add(dtpoint);
+                        }
+                    }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location hospitalDestination1Km = new Location("");
+                        hospitalDestination1Km.setLatitude(arrHospitalLat.get(j));
+                        hospitalDestination1Km.setLongitude(arrHospitalLon.get(j));
 
-                                double distance = location2.distanceTo(hospitalDestination1Km);
+                        double distance = location2.distanceTo(hospitalDestination1Km);
 
-                                if (distance <= 500) {
-                                    TMapPoint dtpoint = new TMapPoint(hospitalDestination1Km.getLatitude(), hospitalDestination1Km.getLongitude());
-                                    String dtname = arrHospitalName.get(j);
-                                    String dtaddr = arrHospitalAddr.get(j);
-                                    distTmapHospitalName.add(dtname);
-                                    distTmapHospitalAddr.add(dtaddr);
-                                    distTmapHospitalPoint.add(dtpoint);
+                        if (distance <= 500) {
+                            TMapPoint dtpoint = new TMapPoint(hospitalDestination1Km.getLatitude(), hospitalDestination1Km.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
+                            distTmapHospitalPoint.add(dtpoint);
 
-                                }
-                            }
-                            for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
-                                Location shopDestination1Km = new Location("");
-                                shopDestination1Km.setLatitude(arrShopLat.get(k));
-                                shopDestination1Km.setLongitude(arrShopLon.get(k));
+                        }
+                    }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
+                        Location shopDestination1Km = new Location("");
+                        shopDestination1Km.setLatitude(arrShopLat.get(k));
+                        shopDestination1Km.setLongitude(arrShopLon.get(k));
 
-                                double distance = location2.distanceTo(shopDestination1Km);
+                        double distance = location2.distanceTo(shopDestination1Km);
 
-                                if (distance <= 500) {
-                                    TMapPoint dtpoint = new TMapPoint(shopDestination1Km.getLatitude(), shopDestination1Km.getLongitude());
-                                    String dtname = arrHospitalName.get(k);
-                                    String dtaddr = arrHospitalAddr.get(k);
-                                    distTmapShopPoint.add(dtpoint);
-                                    distTmapShopName.add(dtname);
-                                    distTmapShopAddr.add(dtaddr);
-                                }
-                            }
-                            makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
-                            makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
-                            makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
-                        } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
+                        if (distance <= 500) {
+                            TMapPoint dtpoint = new TMapPoint(shopDestination1Km.getLatitude(), shopDestination1Km.getLongitude());
+                            String dtname = arrHospitalName.get(k);
+                            String dtaddr = arrHospitalAddr.get(k);
+                            distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
+                        }
+                    }
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
+                } else if (selectDist.equals("2km (약 30분)")) {// 2km 선택시
 
-                            if (removeMarker.isAlive()) {
+                    if (removeMarker.isAlive()) {
 
-                                removeMarker.interrupt();
+                        removeMarker.interrupt();
 
-                            }
-                            removeMarker = new removeMarker();
-                            removeMarker.start();
-                            location location = new location(getContext());
-                            double lat = location.getLatitude();
-                            double lon = location.getLongitude();
-                            point = new TMapPoint(lat, lon);
-                            TMapCircle tMapCircle = new TMapCircle();
-                            tMapCircle.setCenterPoint(point);
-                            tMapCircle.setRadius(1000);
-                            tMapCircle.setCircleWidth(2);
-                            tMapCircle.setLineColor(Color.BLUE);
-                            tMapCircle.setAreaColor(Color.GRAY);
-                            tMapCircle.setAreaAlpha(100);
-                            tmap.addTMapCircle("circle1", tMapCircle);
+                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
+                    location location = new location(getContext());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(1000);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
 
-                            Location CurrentLocation = new Location("");//현재위치
-                            CurrentLocation.setLatitude(lat);
-                            CurrentLocation.setLongitude(lon);
-                            // 리스트 크기만큼 반복문
+                    Location CurrentLocation = new Location("");//현재위치
+                    CurrentLocation.setLatitude(lat);
+                    CurrentLocation.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
 
-                            for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
-                                Location parkLocation = new Location("");
-                                parkLocation.setLatitude(arrParkLat.get(i));
-                                parkLocation.setLongitude(arrParkLon.get(i));
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location parkLocation = new Location("");
+                        parkLocation.setLatitude(arrParkLat.get(i));
+                        parkLocation.setLongitude(arrParkLon.get(i));
 
-                                double distance = CurrentLocation.distanceTo(parkLocation);
+                        double distance = CurrentLocation.distanceTo(parkLocation);
 
-                                if (distance <= 1000) {
-                                    TMapPoint dtpoint = new TMapPoint(parkLocation.getLatitude(), parkLocation.getLongitude());
-                                    String dtname = arrParkName.get(i);
-                                    String dtaddr = arrParkAddr.get(i);
-                                    distTmapParkPoint.add(dtpoint);
-                                    distTmapParkName.add(dtname);
-                                    distTmapParkAddr.add(dtaddr);
-                                }
-                            }
-                            for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
-                                Location hostpitalLocation = new Location("");
-                                hostpitalLocation.setLatitude(arrHospitalLat.get(j));
-                                hostpitalLocation.setLongitude(arrHospitalLon.get(j));
+                        if (distance <= 1000) {
+                            TMapPoint dtpoint = new TMapPoint(parkLocation.getLatitude(), parkLocation.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
+                            distTmapParkPoint.add(dtpoint);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
+                        }
+                    }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location hostpitalLocation = new Location("");
+                        hostpitalLocation.setLatitude(arrHospitalLat.get(j));
+                        hostpitalLocation.setLongitude(arrHospitalLon.get(j));
 
-                                double distance = CurrentLocation.distanceTo(hostpitalLocation);
+                        double distance = CurrentLocation.distanceTo(hostpitalLocation);
 
-                                if (distance <= 1000) {
-                                    TMapPoint dtpoint = new TMapPoint(hostpitalLocation.getLatitude(), hostpitalLocation.getLongitude());
-                                    String dtname = arrHospitalName.get(j);
-                                    String dtaddr = arrHospitalAddr.get(j);
-                                    distTmapHospitalName.add(dtname);
-                                    distTmapHospitalAddr.add(dtaddr);
-                                    distTmapHospitalPoint.add(dtpoint);
-                                }
-                            }
-                            for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련상점
-                                Location shopLocation = new Location("");
-                                shopLocation.setLatitude(arrShopLat.get(k));
-                                shopLocation.setLongitude(arrShopLon.get(k));
+                        if (distance <= 1000) {
+                            TMapPoint dtpoint = new TMapPoint(hostpitalLocation.getLatitude(), hostpitalLocation.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
+                            distTmapHospitalPoint.add(dtpoint);
+                        }
+                    }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련상점
+                        Location shopLocation = new Location("");
+                        shopLocation.setLatitude(arrShopLat.get(k));
+                        shopLocation.setLongitude(arrShopLon.get(k));
 
-                                double distance = CurrentLocation.distanceTo(shopLocation);
+                        double distance = CurrentLocation.distanceTo(shopLocation);
 
-                                if (distance <= 1000) {
-                                    TMapPoint dtpoint = new TMapPoint(shopLocation.getLatitude(), shopLocation.getLongitude());
-                                    String dtname = arrShopName.get(k);
-                                    String dtaddr = arrShopAddr.get(k);
-                                    distTmapShopPoint.add(dtpoint);
-                                    distTmapShopName.add(dtname);
-                                    distTmapShopAddr.add(dtaddr);
+                        if (distance <= 1000) {
+                            TMapPoint dtpoint = new TMapPoint(shopLocation.getLatitude(), shopLocation.getLongitude());
+                            String dtname = arrShopName.get(k);
+                            String dtaddr = arrShopAddr.get(k);
+                            distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
 
-                                }
-                            }
-                            makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
-                            makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
-                            makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
-                        } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
-                            if (removeMarker.isAlive()) {
+                        }
+                    }
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
+                } else if (selectDist.equals("3km (약 45분)")) {// 3km 선택시
+                    if (removeMarker.isAlive()) {
 
-                                removeMarker.interrupt();
+                        removeMarker.interrupt();
 
-                            }
-                            removeMarker = new removeMarker();
-                            removeMarker.start();
+                    }
+                    removeMarker = new removeMarker();
+                    removeMarker.start();
 
-                            distTmapParkPoint.clear();
-                            distTmapHospitalPoint.clear();
-                            distTmapShopPoint.clear();
-                            location location = new location(getContext());
-                            double lat = location.getLatitude();
-                            double lon = location.getLongitude();
-                            point = new TMapPoint(lat, lon);
-                            TMapCircle tMapCircle = new TMapCircle();
-                            tMapCircle.setCenterPoint(point);
-                            tMapCircle.setRadius(1500);
-                            tMapCircle.setCircleWidth(2);
-                            tMapCircle.setLineColor(Color.BLUE);
-                            tMapCircle.setAreaColor(Color.GRAY);
-                            tMapCircle.setAreaAlpha(100);
-                            tmap.addTMapCircle("circle1", tMapCircle);
+                    distTmapParkPoint.clear();
+                    distTmapHospitalPoint.clear();
+                    distTmapShopPoint.clear();
+                    location location = new location(getContext());
+                    double lat = location.getLatitude();
+                    double lon = location.getLongitude();
+                    point = new TMapPoint(lat, lon);
+                    TMapCircle tMapCircle = new TMapCircle();
+                    tMapCircle.setCenterPoint(point);
+                    tMapCircle.setRadius(1500);
+                    tMapCircle.setCircleWidth(2);
+                    tMapCircle.setLineColor(Color.BLUE);
+                    tMapCircle.setAreaColor(Color.GRAY);
+                    tMapCircle.setAreaAlpha(100);
+                    tmap.addTMapCircle("circle1", tMapCircle);
 
-                            Location location2 = new Location("");//현재위치
-                            location2.setLatitude(lat);
-                            location2.setLongitude(lon);
-                            // 리스트 크기만큼 반복문
+                    Location location2 = new Location("");//현재위치
+                    location2.setLatitude(lat);
+                    location2.setLongitude(lon);
+                    // 리스트 크기만큼 반복문
 
-                            for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
-                                Location location3 = new Location("");
-                                location3.setLatitude(arrParkLat.get(i));
-                                location3.setLongitude(arrParkLon.get(i));
+                    for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
+                        Location location3 = new Location("");
+                        location3.setLatitude(arrParkLat.get(i));
+                        location3.setLongitude(arrParkLon.get(i));
 
-                                double distance = location2.distanceTo(location3);
+                        double distance = location2.distanceTo(location3);
 
-                                //걸러진 어레이 리스트도 필요함
-                                if (distance <= 1500) {
-                                    Log.d("3KM 반경 거리", String.valueOf(distance));
-                                    Log.d("3km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
-                                    TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
-                                    String dtname = arrParkName.get(i);
-                                    String dtaddr = arrParkAddr.get(i);
-                                    distTmapParkName.add(dtname);
-                                    distTmapParkAddr.add(dtaddr);
-                                    distTmapParkPoint.add(dtpoint);
-                                }
-
-                            }
-                            for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
-                                Location location4 = new Location("");
-                                location4.setLatitude(arrHospitalLat.get(j));
-                                location4.setLongitude(arrHospitalLon.get(j));
-
-                                double distance = location2.distanceTo(location4);
-
-                                if (distance <= 1500) {
-                                    TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
-                                    String dtname = arrHospitalName.get(j);
-                                    String dtaddr = arrHospitalAddr.get(j);
-                                    distTmapHospitalName.add(dtname);
-                                    distTmapHospitalAddr.add(dtaddr);
-                                    distTmapHospitalPoint.add(dtpoint);
-                                }
-                            }
-                            for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
-                                Location location5 = new Location("");
-                                location5.setLatitude(arrShopLat.get(k));
-                                location5.setLongitude(arrShopLon.get(k));
-
-                                double distance = location2.distanceTo(location5);
-
-                                if (distance <= 1500) {
-                                    TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
-                                    String dtname = arrHospitalName.get(k);
-                                    String dtaddr = arrHospitalAddr.get(k);
-                                    distTmapShopPoint.add(dtpoint);
-                                    distTmapShopName.add(dtname);
-                                    distTmapShopAddr.add(dtaddr);
-                                }
-                            }
-                            // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
-                            makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
-                            makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
-                            makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
-
+                        //걸러진 어레이 리스트도 필요함
+                        if (distance <= 1500) {
+                            Log.d("3KM 반경 거리", String.valueOf(distance));
+                            Log.d("3km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
+                            TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
+                            String dtname = arrParkName.get(i);
+                            String dtaddr = arrParkAddr.get(i);
+                            distTmapParkName.add(dtname);
+                            distTmapParkAddr.add(dtaddr);
+                            distTmapParkPoint.add(dtpoint);
                         }
 
                     }
+                    for (int j = 0; j < arrTMapPointHospital.size(); j++) {//병원
+                        Location location4 = new Location("");
+                        location4.setLatitude(arrHospitalLat.get(j));
+                        location4.setLongitude(arrHospitalLon.get(j));
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
+                        double distance = location2.distanceTo(location4);
 
+                        if (distance <= 1500) {
+                            TMapPoint dtpoint = new TMapPoint(location4.getLatitude(), location4.getLongitude());
+                            String dtname = arrHospitalName.get(j);
+                            String dtaddr = arrHospitalAddr.get(j);
+                            distTmapHospitalName.add(dtname);
+                            distTmapHospitalAddr.add(dtaddr);
+                            distTmapHospitalPoint.add(dtpoint);
+                        }
                     }
+                    for (int k = 0; k < arrTMapPointShop.size(); k++) {//관련 상점
+                        Location location5 = new Location("");
+                        location5.setLatitude(arrShopLat.get(k));
+                        location5.setLongitude(arrShopLon.get(k));
 
-                });
+                        double distance = location2.distanceTo(location5);
+
+                        if (distance <= 1500) {
+                            TMapPoint dtpoint = new TMapPoint(location5.getLatitude(), location5.getLongitude());
+                            String dtname = arrHospitalName.get(k);
+                            String dtaddr = arrHospitalAddr.get(k);
+                            distTmapShopPoint.add(dtpoint);
+                            distTmapShopName.add(dtname);
+                            distTmapShopAddr.add(dtaddr);
+                        }
+                    }
+                    // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
+                    makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
+                    makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
+                    makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
+
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+
+        });
 
         // 리스트뷰에 아답터를 연결한다.
 
@@ -815,14 +832,34 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 @Override
                 public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
                     tmap.removeAllTMapPolyLine();
-                    if(arrHospitalName.contains(tMapMarkerItem2.getID())){
+                    if (arrHospitalName.contains(tMapMarkerItem2.getID())) {
                         Intent intent = new Intent(getActivity(), hospitalReview.class);
-                        intent.putExtra("hpName", String.valueOf(tMapMarkerItem2.getID())) ;
+                        intent.putExtra("hpName", String.valueOf(tMapMarkerItem2.getID()));
 
                         startActivity(intent);
 
 
                         Log.d("병원이름 : ", tMapMarkerItem2.getID());
+                    }else{
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                        builder.setTitle(tMapMarkerItem2.getID()+"로 이동하시겠습니까?");
+
+
+                        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent = new Intent(getActivity(), naviActivity.class);
+                                startActivity(intent);
+                            }
+                        });
+                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        });
+
                     }
                     Log.d("아이템 확인 : ", s);
                     location location = new location(getActivity());
@@ -872,43 +909,93 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         sf = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
         String weight = sf.getString("weight", "");
+        String id = sf.getString("inputId", "");
+        if (start == true) {
+            long end = System.currentTimeMillis();
+            min = (int) ((end - time1) / 1000) / 60 % 60;
+            sec = (int) ((end - time1) / 1000) % 60;
+            // air= 3.5*몸무게*분 kcal=air*5/1000
+            //min = (time1 / 60 % 60);
 
-        long end = System.currentTimeMillis();
-        min = (int) ((end - time1) / 1000) / 60 % 60;
-        sec = (int) ((end - time1) / 1000) % 60;
-        // air= 3.5*몸무게*분 kcal=air*5/1000
-        //min = (time1 / 60 % 60);
+            Log.d("시간 : ", String.valueOf(min) + "분");
+            Log.d("시간 : ", String.valueOf(sec) + "초");
 
-        Log.d("시간 : ", String.valueOf(min) + "분");
-        Log.d("시간 : ", String.valueOf(sec) + "초");
+            double air = 3.5 * Integer.parseInt(weight) * min;
+            double kcal = air * 5 / 1000;
+            kcalView.setText("kcal\n" + (int) kcal);
 
-        double air = 3.5 * Integer.parseInt(weight) * min;
-        double kcal = air * 5 / 1000;
-        kcalView.setText("kcal\n" + (int) kcal);
+            // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
+            if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
+                tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
+                steps++;
 
-        // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            tv_sensor.setText("걸음 수\n" +String.valueOf(totalSteps++));
-            steps++;
+                Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
+                totalDistance = steps * 0.7; //m
+                Log.d("현재 걸음 수 ", String.valueOf(steps));
 
-            Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
-            totalDistance = steps * 0.7; //m
-            Log.d("현재 걸음 수 ", String.valueOf(steps));
+                if (totalDistance >= 2000 ) {
+                    coin++;
+                    accDistance = totalDistance;
+                    totalDistance = totalDistance - 2000;
+                    steps = 0;
+                    dista.setText("이동거리\n" + (int) accDistance + " M");
+                    //여기서 코인수 늘려주면 됩니당
+                    //근데 넘 커찮아여
 
-            if (totalDistance >= 2000) {
-                coin++;
-                accDistance = totalDistance;
-                totalDistance = totalDistance - 2000;
-                steps = 0;
-                dista.setText("이동거리\n" + (int) accDistance + " M");
-                Log.d("코인 수 ", String.valueOf(coin));
+                    Log.d("코인 수 ", String.valueOf(coin));
+                    Log.d("아이디확인 ", id);
+
+                    coinView.setText("이동거리\n"+String.valueOf(coin));
+                    mDatabase = FirebaseDatabase.getInstance();
+                    mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
+                    mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        String db_coin;
+                        String db_id;
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
+                                db_coin = messageData.child("coin").getValue().toString();
+                                db_id = messageData.child("userId").getValue().toString();
+                                Log.d("넘겨온 아디", id);
+                                if(id.equals(db_id)) {
+                                    mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
+                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+
+                                                }
+
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+                                }
+
+                            }
+
+                            
+                            // null값뜸
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
 
             } else {
                 dista.setText("이동거리\n" + (int) totalDistance + " M");
             }
         }
-
+            //zzzzzz
     }
+
+}
 
     private final LocationListener mLocationListener = new LocationListener() {
 
@@ -1044,7 +1131,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                         String trailEnd = intent.getStringExtra("end");
                         String[] tstart = trailStart.split(":");
                         String[] tsend = trailEnd.split(":");
-                       // passList.add(new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1])));
+                        // passList.add(new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1])));
                         TMapPoint stpt = new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1]));
                         TMapPoint edpt = new TMapPoint(Double.valueOf(tsend[0]), Double.valueOf(tsend[1]));
 
@@ -1148,26 +1235,26 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         mReference.addChildEventListener(mChild);
     }
 
-    public abstract class OnSingleClickListener implements View.OnClickListener {
+public abstract class OnSingleClickListener implements View.OnClickListener {
 
-        //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
-        private static final long MIN_CLICK_INTERVAL = 600;
-        private long mLastClickTime = 0;
+    //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
+    private static final long MIN_CLICK_INTERVAL = 600;
+    private long mLastClickTime = 0;
 
-        public abstract void onSingleClick(View v);
+    public abstract void onSingleClick(View v);
 
-        @Override
-        public final void onClick(View v) {
-            long currentClickTime = SystemClock.uptimeMillis();
-            long elapsedTime = currentClickTime - mLastClickTime;
-            mLastClickTime = currentClickTime;
+    @Override
+    public final void onClick(View v) {
+        long currentClickTime = SystemClock.uptimeMillis();
+        long elapsedTime = currentClickTime - mLastClickTime;
+        mLastClickTime = currentClickTime;
 
-            // 중복클릭 아닌 경우
-            if (elapsedTime > MIN_CLICK_INTERVAL) {
-                onSingleClick(v);
-            }
+        // 중복클릭 아닌 경우
+        if (elapsedTime > MIN_CLICK_INTERVAL) {
+            onSingleClick(v);
         }
     }
+}
 
 
 }
