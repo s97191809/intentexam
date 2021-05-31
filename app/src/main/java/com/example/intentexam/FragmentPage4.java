@@ -24,6 +24,7 @@ public class FragmentPage4 extends Fragment {
 
     TextView nameView;
     TextView weightView;
+    TextView coinView;
     SharedPreferences sf;
     private TextView txt_preferences;
 
@@ -39,16 +40,20 @@ public class FragmentPage4 extends Fragment {
 
         String name = sf.getString("name", "");
         String weight = sf.getString("weight", "");
+        String coin = sf.getString("coin", "");
+        int icoin =  Integer.parseInt(coin)/100;;
+        String slevel = String.valueOf(icoin);
 
         idView = v.findViewById(R.id.id);
 
         nameView = v.findViewById(R.id.name);
         weightView = v.findViewById(R.id.weight);
+        coinView = v.findViewById(R.id.coin);
 
         idView.setText("아이디 : " + id);
-
         nameView.setText("이름 : " + name);
         weightView.setText("몸무게(kg) : " + weight);
+        coinView.setText("레벨 : " + slevel);
 
         logoutButton = v.findViewById(R.id.logout);
         logoutButton.setOnClickListener(new View.OnClickListener() {

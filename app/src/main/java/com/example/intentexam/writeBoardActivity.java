@@ -89,7 +89,7 @@ public class writeBoardActivity extends AppCompatActivity {
         });
 
 
-        board_cancelButton = findViewById(R.id.board_cancelButton);
+        board_cancelButton = findViewById(R.id.add_pic_Button);
         board_cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
