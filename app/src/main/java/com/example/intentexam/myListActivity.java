@@ -163,32 +163,32 @@ public class myListActivity extends AppCompatActivity {
                         if (reviewContent != null) {
 
 
-                        // 게시판 경우도 추가
-                        Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
-                        Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
-                        // 아이템 삭제
-                        oData.remove(position);
-                        //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
+                            // 게시판 경우도 추가
+                            Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
+                            Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
+                            // 아이템 삭제
+                            oData.remove(position);
+                            //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
 
-                        mReference = mDatabase.getReference().child("hospitalreview").child(hosList.get(position)); // 지워야할 내용에 해당되는 부분 지우기
-                        mReference.child(reviewContent.get(position)).setValue(null)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                        reviewContent.clear();
-                                        reviewSubContent.clear();
-                                        oData.clear();
-                                        oAdapter.notifyDataSetChanged();
-                                    }
+                            mReference = mDatabase.getReference().child("hospitalreview").child(hosList.get(position)); // 지워야할 내용에 해당되는 부분 지우기
+                            mReference.child(reviewContent.get(position)).setValue(null)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                            reviewContent.clear();
+                                            reviewSubContent.clear();
+                                            oData.clear();
+                                            oAdapter.notifyDataSetChanged();
+                                        }
 
-                                }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
 
-                            }
-                        });
-                        } else{
+                                }
+                            });
+                        } else {
                             oData.remove(position);
                             //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
 
