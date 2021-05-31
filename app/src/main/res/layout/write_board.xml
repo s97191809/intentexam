@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:gravity="center"
-        android:textColor="#707070"
+        android:textColor="#ffffff"
         android:textSize="16dp"
-        android:text="게시글 작성"
+        android:text="글 작성"
         android:background="#BFD0E6"
         />
     <LinearLayout
@@ -33,7 +33,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#000000"/>
+        android:background="#707070"/>
 
         <EditText
             android:id="@+id/a_title"
@@ -86,7 +86,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/button"
             android:gravity="center"
-            android:textColor="#ffffff"
+            android:textColor="#707070"
             android:textSize="16dp"
             android:text="첨부"
             app:layout_constraintStart_toStartOf="parent"
