@@ -46,6 +46,20 @@
             android:textSize="16dp"
           />
         <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#ffffff"
+        />
+        <TextView
+            android:hint="주소"
+            android:id="@+id/b_title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center"
+            android:textColor="#707070"
+            android:textSize="16dp"
+            />
+        <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#ffffff"
