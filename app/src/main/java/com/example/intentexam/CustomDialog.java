@@ -1,7 +1,9 @@
 package com.example.intentexam;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.view.View;
 import android.view.Window;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.common.internal.Constants;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -68,6 +71,8 @@ public class CustomDialog extends AppCompatActivity {
 
         final Button okButton = (Button) dlg.findViewById(R.id.okButton);
         final Button cancelButton = (Button) dlg.findViewById(R.id.cancelButton);
+        final Button daylist = (Button) dlg.findViewById(R.id.daylist);
+
 
         mDatabase = FirebaseDatabase.getInstance();
         getloginInfo = context.getSharedPreferences("info", context.MODE_PRIVATE);
@@ -113,6 +118,17 @@ public class CustomDialog extends AppCompatActivity {
                 dlg.dismiss();
             }
         });
+        daylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, dayListActivity.class);
+                context.startActivity(intent);
+
+            }
+        });
+
+
     }
 
     private void writeMemo(String title, String content, String id, String curYear, String curMonth, String day) {

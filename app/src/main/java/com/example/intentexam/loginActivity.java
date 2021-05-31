@@ -35,6 +35,7 @@ public class loginActivity extends AppCompatActivity {
     EditText input_pw;
     String name;
     String weight;
+    String coin;
 
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +79,7 @@ public class loginActivity extends AppCompatActivity {
                             if (db_id.equals(id) && db_pw.equals(pw)) {
                                 name = messageData.child("userName").getValue().toString().trim();
                                 weight = messageData.child("weight").getValue().toString().trim();
+                                coin = messageData.child("coin").getValue().toString().trim();
                                 f_id = id;
                                 f_pw = pw;
                                 break;
@@ -177,6 +179,7 @@ public class loginActivity extends AppCompatActivity {
                 autoLogin.putString("inputPwd", input_pw.getText().toString());
                 autoLogin.putString("name", name);
                 autoLogin.putString("weight", weight);
+                autoLogin.putString("coin", coin);
                 autoLogin.commit();
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);

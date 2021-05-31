@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class drawalActivity extends AppCompatActivity {
     Button withdrawal_ok_Button;
+    Button withdrawal_cancelButton;
     final ArrayList<String> reviewList = new ArrayList<>();
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
@@ -54,6 +55,13 @@ public class drawalActivity extends AppCompatActivity {
                 delUser(id);
                 delHospitalReview(id);
                 delCalender(id);
+            }
+        });
+        withdrawal_cancelButton =findViewById(R.id.withdrawal_cancelButton);
+        withdrawal_cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 
@@ -95,6 +103,7 @@ public class drawalActivity extends AppCompatActivity {
                 finish();
             }
         });
+
     }
 
     public void delHospitalReview(String id) {

@@ -4,14 +4,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -19,13 +23,30 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.skt.Tmap.TMapAddressInfo;
+import com.skt.Tmap.TMapData;
+import com.skt.Tmap.TMapPoint;
+
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 public class showBoardDetail extends AppCompatActivity {
     private DatabaseReference mReference;
     private FirebaseDatabase mDatabase;
     TextView boardTitleView;
     TextView boardDetailView;
+    ImageView imgview;
+    TextView address;
     Button boardGpoint;
+    String filename;
+    String gpoint;
+    String gp;
+    //TMapAddressInfo aressInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +55,63 @@ public class showBoardDetail extends AppCompatActivity {
         Intent secondIntent = getIntent();
         String title = secondIntent.getStringExtra("title");
         String content = secondIntent.getStringExtra("content");
+        address = findViewById(R.id.b_title);
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
+        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
+                    String db_title = messageData.child("title").getValue().toString();
+                    String db_content = messageData.child("content").getValue().toString();
+                    if(title.equals(db_title) && content.equals(db_content)){
+                        String db_address = messageData.child("address").getValue().toString();
+                        address.setText(db_address);
+                        filename = title+content+db_address;
+                        Log.d("파일이름  ",filename);
+                    }
+                }
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        imgview = findViewById(R.id.imgview);
+        FirebaseStorage storage = FirebaseStorage.getInstance("gs://narang-a1a26.appspot.com/");
+        StorageReference storageRef = storage.getReference().child("board_img/");
+
+
+        //Url을 다운받기
+        storageRef.child(filename+".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
+                Glide.with(getApplicationContext()).load(uri).into(imgview);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        /*storageRef.child(filename+".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            public void onSuccess(Uri uri) {
+                Glide.with(getApplicationContext()).load(uri).into(imgview);
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "실패", Toast.LENGTH_SHORT).show();
+            }
+        });*/
         boardTitleView = findViewById(R.id.a_title);
         boardTitleView.setText(title);
 
@@ -49,13 +126,15 @@ public class showBoardDetail extends AppCompatActivity {
                 mDatabase = FirebaseDatabase.getInstance();
                 mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
                 mReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    String gp;
+
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
                             gp = messageData.child("gPoint").getValue().toString();
+                            boardGpoint.setText(gp);
                             Log.d("받은 좋아요 수 : ", gp);
+
 
                         }
                         mReference = mDatabase.getReference().child("board"); // 지워야할 내용에 해당되는 부분 지우기

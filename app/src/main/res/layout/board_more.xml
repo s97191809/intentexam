@@ -45,6 +45,7 @@
             android:textColor="#707070"
             android:textSize="16dp"
           />
+
         <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
@@ -55,6 +56,20 @@
             android:id="@+id/b_title"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:gravity="center"
+            android:textColor="#707070"
+            android:textSize="16dp"
+            />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ffffff"
+            />
+        <ImageView
+            android:hint="사진"
+            android:id="@+id/imgview"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
             android:gravity="center"
             android:textColor="#707070"
             android:textSize="16dp"

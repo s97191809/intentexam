@@ -30,7 +30,6 @@
             android:gravity="center_vertical"
             android:paddingLeft="10dp"
             android:textColor="#707070"
-
             />
     </LinearLayout>
 

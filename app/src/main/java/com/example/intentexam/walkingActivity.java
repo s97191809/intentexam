@@ -42,7 +42,7 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
-public class naviActivity extends AppCompatActivity implements SensorEventListener {
+public class walkingActivity extends AppCompatActivity implements SensorEventListener {
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     private TMapView tmap;
     private FirebaseDatabase mDatabase;
@@ -63,7 +63,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
     double accDistance = 0;
     calTime calTime;
     SharedPreferences sf;
-
+    TMapPoint st_point;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_navi);
         setGps();
 
-        if (ContextCompat.checkSelfPermission(naviActivity.this,
+        if (ContextCompat.checkSelfPermission(walkingActivity.this,
                 Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {//센서 권한 요청
             //ask for permission
 
@@ -92,7 +92,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         tmap.setCompassMode(true);
         tmap.setIconVisibility(true);
 
-        TMapGpsManager tmapgps = new TMapGpsManager(naviActivity.this);
+        TMapGpsManager tmapgps = new TMapGpsManager(walkingActivity.this);
         tmapgps.setMinTime(1000);
         tmapgps.setMinDistance(5);
         tmapgps.setProvider(tmapgps.NETWORK_PROVIDER);
@@ -102,45 +102,17 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         tmap.setSightVisible(true);
 
         //넘어올때 위치 정보 가져오고 안내 여부 묻기
-        TMapData tmapdata = new TMapData();
-        Intent intent = getIntent();
-        String naviName = intent.getStringExtra("naviName");
-        Double edlt = intent.getDoubleExtra("eplt", 0);
-        Double edln = intent.getDoubleExtra("epln", 0);
-        TMapPoint endPoint = new TMapPoint(edlt, edln);
-        location location = new location(this);
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        TMapPoint st_point = new TMapPoint(lat, lon);
-        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, endPoint, new TMapData.FindPathDataListenerCallback() {
-            @Override
-            public void onFindPathData(TMapPolyLine polyLine) {
 
-                polyLine.setID("pedLine");
-                tmap.addTMapPath(polyLine);
-                TMapInfo info = tmap.getDisplayTMapInfo(polyLine.getLinePoint());
-
-                int zoom = info.getTMapZoomLevel();
-                if (zoom > 20) {
-                    zoom = 20;
-                }
-                tmap.setZoomLevel(zoom);
-
-            }
-        });
         startButton = findViewById(R.id.startbutton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 안내 시작하겠다고 하면 true로 바꿔서 기록 시작
                 Log.d( "시자아ㅏㅏㅏㅏㅏ악", "tqdasf");
-                AlertDialog.Builder builder = new AlertDialog.Builder(naviActivity.this);
-
-                builder.setTitle("안내를 시작하시겠습니까?").setMessage("도착 장소 : " + naviName);
-                builder.setPositiveButton("출발", new DialogInterface.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(walkingActivity.this);
+                builder.setPositiveButton("시작", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        tmap.setZoomLevel(20);
                         start = true;
                     }
                 });
@@ -148,6 +120,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
+                        finish();
                     }
                 });
 
@@ -193,6 +166,28 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
                 //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
+                TMapData tmapdata = new TMapData();
+                Intent intent = getIntent();
+                if(st_point==null){
+                   st_point = new TMapPoint(latitude, longitude);
+                }
+                TMapPoint endPoint = new TMapPoint(latitude, longitude);
+
+                tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, endPoint, new TMapData.FindPathDataListenerCallback() {
+                    @Override
+                    public void onFindPathData(TMapPolyLine polyLine) {
+                        polyLine.setLineColor(1);
+
+                        //polyLine.setID("pedLine");
+                        tmap.addTMapPolyLine("pedine",polyLine);
+                        TMapInfo info = tmap.getDisplayTMapInfo(polyLine.getLinePoint());
+
+                        int zoom = info.getTMapZoomLevel();
+                        zoom = 20;
+                        tmap.setZoomLevel(zoom);
+
+                    }
+                });
 
             }
 

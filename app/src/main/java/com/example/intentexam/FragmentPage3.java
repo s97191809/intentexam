@@ -1,6 +1,9 @@
 package com.example.intentexam;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,13 +18,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.skt.Tmap.TMapAddressInfo;
+import com.skt.Tmap.TMapData;
+import com.skt.Tmap.TMapPoint;
 
+import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import static android.app.Activity.RESULT_OK;
 
 public class FragmentPage3 extends Fragment {
 
@@ -29,15 +44,24 @@ public class FragmentPage3 extends Fragment {
     private FirebaseDatabase mDatabase;
     Button board_write_button;
     TextView textView3;
+
     ListView board_list;
     final ArrayList<String> boardTitle = new ArrayList<>();
     final ArrayList<String> subContent = new ArrayList<>();
     final ArrayList<String> boardContent = new ArrayList<>();
     final ArrayList<ItemData> oData = new ArrayList<>();
+    TMapAddressInfo aressInfo;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
     @Override
     public void onPause() {//리스트 초기화
         super.onPause();
+
 
     }
 
@@ -46,9 +70,7 @@ public class FragmentPage3 extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_3, container, false);
-        boardTitle.clear();
-        subContent.clear();
-        oData.clear();
+
         board_write_button = v.findViewById(R.id.board_write_button);
         board_write_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,14 +90,20 @@ public class FragmentPage3 extends Fragment {
         mDatabase = FirebaseDatabase.getInstance();
         mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
         mReference.addValueEventListener(new ValueEventListener() {
+
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boardTitle.clear();
+                subContent.clear();
+                oData.clear();
                 for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
                     String db_title = messageData.child("title").getValue().toString();
                     String db_writer = messageData.child("id").getValue().toString();
                     String db_date = messageData.child("date").getValue().toString();
                     String content = messageData.child("content").getValue().toString();
+
+
                     String subCon = db_writer + "        " + db_date;
                     if (boardTitle.contains(db_title) && subContent.contains(subCon)) {
                     } else {
@@ -113,8 +141,9 @@ public class FragmentPage3 extends Fragment {
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
                 String data = oData.get(position).toString();
 
-                intent.putExtra("title", boardTitle.get(position)) ;
-                intent.putExtra("content", boardContent.get(position)) ;
+                intent.putExtra("title", boardTitle.get(position));
+                intent.putExtra("content", boardContent.get(position));
+
 
                 Log.d("위치를 찾아봅시다 : ", boardTitle.get(position) + "," + boardContent.get(position));
                 Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
@@ -123,9 +152,10 @@ public class FragmentPage3 extends Fragment {
                 startActivity(intent);
 
 
-
             }
         });
+
+
         return v;
     }
 
@@ -137,5 +167,9 @@ public class FragmentPage3 extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+
     }
+
+
 }
+

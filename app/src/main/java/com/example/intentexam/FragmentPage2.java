@@ -50,6 +50,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.skt.Tmap.TMapAddressInfo;
 import com.skt.Tmap.TMapCircle;
 import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapGpsManager;
@@ -63,13 +64,18 @@ import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.LogManager;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import static android.app.Activity.RESULT_OK;
 import static java.lang.Thread.sleep;
@@ -81,6 +87,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     Button button5;
     Button startbutton;
     Button trailButton;
+    Button goodboard;
     EditText editText1;
     TextView tv_sensor;
     TextView dista;
@@ -120,6 +127,13 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     final ArrayList<String> distTmapShopName = new ArrayList<>();
     final ArrayList<String> distTmapShopAddr = new ArrayList<>();
 
+    final ArrayList<TMapPoint> boardTopPoint = new ArrayList<>();
+    final ArrayList<String> boardTopName = new ArrayList<>();
+    final ArrayList<String> boardTopgPoint  = new ArrayList<>();
+    final ArrayList<String> boardTopAddr  = new ArrayList<>();
+    final ArrayList<Double> boardToplat = new ArrayList<>();
+    final ArrayList<Double> boardToplon = new ArrayList<>();
+
     final ArrayList<String> trailInfo = new ArrayList<>();
     final ArrayList<TMapPoint> passList = new ArrayList<>();
 
@@ -144,6 +158,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     SensorManager sm;
     Sensor sensor_step_detector;
     SharedPreferences sf;
+    loadBoard loadBoard;
+    findAddress findAddress;
 
     calTime calTime;
     static final int REQ_ADD_CONTACT = 1;
@@ -156,6 +172,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     private int accMin;
     private int sec;
     private String name;
+    private int exp;
+    TMapAddressInfo aressInfo;
 
 
     @Override
@@ -165,12 +183,13 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         time1 = System.currentTimeMillis();
         try {
             SharedPreferences prefs = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
-
             int size = prefs.getInt("Status_size", 0);
             String name = sf.getString("name", "");
             String start = sf.getString("start", "");
             String end = sf.getString("end", "");
             Log.d("이름, 시작, 끝", name + ", " + start + ", " + end);
+
+
         } catch (Exception exception) {
             exception.printStackTrace();
         }
@@ -213,6 +232,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         TMapPoint polypoint = new TMapPoint(lat, lon);
         polyline.addLinePoint(polypoint);
 
+        SharedPreferences sf = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
 
         initDatabase();
         //칼로리계산
@@ -232,8 +252,18 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         startbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 여기서 화면 이동
+                if (removeMarker.isAlive()) {
 
+                    removeMarker.interrupt();
+
+                }
+                removeMarker = new removeMarker();
+                removeMarker.start();
+                // 여기서 화면 이동
+                Log.d("클릭여부", "stads");
+                Toast.makeText(getContext(),"산책을 시작합니다.",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getContext(), walkingActivity.class);
+                startActivityForResult(intent, 2);
                 start = true;
             }
         });
@@ -249,6 +279,17 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         dbLoad = new dbLoad();
         dbLoad.start();
+        TMapData tMapData = new TMapData();
+
+
+
+        loadBoard = new loadBoard();
+        loadBoard.start();
+
+        findAddress = new findAddress();
+        findAddress.start();
+
+
 
         tv_sensor = (TextView) v.findViewById(R.id.sensor);
         sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
@@ -258,7 +299,23 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         if (sensor_step_detector == null) {
             Toast.makeText(getContext(), "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
         }
+        goodboard = v.findViewById(R.id.goodboard);
+        goodboard.setOnClickListener(new OnSingleClickListener() {
+            @Override
+            public void onSingleClick(View v) {
+                if (removeMarker.isAlive()) {
 
+                    removeMarker.interrupt();
+
+                }
+                removeMarker = new removeMarker();
+                removeMarker.start();
+                TMapData tMapData = new TMapData();
+
+                makeMarkerBoard(boardTopPoint, boardTopName, boardTopAddr);
+
+            }
+        });
         removeMarker = new removeMarker();
         button3 = v.findViewById(R.id.button3);// 공원 위치 표시
         button3.setOnClickListener(new OnSingleClickListener() {
@@ -284,6 +341,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 Intent intent = new Intent(getContext(), trailActivity.class);
                 startActivityForResult(intent, REQ_ADD_CONTACT);
             }
+
         });
 
 
@@ -318,7 +376,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 }
                 removeMarker = new removeMarker();
                 removeMarker.start();
-                makeMarkerShop(arrTMapPointShop, arrParkName, arrParkAddr);
+                makeMarkerShop(arrTMapPointShop, arrShopName, arrShopAddr);
 
             }
 
@@ -781,6 +839,65 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         }
     }
+    private class loadBoard extends Thread{
+        public loadBoard(){
+
+        }
+
+        @Override
+        public void run() {
+
+            if(boardTopgPoint.isEmpty()){
+                mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
+                mReference.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            String db_title = messageData.child("title").getValue().toString();
+                            String db_lat = messageData.child("lat").getValue().toString();
+                            String db_lon = messageData.child("lon").getValue().toString();
+                            String db_gPoint = messageData.child("gPoint").getValue().toString();
+                            String db_address = messageData.child("address").getValue().toString();
+
+                            boardTopName.add(db_title);
+                            boardToplat.add(Double.valueOf(db_lat));
+                            boardToplon.add(Double.valueOf(db_lon));
+                            boardTopAddr.add(db_address);
+                            boardTopgPoint.add(db_gPoint);
+
+                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                            boardTopPoint.add(tMapPoint);
+
+
+                            Log.d("주소가 잘 나오나", String.valueOf(tMapPoint));
+
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+
+
+        }
+    }
+    private class findAddress extends Thread{
+        public findAddress(){
+
+        }
+
+        @Override
+        public void run() {
+
+
+        }
+    }
 
     private class calTime extends Thread {
         public calTime() {
@@ -801,7 +918,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         @Override
         public void run() {
-
+            tmap.removeTMapPath();
+            tmap.removeAllMarkerItem();
             tmap.removeAllTMapPolyLine();
             tmap.removeAllTMapCircle();
             for (int c = 0; c < arrHospitalName.size(); c++) {
@@ -841,7 +959,15 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                         Log.d("병원이름 : ", tMapMarkerItem2.getID());
                     }else{
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                        Intent intent = new Intent(getActivity(), naviActivity.class);
+                        intent.putExtra("naviName", String.valueOf(tMapMarkerItem2.getID()));
+                        TMapPoint et = tmap.getMarkerItem2FromID(s).getTMapPoint();
+                        intent.putExtra("eplt", tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude());
+                        intent.putExtra("epln", tmap.getMarkerItem2FromID(s).getTMapPoint().getLongitude());
+                        Log.d("뭘로 입력이 되냐", String.valueOf(tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude()));
+                        //c 출발 도착 위치랑 공원 이름정도
+                        startActivity(intent);
+/*                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
                         builder.setTitle(tMapMarkerItem2.getID()+"로 이동하시겠습니까?");
 
@@ -850,15 +976,14 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Intent intent = new Intent(getActivity(), naviActivity.class);
-                                startActivity(intent);
+
                             }
                         });
                         builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
                             }
-                        });
+                        });*/
 
                     }
                     Log.d("아이템 확인 : ", s);
@@ -933,8 +1058,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 totalDistance = steps * 0.7; //m
                 Log.d("현재 걸음 수 ", String.valueOf(steps));
 
-                if (totalDistance >= 2000 ) {
-                    coin++;
+                if (totalDistance >= 20 ) {
+
+                    exp = exp+10;
                     accDistance = totalDistance;
                     totalDistance = totalDistance - 2000;
                     steps = 0;
@@ -944,50 +1070,53 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                     Log.d("코인 수 ", String.valueOf(coin));
                     Log.d("아이디확인 ", id);
+                    if(exp == 100) {
+                        coin++;
+                        coinView.setText("이동거리\n" + String.valueOf(coin));
+                        mDatabase = FirebaseDatabase.getInstance();
+                        mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
+                        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            String db_coin;
+                            String db_id;
 
-                    coinView.setText("이동거리\n"+String.valueOf(coin));
-                    mDatabase = FirebaseDatabase.getInstance();
-                    mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
-                    mReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        String db_coin;
-                        String db_id;
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
-                                db_coin = messageData.child("coin").getValue().toString();
-                                db_id = messageData.child("userId").getValue().toString();
-                                Log.d("넘겨온 아디", id);
-                                if(id.equals(db_id)) {
-                                    mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
-                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
+                                    db_coin = messageData.child("coin").getValue().toString();
+                                    db_id = messageData.child("userId").getValue().toString();
+                                    Log.d("넘겨온 아디", id);
+                                    if (id.equals(db_id)) {
+                                        mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
+                                        mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
+                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void unused) {
 
-                                                }
+                                                    }
 
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
+                                                }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
 
-                                        }
-                                    });
+                                            }
+                                        });
+                                    }
+
                                 }
+
+
+                                // null값뜸
 
                             }
 
-                            
-                            // null값뜸
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
+                            }
+                        });
+                    }
+                    exp=0;
             } else {
                 dista.setText("이동거리\n" + (int) totalDistance + " M");
             }
@@ -1008,6 +1137,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
+
 
             }
 
@@ -1059,6 +1189,26 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.maker_park);
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
+            marker.setPosition(0.0f, 0.0f);
+            marker.getTMapPoint();
+
+            marker.setID(arrName.get(i));
+            marker.setIcon(bitmap);
+            marker.setTMapPoint(arrTMapPoint.get(i));
+
+            tmap.addMarkerItem2(arrName.get(i), marker);
+            tmap.showCallOutViewWithMarkerItemID(arrName.get(i));
+        }
+    }
+
+    public void makeMarkerBoard(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+
+        for (int i = 0; i < arrTMapPoint.size(); i++) {
+            MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.good);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
             bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
