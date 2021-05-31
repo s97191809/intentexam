@@ -30,10 +30,7 @@
         android:orientation="vertical"
         android:padding="15dp"
         >
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000"/>
+
 
         <TextView
             android:hint="글 제목"
@@ -44,7 +41,11 @@
             android:textColor="#000000"
             android:textSize="16dp"
           />
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ffffff"
+            />
         <TextView
             android:hint="글 내용"
             android:id="@+id/board_content"
@@ -54,10 +55,7 @@
             android:textColor="#000000"
             android:textSize="16dp"
         />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#000000"/>
+
     </LinearLayout>
 
     <LinearLayout

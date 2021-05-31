@@ -4,12 +4,26 @@
     android:layout_height="match_parent"
     android:background="#EAEFF8"
     android:orientation="vertical">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    <LinearLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:id="@+id/trail_list_title"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:gravity="center"
+            android:textColor="#707070"
+            android:textSize="16dp"
+            android:text="산책로 목록"
+            android:background="#BFD0E6"
+            />
+    </LinearLayout>
     <ListView
         android:id="@+id/trailList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"></ListView>
-</LinearLayout>
+
 </LinearLayout>
