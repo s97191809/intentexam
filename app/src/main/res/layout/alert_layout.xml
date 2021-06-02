@@ -24,7 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center"
-        android:textColor="#000000"
+        android:textColorHint="#707070"
+        android:textColor="#707070"
         android:textSize="16dp"
         android:hint="제목을 입력하세요."/>
     <EditText
@@ -32,8 +33,9 @@
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:gravity="center"
-        android:textColor="#000000"
+        android:textColorHint="#707070"
         android:textSize="16dp"
+        android:textColor="#707070"
         android:hint="내용을 입력하세요."/>
     <View
         android:layout_width="match_parent"
