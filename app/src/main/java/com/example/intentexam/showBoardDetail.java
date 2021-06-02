@@ -65,13 +65,35 @@ public class showBoardDetail extends AppCompatActivity {
 
                     String db_title = messageData.child("title").getValue().toString();
                     String db_content = messageData.child("content").getValue().toString();
+                    String db_id = messageData.child("id").getValue().toString();
+                    Log.d("값 확인", title +","+content);
                     if(title.equals(db_title) && content.equals(db_content)){
                         String db_address = messageData.child("address").getValue().toString();
                         address.setText(db_address);
-                        filename = title+content+db_address;
+                        filename = title+"_"+db_id;
                         Log.d("파일이름  ",filename);
+
                     }
                 }
+                imgview = findViewById(R.id.imgview);
+                FirebaseStorage storage = FirebaseStorage.getInstance();
+                StorageReference storageRef = storage.getReference().child("board_img/");
+
+
+                //Url을 다운받기
+                storageRef.child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
+                        Glide.with(getApplicationContext()).load(uri).into(imgview);
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
 
@@ -81,25 +103,7 @@ public class showBoardDetail extends AppCompatActivity {
             }
         });
 
-        imgview = findViewById(R.id.imgview);
-        FirebaseStorage storage = FirebaseStorage.getInstance("gs://narang-a1a26.appspot.com/");
-        StorageReference storageRef = storage.getReference().child("board_img/");
 
-
-        //Url을 다운받기
-        storageRef.child(filename+".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
-                Glide.with(getApplicationContext()).load(uri).into(imgview);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         /*storageRef.child(filename+".jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             public void onSuccess(Uri uri) {

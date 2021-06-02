@@ -2,18 +2,26 @@ package com.example.intentexam;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.loader.content.CursorLoader;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +30,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +48,10 @@ import com.skt.Tmap.TMapData;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +70,11 @@ public class writeBoardActivity extends AppCompatActivity {
     Uri photoURI;
     final ArrayList<Integer> boardNum = new ArrayList<>();
     private int maxNum;
+
+    private static final int REQUEST_IMAGE_1 = 1;
+    private String imagePath1 = "";
+
+
     private TMapView tmap;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     @Override
@@ -68,6 +86,7 @@ public class writeBoardActivity extends AppCompatActivity {
 
         a_title = (EditText) findViewById(R.id.a_title);
         board_content = (EditText) findViewById(R.id.board_content);
+
 
 
 
@@ -113,14 +132,34 @@ public class writeBoardActivity extends AppCompatActivity {
                 String title = a_title.getText().toString().trim();
                 String content = board_content.getText().toString().trim();
                 String address = b_address.getText().toString();
+
                 writeBoard(content, id, String.valueOf(time1), title, String.valueOf(maxNum+1),lat,lon,address);
+
                 FirebaseStorage storage = FirebaseStorage.getInstance();
-                StorageReference storageRef = storage.getReference();
+                final String cu = title;
+
+                //1. 사진을 storage에 저장하고 그 url을 알아내야함..
+
+                String filename = cu + "_" + id;
+
+                StorageReference storageRef = storage.getReferenceFromUrl("gs://narang-a1a26.appspot.com/").child("board_img/" + filename);
+
+
+                UploadTask uploadTask;
+
+
+                Uri file = null;
+                file = photoURI;
+
+                uploadTask = storageRef.putFile(file);
+
+
+/*                StorageReference storageRef = storage.getReference();
                 String filename = title+ content + address + ".jpg";
                 Uri file = photoURI;
                 StorageReference riversRef = storageRef.child("board_img/"+filename);
 
-                UploadTask uploadTask = riversRef.putFile(file);
+                UploadTask uploadTask = riversRef.putFile(file);*/
                 uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -162,12 +201,25 @@ public class writeBoardActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(intent, 1);
+                intent.setAction(Intent.ACTION_PICK);
+                startActivityForResult(Intent.createChooser(intent, "Get Album"), REQUEST_IMAGE_1);
+
+
             }
         });
     }
+    private String getRealPathFromUri(Uri uri)
+    {
+        String[] proj=  {MediaStore.Images.Media.DATA};
+        CursorLoader cursorLoader = new CursorLoader(this,uri,proj,null,null,null);
+        Cursor cursor = cursorLoader.loadInBackground();
 
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String url = cursor.getString(columnIndex);
+        cursor.close();
+        return  url;
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -179,14 +231,93 @@ public class writeBoardActivity extends AppCompatActivity {
 
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), photoURI);
 
-                Log.d("이미지 이름 : ", String.valueOf(bitmap));
+
 
                 // 이미지 표시
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+        }
+
+
+
+/*    public String getExternalPath(String forlderName){
+
+        String sdPath ="";
+        String ext = Environment.getExternalStorageState();
+        if(ext.equals(Environment.MEDIA_MOUNTED)){
+            sdPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + forlderName;
+        }else{
+            sdPath  = getFilesDir() +"/" + forlderName;
+
+        }
+        return sdPath;
     }
+
+    public String setImageAndSaveImageReturnPath(View v, Intent data) {
+
+        try {
+            // URI 가져오기
+            Uri selectedImageUri = data.getData();
+
+            // 선택한 이미지에서 비트맵 생성
+            InputStream in = getContentResolver().openInputStream(selectedImageUri);
+            Bitmap img = BitmapFactory.decodeStream(in);
+            in.close();
+
+            String path = getString(R.string.app_name);
+            String fileName = "/" + System.currentTimeMillis() + ".png";
+            String externalPath = getExternalPath(path);
+
+            String address = externalPath + fileName;
+
+            //imagePath1 = address;
+            //Toast.makeText(context, "imagePath1", Toast.LENGTH_SHORT).show();
+
+            BufferedOutputStream out = null;
+
+            File dirFile = new File(externalPath);
+
+            if (!dirFile.isDirectory()) {
+                dirFile.mkdirs();
+            }
+
+            File copyFile = new File(address);
+
+            try {
+
+                copyFile.createNewFile();
+
+                out = new BufferedOutputStream(new FileOutputStream(copyFile));
+
+                img.compress(Bitmap.CompressFormat.PNG, 100, out);
+
+                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(copyFile)));
+
+                Log.d("여부 : ", "이미지저장됨");
+                //Toast.makeText(getActivity(), captureMessage, Toast.LENGTH_LONG).show();
+                // 저장되었다는 문구 생성
+
+                out.close();
+                // 이거때문인가
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d("여부 : ", "에러");
+            }
+            return address;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "null";
+        }
+
+    }*/
+
+
 
     private void writeBoard(String content, String writer, String date, String title, String num,String lat, String lon,String address) {
         User user = new User(content, writer, date, title, num, lat, lon,address);

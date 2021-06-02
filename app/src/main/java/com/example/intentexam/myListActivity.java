@@ -71,6 +71,7 @@ public class myListActivity extends AppCompatActivity {
                 oData.clear();
                 mReference = mDatabase.getReference("hospitalreview"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
+                    //여기다가 리스트 초기화
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         for (DataSnapshot messageData : dataSnapshot.getChildren()) {
