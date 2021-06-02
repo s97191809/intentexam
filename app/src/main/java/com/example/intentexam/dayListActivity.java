@@ -65,7 +65,7 @@ public class dayListActivity extends AppCompatActivity {
                     if (db_id.equals(id)) {//로그인한 id와 내용의 id가 같으면
                         String db_date = db_year + "-" + db_month + "-" + db_day;
                         Log.d("이계정이 가진 글목록", db_content);
-                        String subCon = db_content;
+                        String subCon = db_content+"         "+db_date;
 
                         if (boardTitle.contains(db_title) && boardContent.contains(db_content)) {
                         } else {

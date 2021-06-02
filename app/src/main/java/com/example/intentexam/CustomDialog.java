@@ -106,6 +106,7 @@ public class CustomDialog extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "내용을 입력해 주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
+
                     writeMemo(title, content, id, curYear, curMonth, day);
                     finish();
                 }

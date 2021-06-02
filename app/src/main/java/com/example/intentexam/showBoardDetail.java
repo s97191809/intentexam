@@ -123,7 +123,7 @@ public class showBoardDetail extends AppCompatActivity {
         boardDetailView.setText(content);
 
         boardGpoint = findViewById(R.id.board_good);
-        boardGpoint.setText("좋아요");
+
         mDatabase = FirebaseDatabase.getInstance();
         mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
         mReference.addValueEventListener(new ValueEventListener() {
@@ -136,7 +136,7 @@ public class showBoardDetail extends AppCompatActivity {
 
                     if(title.equals(db_title) && content.equals(db_content)){
                         gp = messageData.child("gPoint").getValue().toString();
-
+                        boardGpoint.setText("좋아요 "+gp);
                         Log.d("받은 좋아요 수 : ", gp);
                     }
 
@@ -161,6 +161,7 @@ public class showBoardDetail extends AppCompatActivity {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
+                                boardGpoint.setText("좋아요"+" "+gp);
                                 finish();
 
                             }
