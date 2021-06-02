@@ -80,7 +80,7 @@ public class showBoardDetail extends AppCompatActivity {
                 StorageReference storageRef = storage.getReference().child("board_img/");
 
 
-                //Url을 다운받기
+                //Url을 다운받기ㅋㅋ
                 storageRef.child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
