@@ -68,6 +68,7 @@ public class myListActivity extends AppCompatActivity {
         rvListButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
+
                 oData.clear();
                 mReference = mDatabase.getReference("hospitalreview"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
@@ -95,6 +96,8 @@ public class myListActivity extends AppCompatActivity {
                                             // 한 병원에 계정 하나가 하나의 리뷰만 등록가능
                                             if (reviewContent.contains(db_content) && reviewSubContent.contains(subCon)) {
 
+                                                reviewContent.set(reviewContent.indexOf(db_content),db_content);
+                                                reviewSubContent.set(reviewSubContent.indexOf(subCon),subCon);
                                                 // 같은 내용도 생각하기
                                                 // 같은날 같은제목 일수도
                                                 // 리뷰 번호가 필요한가 필요하겠다//
@@ -159,9 +162,10 @@ public class myListActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         ListViewAdapter oAdapter = new ListViewAdapter(oData);
+                        oAdapter.notifyDataSetChanged();
                         String data = oData.get(position).toString();
 
-                        if (reviewContent == null) {
+                        if (reviewContent != null) {
 
 
                             // 게시판 경우도 추가
@@ -177,9 +181,11 @@ public class myListActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                            reviewContent.clear();
+                         /*                   reviewContent.clear();
                                             reviewSubContent.clear();
-                                            oData.clear();
+*/
+                                            reviewContent.remove(reviewContent.indexOf(reviewContent.get(position)));
+                                            reviewSubContent.remove(reviewSubContent.indexOf(reviewSubContent.get(position)));
                                             oAdapter.notifyDataSetChanged();
                                         }
 
@@ -199,10 +205,12 @@ public class myListActivity extends AppCompatActivity {
                                         @Override
                                         public void onSuccess(Void unused) {
                                             Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                            boardContent.clear();
+                             /*               boardContent.clear();
                                             boardTitle.clear();
                                             boardSubContent.clear();
-                                            oData.clear();
+                                            oData.clear();*/
+                                            boardContent.remove(boardContent.indexOf(boardContent.get(position)));
+                                            boardSubContent.remove(boardSubContent.indexOf(boardSubContent.get(position)));
                                             oAdapter.notifyDataSetChanged();
                                         }
 
@@ -234,8 +242,10 @@ public class myListActivity extends AppCompatActivity {
         });
         bdListButton = findViewById(R.id.bd_list);
         bdListButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+              /*  reviewContent.clear();*/
                 oData.clear();
                 mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
@@ -262,6 +272,10 @@ public class myListActivity extends AppCompatActivity {
                                             String subCon = db_id + "        " + db_date;
                                             // 한 병원에 계정 하나가 하나의 리뷰만 등록가능
                                             if (boardTitle.contains(db_title) && boardSubContent.contains(subCon)) {
+
+                                                boardTitle.set(boardTitle.indexOf(db_title),db_title);
+                                                boardContent.set(boardContent.indexOf(db_content),db_content);
+                                                boardSubContent.set(boardSubContent.indexOf(subCon),subCon);
 
                                                 // 같은 내용도 생각하기
                                                 // 같은날 같은제목 일수도

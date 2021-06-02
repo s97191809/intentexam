@@ -102,7 +102,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
         tmap.setSightVisible(true);
 
         //넘어올때 위치 정보 가져오고 안내 여부 묻기
-
+        start = true;
         startButton = findViewById(R.id.startbutton);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,10 +110,11 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 // 안내 시작하겠다고 하면 true로 바꿔서 기록 시작
                 Log.d( "시자아ㅏㅏㅏㅏㅏ악", "tqdasf");
                 AlertDialog.Builder builder = new AlertDialog.Builder(walkingActivity.this);
+                builder.setTitle("산책을 종료하시겠습니까??");
                 builder.setPositiveButton("종료", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        start = true;
+                        finish();
                     }
                 });
 
