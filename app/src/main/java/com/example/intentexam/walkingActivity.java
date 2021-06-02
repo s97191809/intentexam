@@ -64,11 +64,13 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
     calTime calTime;
     SharedPreferences sf;
     TMapPoint st_point;
+    SensorManager sm;
+    Sensor sensor_step_detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_navi);
+        setContentView(R.layout.activity_walking);
         setGps();
 
         if (ContextCompat.checkSelfPermission(walkingActivity.this,
@@ -121,7 +123,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        finish();
+
                     }
                 });
 
@@ -142,9 +144,9 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
         calTime = new calTime();
         calTime.start();
 
-        SensorManager sm;
-        Sensor sensor_step_detector;
+
         tv_sensor = (TextView) findViewById(R.id.sensor);
+
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         // 버튼 누르기 전까지 NULL 이였다가 누르면 0으로 셋팅
@@ -154,6 +156,12 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
         }
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sm.registerListener(this, sensor_step_detector, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     private final LocationListener mLocationListener = new LocationListener() {
@@ -240,7 +248,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
         sf = getSharedPreferences("info", MODE_PRIVATE);
         String weight = sf.getString("weight", "");
         String id = sf.getString("inputId", "");
-        if (start == true) {
+
             long end = System.currentTimeMillis();
             min = (int) ((end - time1) / 1000) / 60 % 60;
             sec = (int) ((end - time1) / 1000) % 60;
@@ -324,7 +332,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 }
             }
             //zzzzzz
-        }
+
     }
 
     @Override

@@ -174,6 +174,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     private String name;
     private int exp;
     TMapAddressInfo aressInfo;
+    TMapPoint st_point;
 
 
     @Override
@@ -1136,11 +1137,13 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         public void onLocationChanged(Location location) {
 
             if (location != null) {
+
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
+
 
 
             }
@@ -1168,7 +1171,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                10000, // 통지사이의 최소 시간간격 (miliSecond)
+                500000, // 통지사이의 최소 시간간격 (miliSecond)
                 5, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }

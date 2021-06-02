@@ -17,10 +17,11 @@
         android:text="글 상세보기"
         android:background="#BFD0E6"
         />
+
     <LinearLayout
         android:id="@+id/linearLayout6"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="517dp"
         android:layout_marginStart="14dp"
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
@@ -28,66 +29,64 @@
         android:layout_marginRight="14dp"
         android:background="@drawable/background_round_blue"
         android:orientation="vertical"
-        android:padding="15dp"
-        >
+        android:padding="15dp">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#ffffff"
-            />
+            android:background="#ffffff" />
+
         <TextView
-            android:hint="글 제목"
             android:id="@+id/a_title"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
+            android:hint="글 제목"
             android:textColor="#707070"
-            android:textSize="16dp"
-          />
+            android:textSize="16dp" />
 
         <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#ffffff"
-        />
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#ffffff" />
+
         <TextView
-            android:hint="주소"
             android:id="@+id/b_title"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:gravity="center"
+            android:hint="주소"
             android:textColor="#707070"
-            android:textSize="16dp"
-            />
+            android:textSize="16dp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#ffffff"
-            />
+            android:background="#ffffff" />
+
         <ImageView
-            android:hint="사진"
             android:id="@+id/imgview"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="259dp"
             android:gravity="center"
+            android:hint="사진"
+            android:scaleType="fitXY"
             android:textColor="#707070"
-            android:textSize="16dp"
-            />
+            android:textSize="16dp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#ffffff"
-            />
+            android:background="#ffffff" />
+
         <TextView
-            android:hint="글 내용"
             android:id="@+id/board_content"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:gravity="center"
+            android:hint="글 내용"
             android:textColor="#707070"
-            android:textSize="16dp"
-        />
+            android:textSize="16dp" />
 
     </LinearLayout>
     <View
