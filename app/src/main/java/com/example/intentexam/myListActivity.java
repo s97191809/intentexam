@@ -152,7 +152,7 @@ public class myListActivity extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(myListActivity.this);
 
-                builder.setTitle("해당 글을 삭제 하시겠습니까?").setMessage("삭제 후 버튼을 터치해 갱신해 주세요ㅎ;");
+                builder.setTitle("해당 글을 삭제 하시겠습니까?").setMessage("삭제 후 버튼을 터치해 갱신해 주세요");
 
 
                 builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
@@ -161,12 +161,12 @@ public class myListActivity extends AppCompatActivity {
                         ListViewAdapter oAdapter = new ListViewAdapter(oData);
                         String data = oData.get(position).toString();
 
-                        if (reviewContent != null) {
+                        if (reviewContent == null) {
 
 
                             // 게시판 경우도 추가
-                            Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
-                            Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
+//                            Log.d("위치를 찾아봅시다 : ", String.valueOf(reviewContent.get(position)) + "," + hosList.get(position));
+ //                           Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
                             // 아이템 삭제
                             oData.remove(position);
                             //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.

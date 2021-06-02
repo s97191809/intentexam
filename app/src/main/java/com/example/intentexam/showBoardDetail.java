@@ -123,43 +123,51 @@ public class showBoardDetail extends AppCompatActivity {
         boardDetailView.setText(content);
 
         boardGpoint = findViewById(R.id.board_good);
+        boardGpoint.setText("좋아요");
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
+        mReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                    String db_title = messageData.child("title").getValue().toString().trim();
+                    String db_content = messageData.child("content").getValue().toString().trim();
+
+                    if(title.equals(db_title) && content.equals(db_content)){
+                        gp = messageData.child("gPoint").getValue().toString();
+
+                        Log.d("받은 좋아요 수 : ", gp);
+                    }
+
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         boardGpoint.setOnClickListener(new OnSingleClickListener() {
 
             @Override
             public void onSingleClick(View v) {
-                mDatabase = FirebaseDatabase.getInstance();
-                mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
-                mReference.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-
-                            gp = messageData.child("gPoint").getValue().toString();
-                            boardGpoint.setText(gp);
-                            Log.d("받은 좋아요 수 : ", gp);
-
-
-                        }
-                        mReference = mDatabase.getReference().child("board"); // 지워야할 내용에 해당되는 부분 지우기
-                        mReference.child(content).child("gPoint").setValue(String.valueOf(Integer.parseInt(gp)+1))
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                       finish();
-
-                                    }
-
-                                }).addOnFailureListener(new OnFailureListener() {
+                mReference = mDatabase.getReference().child("board"); // 지워야할 내용에 해당되는 부분 지우기
+                mReference.child(content).child("gPoint").setValue(String.valueOf(Integer.parseInt(gp)+1))
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
-                            public void onFailure(@NonNull Exception e) {
+                            public void onSuccess(Void unused) {
+                                finish();
 
                             }
-                        });
-                    }
 
+                        }).addOnFailureListener(new OnFailureListener() {
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
+                    public void onFailure(@NonNull Exception e) {
 
                     }
                 });

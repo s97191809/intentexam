@@ -110,7 +110,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 // 안내 시작하겠다고 하면 true로 바꿔서 기록 시작
                 Log.d( "시자아ㅏㅏㅏㅏㅏ악", "tqdasf");
                 AlertDialog.Builder builder = new AlertDialog.Builder(walkingActivity.this);
-                builder.setPositiveButton("시작", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("종료", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         start = true;

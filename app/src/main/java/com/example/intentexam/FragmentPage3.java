@@ -102,9 +102,10 @@ public class FragmentPage3 extends Fragment {
                     String db_writer = messageData.child("id").getValue().toString();
                     String db_date = messageData.child("date").getValue().toString();
                     String content = messageData.child("content").getValue().toString();
+                    String gpoint = messageData.child("gPoint").getValue().toString();
 
 
-                    String subCon = db_writer + "        " + db_date;
+                    String subCon = db_writer + "        " + db_date+"      " + "좋아요 수 : " + gpoint;
                     if (boardTitle.contains(db_title) && subContent.contains(subCon)) {
                     } else {
                         boardTitle.add(db_title);

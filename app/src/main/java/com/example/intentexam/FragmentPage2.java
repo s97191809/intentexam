@@ -859,6 +859,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                             String db_gPoint = messageData.child("gPoint").getValue().toString();
                             String db_address = messageData.child("address").getValue().toString();
 
+                            if(Integer.valueOf(db_gPoint) > 20){
+
+
                             boardTopName.add(db_title);
                             boardToplat.add(Double.valueOf(db_lat));
                             boardToplon.add(Double.valueOf(db_lon));
@@ -867,9 +870,10 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                             TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
                             boardTopPoint.add(tMapPoint);
+                                Log.d("주소가 잘 나오나", String.valueOf(tMapPoint));
+                            }
 
 
-                            Log.d("주소가 잘 나오나", String.valueOf(tMapPoint));
 
 
                         }
