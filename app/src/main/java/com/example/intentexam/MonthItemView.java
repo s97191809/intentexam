@@ -36,6 +36,7 @@ public class MonthItemView extends androidx.appcompat.widget.AppCompatTextView {
     private String db_title;
     SharedPreferences sf;
     CalendarMonthAdapter monthViewAdapter;
+
     public MonthItemView(Context context) {
         super(context);
 
@@ -61,28 +62,16 @@ public class MonthItemView extends androidx.appcompat.widget.AppCompatTextView {
         this.item = item;
         int day = item.getDay();
         FragmentPage1 f1 = new FragmentPage1();
-/*        monthViewAdapter = new CalendarMonthAdapter(getContext());
-        String year = String.valueOf(monthViewAdapter.curMonth);
-
-        sf = getContext().getSharedPreferences("dateInfo", getContext().MODE_PRIVATE);
-        SharedPreferences.Editor getDate = sf.edit();
-        String month = sf.getString("month", "");
-        Log.d("월", month);
-        getDate.clear();
-        getDate.commit();
-
-
-        textview1 = findViewById(R.id.monthText);*/
         if (day != 0) {
             setText(String.valueOf(day));
 
             //-------------userdb
             mCalendar = Calendar.getInstance();
             getloginInfo = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
-            String id= getloginInfo.getString("inputId", "");
+            String id = getloginInfo.getString("inputId", "");
             String curYear = String.valueOf(mCalendar.get(Calendar.YEAR)).trim();
-            String curMonth = String.valueOf(f1.curMonth+1);
-                    //String.valueOf(mCalendar.get(Calendar.MONTH)).trim();
+            String curMonth = String.valueOf(f1.curMonth + 1);
+            //String.valueOf(mCalendar.get(Calendar.MONTH)).trim();
 
 
             //-------------caldb
@@ -97,11 +86,9 @@ public class MonthItemView extends androidx.appcompat.widget.AppCompatTextView {
                         db_curYear = messageData.child("curYear").getValue().toString().trim();
                         db_curMonth = messageData.child("curMonth").getValue().toString().trim();
                         db_day = messageData.child("day").getValue().toString().trim();
-                        db_title  = messageData.child("title").getValue().toString().trim();
-                      //  Log.d("오긴하니 : ", db_title);
-                    //    Log.d("오긴하니 curMonth: ", curMonth);
-                        if (db_id.equals(id)&&db_curYear.equals(curYear)&& db_curMonth.equals(curMonth) && db_day.equals(String.valueOf(day))) {
-                            setText(day + "\n" +db_title);
+                        db_title = messageData.child("title").getValue().toString().trim();
+                        if (db_id.equals(id) && db_curYear.equals(curYear) && db_curMonth.equals(curMonth) && db_day.equals(String.valueOf(day))) {
+                            setText(day + "\n" + db_title);
 
                         }
 

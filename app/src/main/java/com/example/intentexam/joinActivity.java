@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
@@ -30,8 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class joinActivity extends AppCompatActivity {
-
+public class joinActivity extends AppCompatActivity {//회원가입 클래스
 
     Button btn_save;
     Button btn_check;
@@ -40,12 +40,11 @@ public class joinActivity extends AppCompatActivity {
     private DatabaseReference mReference;
     private ChildEventListener mChild;
     final ArrayList<String> arrId = new ArrayList<>();
-    int check = 0;
 
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_join);
+        setContentView(R.layout.activity_join);//회원가입 정보 입력창
         EditText join_id = (EditText) findViewById(R.id.join_id);
         EditText join_pw = (EditText) findViewById(R.id.join_password);
         EditText join_name = (EditText) findViewById(R.id.join_name);
@@ -54,7 +53,7 @@ public class joinActivity extends AppCompatActivity {
         btn_save = findViewById(R.id.join_button);
         btn_check = findViewById(R.id.check_button);
         btn_cancel = findViewById(R.id.cancel);
-        initDatabase();
+
         mReference = mDatabase.getReference("user");
         if (arrId.isEmpty()) {// 회원 정보 가져오기
             mReference.addValueEventListener(new ValueEventListener() {
@@ -79,9 +78,9 @@ public class joinActivity extends AppCompatActivity {
                 }
             });
         }
-        btn_check.setOnClickListener(new View.OnClickListener() {
+        btn_check.setOnClickListener(new OnSingleClickListener() {//아이디 중복 체크 버튼
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 String id = join_id.getText().toString();
                 if(arrId.contains(id)) {
                     Toast.makeText(joinActivity.this, "이미 존재하는 아이디 입니다.", Toast.LENGTH_SHORT).show();
@@ -91,9 +90,9 @@ public class joinActivity extends AppCompatActivity {
 
             }
         });
-        btn_save.setOnClickListener(new View.OnClickListener() {
+        btn_save.setOnClickListener(new OnSingleClickListener() {//회원가입 버튼
             @Override
-            public void onClick(View v) {
+            public void onSingleClick(View v) {
                 String id = join_id.getText().toString().trim();
                 String pw = join_pw.getText().toString().trim();
                 String name = join_name.getText().toString().trim();
@@ -111,7 +110,7 @@ public class joinActivity extends AppCompatActivity {
 
             }
         });
-        btn_cancel.setOnClickListener(new View.OnClickListener() {
+        btn_cancel.setOnClickListener(new View.OnClickListener() {//회원가입 취소 버튼
             @Override
             public void onClick(View v) {
                 finish();
@@ -119,9 +118,9 @@ public class joinActivity extends AppCompatActivity {
         });
     }
 
-    private void writeNewUser(String userId, String name, String password, String weight, String coin) {
+    private void writeNewUser(String userId, String name, String password, String weight, String coin) {//회원 정보 디비 업로드 메소드
         User user = new User(userId, name, password, weight, coin);
-        // 중복 체크를 했을 때 트루면 가입 안되게 하고 펄스면 되게
+
         mReference.child(userId).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -130,7 +129,7 @@ public class joinActivity extends AppCompatActivity {
                         Toast.makeText(joinActivity.this, "회원가입을 완료했습니다.", Toast.LENGTH_SHORT).show();
                         // 로그인 화면으로 이동
                         toString();
-                        finish();//종료와 함께 넘어가짐
+                        finish();//종료
 
                     }
                 })
@@ -138,7 +137,6 @@ public class joinActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Write failed
-
                         Toast.makeText(joinActivity.this, "회원가입을 실패했습니다.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -212,28 +210,7 @@ public class joinActivity extends AppCompatActivity {
         }
     }
 
-    private void readUser(String userId, String name, String password, String weight, String coin) {
-        User user = new User(userId, name, password, weight, coin);
-        mReference.child(userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                if (dataSnapshot.getValue(User.class) != null) {
-
-                    User post = dataSnapshot.getValue(User.class);
-                    Log.w("FireBaseData", "getData" + post.toString());
-                } else {
-                    Toast.makeText(joinActivity.this, "값이존재", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w("FireBaseData", "loadPost:onCancelled", databaseError.toException());
-            }
-        });
-    }
 
     private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
@@ -270,6 +247,27 @@ public class joinActivity extends AppCompatActivity {
         };
         mReference.addChildEventListener(mChild);
     }
+    public abstract class OnSingleClickListener implements View.OnClickListener {// 싱글 클릭 리스너
+
+        //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
+        private static final long MIN_CLICK_INTERVAL = 600;
+        private long mLastClickTime = 0;
+
+        public abstract void onSingleClick(View v);
+
+        @Override
+        public final void onClick(View v) {
+            long currentClickTime = SystemClock.uptimeMillis();
+            long elapsedTime = currentClickTime - mLastClickTime;
+            mLastClickTime = currentClickTime;
+
+            // 중복클릭 아닌 경우
+            if (elapsedTime > MIN_CLICK_INTERVAL) {
+                onSingleClick(v);
+            }
+        }
+    }
+
        
 }
 

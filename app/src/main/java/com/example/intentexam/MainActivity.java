@@ -43,8 +43,7 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
 
-public class MainActivity extends FragmentActivity {
-    private BottomNavigationView mBottomNV;
+public class MainActivity extends FragmentActivity {//메인 액티비티
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

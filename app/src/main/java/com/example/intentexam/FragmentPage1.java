@@ -41,7 +41,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FragmentPage1 extends Fragment {
+public class FragmentPage1 extends Fragment {//일정 클래스
 //----------일정
     /**
      * 월별 캘린더 뷰 객체
@@ -166,7 +166,7 @@ public class FragmentPage1 extends Fragment {
         public void onStatusChanged(String provider, int status, Bundle extras) {
         }
     };
-    public void setGps() {
+    public void setGps() {//위치 권한 설정
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

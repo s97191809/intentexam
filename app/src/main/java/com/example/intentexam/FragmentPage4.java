@@ -15,18 +15,25 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-public class FragmentPage4 extends Fragment {
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+public class FragmentPage4 extends Fragment {//내정보 페이지 클래스
     //객체 선언
     Button logoutButton;
     Button withdrawalButton;
     Button my_listButton;
     TextView idView;
-
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
     TextView nameView;
     TextView weightView;
     TextView coinView;
     SharedPreferences sf;
-    private TextView txt_preferences;
+
 
     @Nullable
     @Override
@@ -34,18 +41,15 @@ public class FragmentPage4 extends Fragment {
 
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_4, container, false);
-        // 값 넘겨 받아오는 부분
+        // 로그인 정보 수신
         sf = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
         String id = sf.getString("inputId", "");
 
         String name = sf.getString("name", "");
         String weight = sf.getString("weight", "");
-        String coin = sf.getString("coin", "");
-        int icoin =  Integer.parseInt(coin)/100;;
-        String slevel = String.valueOf(icoin);
+
 
         idView = v.findViewById(R.id.id);
-
         nameView = v.findViewById(R.id.name);
         weightView = v.findViewById(R.id.weight);
         coinView = v.findViewById(R.id.coin);
@@ -53,7 +57,29 @@ public class FragmentPage4 extends Fragment {
         idView.setText("아이디 : " + id);
         nameView.setText("이름 : " + name);
         weightView.setText("몸무게(kg) : " + weight);
-        coinView.setText("레벨 : " + slevel);
+
+
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("user"); // 레벨업 시 내정보 화면에 반영
+        mReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot messageData : snapshot.getChildren()) {
+                    String db_id = messageData.child("userId").getValue().toString();
+                    if (db_id.equals(id)) {
+                        coinView.setText("레벨 : " + messageData.child("coin").getValue().toString());
+                    }
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         logoutButton = v.findViewById(R.id.logout);
         logoutButton.setOnClickListener(new View.OnClickListener() {
@@ -63,18 +89,19 @@ public class FragmentPage4 extends Fragment {
                 startActivity(intent);
 
                 SharedPreferences.Editor editor = sf.edit();
-                //editor.clear()는 auto에 들어있는 모든 정보를 기기에서 지웁니다.
                 editor.clear();
                 editor.commit();
+
                 Toast.makeText(getActivity(), "로그아웃.", Toast.LENGTH_SHORT).show();
+
                 FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
                 fragmentManager.beginTransaction().remove(FragmentPage4.this).commit();
-                fragmentManager.popBackStack();
+                fragmentManager.popBackStack();//finish() 액티비티 종료
 
             }
         });
 
-        withdrawalButton = v.findViewById(R.id.withdrawal);
+        withdrawalButton = v.findViewById(R.id.withdrawal);//회원 탈퇴 버튼 
         withdrawalButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,7 +110,7 @@ public class FragmentPage4 extends Fragment {
             }
         });
 
-        my_listButton = v.findViewById(R.id.my_list_button);
+        my_listButton = v.findViewById(R.id.my_list_button);//작성한 글 목록 버튼
         my_listButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

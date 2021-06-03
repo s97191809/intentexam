@@ -14,7 +14,7 @@ import com.skt.Tmap.TMapMarkerItem2;
 import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapView;
 
-public class MarkerOverlay extends TMapMarkerItem2 {
+public class MarkerOverlay extends TMapMarkerItem2 {//TMaApi 커스텀 풍선뷰 설정 클래스
 
     private DisplayMetrics dm = null;
 

@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class ListViewAdapter extends BaseAdapter
+public class ListViewAdapter extends BaseAdapter//커스텀 리스트뷰 사용을 위한 리스트뷰 어댑터
 {
     LayoutInflater inflater = null;
     private ArrayList<ItemData> m_oData = null;

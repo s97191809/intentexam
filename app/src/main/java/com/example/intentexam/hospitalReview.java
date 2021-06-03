@@ -23,11 +23,11 @@ import com.skt.Tmap.TMapPoint;
 
 import java.util.ArrayList;
 
-public class hospitalReview extends AppCompatActivity {
-    private FirebaseDatabase mDatabase;
-    private DatabaseReference mReference;
+public class hospitalReview extends AppCompatActivity {//병원 리뷰 클래스
     ListView review_list;
     Button write_r;
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
     final ArrayList<String> reviewContent = new ArrayList<>();
     final ArrayList<String> subContent = new ArrayList<>();
     final ArrayList<ItemData> oData = new ArrayList<>();
@@ -36,15 +36,14 @@ public class hospitalReview extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.review_board);
 
-        //병원이름 받아오기
+        
 
-        Intent intent = getIntent(); /*데이터 수신*/
+        Intent intent = getIntent();//병원이름 수신
 
         String name = intent.getExtras().getString("hpName");
 
-        int count = 0;
         mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("hospitalreview").child(name); // 변경값을 확인할 child 이름
+        mReference = mDatabase.getReference("hospitalreview").child(name);//병원 리뷰 리스트 생성을 위한 디비 로드
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -59,14 +58,9 @@ public class hospitalReview extends AppCompatActivity {
                         reviewContent.add(db_content);
                         subContent.add(db_writer+"        "+db_date);
                         }
-                        Log.d("디비 값",db_content+","+db_writer+","+db_date);
-                    Log.d("디비 길이", String.valueOf(reviewContent.size()));
 
                     // 리스트뷰 참조 및 Adapter달기
                   }
-
-
-
 
                 for (int i = 0; i < reviewContent.size(); i++)
                 {
@@ -78,7 +72,7 @@ public class hospitalReview extends AppCompatActivity {
 
                 }
 // ListView, Adapter 생성 및 연결 ------------------------
-                review_list = (ListView)findViewById(R.id.review_list);
+                review_list = (ListView)findViewById(R.id.review_list);//병원 리뷰 리스트 생성
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
                 review_list.setAdapter(oAdapter);
             }
@@ -88,7 +82,7 @@ public class hospitalReview extends AppCompatActivity {
 
             }
         });
-        write_r = findViewById(R.id.write_r);
+        write_r = findViewById(R.id.write_r);//병원 리뷰 작성 버튼
         write_r.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

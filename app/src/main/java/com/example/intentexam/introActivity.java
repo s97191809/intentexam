@@ -7,7 +7,7 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class introActivity extends Activity {
+public class introActivity extends Activity {//인트로 화면 액티비티
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

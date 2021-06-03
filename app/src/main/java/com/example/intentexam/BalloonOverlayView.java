@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class BalloonOverlayView extends FrameLayout {
+public class BalloonOverlayView extends FrameLayout {//TMapApi 사용자 정의 풍선뷰를 표시하기 위한 클래스 입니다.
 
     private LinearLayout layout;
     private TextView title;

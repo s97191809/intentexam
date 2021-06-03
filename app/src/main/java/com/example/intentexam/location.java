@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 
-public class location extends Service implements LocationListener {
+public class location extends Service implements LocationListener {//위치 정보 클래스
 
     private final Context mContext;
     Location location;

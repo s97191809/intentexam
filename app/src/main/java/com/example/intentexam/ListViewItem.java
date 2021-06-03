@@ -1,6 +1,6 @@
 package com.example.intentexam;
 
-public class ListViewItem {
+public class ListViewItem {//리스트뷰
 
     private String titleStr ;
     private String descStr ;

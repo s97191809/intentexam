@@ -23,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class dayListActivity extends AppCompatActivity {
+public class dayListActivity extends AppCompatActivity {//일정 목록 클래스입니다.
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     SharedPreferences getloginInfo;
@@ -45,7 +45,7 @@ public class dayListActivity extends AppCompatActivity {
         day_list = findViewById(R.id.day_list);
 
         mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("calender"); // 변경값을 확인할 child 이름
+        mReference = mDatabase.getReference("calender"); // 캘린더 정보 불러오기
         mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -62,10 +62,10 @@ public class dayListActivity extends AppCompatActivity {
                     String db_month = messageData.child("curMonth").getValue().toString();
                     String db_day = messageData.child("day").getValue().toString();
 
-                    if (db_id.equals(id)) {//로그인한 id와 내용의 id가 같으면
+                    if (db_id.equals(id)) {//로그인한 id와 일정의 id가 같으면
                         String db_date = db_year + "-" + db_month + "-" + db_day;
                         Log.d("이계정이 가진 글목록", db_content);
-                        String subCon = db_content+"         "+db_date;
+                        String subCon = db_content + "         " + db_date;
 
                         if (boardTitle.contains(db_title) && boardContent.contains(db_content)) {
                         } else {
@@ -94,22 +94,18 @@ public class dayListActivity extends AppCompatActivity {
 
 
             @Override
-            public void onCancelled (@NonNull DatabaseError error){
+            public void onCancelled(@NonNull DatabaseError error) {
 
             }
-// ListView, Adapter 생성 및 연결 ------------------------
-
-
 
         });
-        day_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        day_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {//일정 삭제 버튼
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(dayListActivity.this);
 
-                builder.setTitle("해당 글을 삭제 하시겠습니까?").setMessage("삭제 후 버튼을 터치해 갱신해 주세요ㅎ;");
-
+                builder.setTitle("해당 글을 삭제 하시겠습니까?").setMessage("삭제 후 버튼을 터치해 갱신해 주세요.");
 
                 builder.setPositiveButton("삭제", new DialogInterface.OnClickListener() {
                     @Override
@@ -117,31 +113,29 @@ public class dayListActivity extends AppCompatActivity {
                         ListViewAdapter oAdapter = new ListViewAdapter(oData);
                         String data = oData.get(position).toString();
 
-                            oData.remove(position);
-                            //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
+                        oData.remove(position);
 
-                            mReference = mDatabase.getReference().child("calender"); // 지워야할 내용에 해당되는 부분 지우기
-                            mReference.child(boardTitle.get(position)).setValue(null)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
-                                            boardContent.clear();
-                                            boardTitle.clear();
-                                            boardSubContent.clear();
-                                            oData.clear();
-                                            oAdapter.notifyDataSetChanged();
-                                        }
+                        mReference = mDatabase.getReference().child("calender"); // 지워야할 내용에 해당되는 부분 지우기
+                        mReference.child(boardTitle.get(position)).setValue(null)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        Toast.makeText(getApplicationContext(), "삭제되었습니다.", Toast.LENGTH_SHORT).show();
+                                        boardContent.clear();
+                                        boardTitle.clear();
+                                        boardSubContent.clear();
+                                        oData.clear();
+                                        oAdapter.notifyDataSetChanged();
+                                    }
 
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
+                                }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
 
-                                }
-                            });
-                        }
-                        // listview 갱신.
-
+                            }
+                        });
+                    }
+                    // listview 갱신.
 
 
                 });
@@ -158,7 +152,7 @@ public class dayListActivity extends AppCompatActivity {
         });
 
     }
-    }
+}
 
 
 

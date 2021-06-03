@@ -42,7 +42,7 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
-public class naviActivity extends AppCompatActivity implements SensorEventListener {
+public class naviActivity extends AppCompatActivity implements SensorEventListener {//공원, 상점 경로 안내 클래스
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
     private TMapView tmap;
     private FirebaseDatabase mDatabase;
@@ -64,6 +64,8 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
     calTime calTime;
     SharedPreferences sf;
 
+    SensorManager sm;
+    Sensor sensor_step_detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,12 +103,14 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
 
-        //넘어올때 위치 정보 가져오고 안내 여부 묻기
+        
         TMapData tmapdata = new TMapData();
         Intent intent = getIntent();
+
         String naviName = intent.getStringExtra("naviName");
         Double edlt = intent.getDoubleExtra("eplt", 0);
         Double edln = intent.getDoubleExtra("epln", 0);
+
         TMapPoint endPoint = new TMapPoint(edlt, edln);
         location location = new location(this);
         double lat = location.getLatitude();
@@ -128,12 +132,12 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
 
             }
         });
-        startButton = findViewById(R.id.startbutton);
+        startButton = findViewById(R.id.startbutton);//시작버튼
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 안내 시작하겠다고 하면 true로 바꿔서 기록 시작
-                Log.d( "시자아ㅏㅏㅏㅏㅏ악", "tqdasf");
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(naviActivity.this);
 
                 builder.setTitle("안내를 시작하시겠습니까?").setMessage("도착 장소 : " + naviName);
@@ -168,13 +172,11 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         calTime = new calTime();
         calTime.start();
 
-        SensorManager sm;
-        Sensor sensor_step_detector;
+
         tv_sensor = (TextView) findViewById(R.id.sensor);
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        // 버튼 누르기 전까지 NULL 이였다가 누르면 0으로 셋팅
-        //센서 거기에 NULL 이면 동작 안하게끔 만듬
+
         if (sensor_step_detector == null) {
             Toast.makeText(this, "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
         }
@@ -210,7 +212,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
         }
     };
 
-    public void setGps() {
+    public void setGps() {// gps 권한 요청
         final LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -228,7 +230,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private class calTime extends Thread {
-        public calTime() {
+        public calTime() {//시간 계산 쓰레드
 
         }
 
@@ -240,7 +242,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event) {//센서 감지시 호출
         sf = getSharedPreferences("info", MODE_PRIVATE);
         String weight = sf.getString("weight", "");
         String id = sf.getString("inputId", "");
@@ -265,23 +267,21 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
 
                 Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
                 totalDistance = steps * 0.7; //m
+                accDistance = steps * 0.7; //m
                 Log.d("현재 걸음 수 ", String.valueOf(steps));
 
                 if (totalDistance >= 2000) {
                     coin++;
-                    accDistance = totalDistance;
                     totalDistance = totalDistance - 2000;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
-                    //여기서 코인수 늘려주면 됩니당
-                    //근데 넘 커찮아여
 
                     Log.d("코인 수 ", String.valueOf(coin));
                     Log.d("아이디확인 ", id);
 
                     coinView.setText("이동거리\n" + String.valueOf(coin));
                     mDatabase = FirebaseDatabase.getInstance();
-                    mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
+                    mReference = mDatabase.getReference("user");
                     mReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         String db_coin;
                         String db_id;
@@ -294,7 +294,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
                                 db_id = messageData.child("userId").getValue().toString();
                                 Log.d("넘겨온 아디", id);
                                 if (id.equals(db_id)) {
-                                    mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
+                                    mReference = mDatabase.getReference().child("user");
                                     mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
@@ -312,9 +312,6 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
 
                             }
 
-
-                            // null값뜸
-
                         }
 
                         @Override
@@ -324,10 +321,9 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
                     });
 
                 } else {
-                    dista.setText("이동거리\n" + (int) totalDistance + " M");
+                    dista.setText("이동거리\n" + (int) accDistance + " M");
                 }
             }
-            //zzzzzz
         }
     }
 

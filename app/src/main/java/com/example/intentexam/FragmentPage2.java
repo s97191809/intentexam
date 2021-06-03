@@ -81,14 +81,13 @@ import static android.app.Activity.RESULT_OK;
 import static java.lang.Thread.sleep;
 
 
-public class FragmentPage2 extends Fragment implements SensorEventListener {
+public class FragmentPage2 extends Fragment implements SensorEventListener {// 지도 화면 클래스
     Button button3;
     Button button4;
     Button button5;
     Button startbutton;
     Button trailButton;
     Button goodboard;
-    EditText editText1;
     TextView tv_sensor;
     TextView dista;
     TextView coinView;
@@ -97,8 +96,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     private ChildEventListener mChild;
-    private ListView listView;
-    final ArrayList<String> arrParkName = new ArrayList<>();
+        final ArrayList<String> arrParkName = new ArrayList<>();
     final ArrayList<Double> arrParkLat = new ArrayList<>();
     final ArrayList<Double> arrParkLon = new ArrayList<>();
     final ArrayList<String> arrParkAddr = new ArrayList<>();
@@ -129,13 +127,12 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
     final ArrayList<TMapPoint> boardTopPoint = new ArrayList<>();
     final ArrayList<String> boardTopName = new ArrayList<>();
-    final ArrayList<String> boardTopgPoint  = new ArrayList<>();
-    final ArrayList<String> boardTopAddr  = new ArrayList<>();
+    final ArrayList<String> boardTopgPoint = new ArrayList<>();
+    final ArrayList<String> boardTopAddr = new ArrayList<>();
     final ArrayList<Double> boardToplat = new ArrayList<>();
     final ArrayList<Double> boardToplon = new ArrayList<>();
 
-    final ArrayList<String> trailInfo = new ArrayList<>();
-    final ArrayList<TMapPoint> passList = new ArrayList<>();
+        final ArrayList<TMapPoint> passList = new ArrayList<>();
 
 
     private TMapGpsManager tmapgps = null;
@@ -147,6 +144,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     private removeMarker removeMarker;
 
     int coin = 0;
+    int count = 0;
+
     double totalDistance = 0;
     double accDistance = 0;
     int steps = 0;
@@ -154,12 +153,14 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     int min;
     long time1;
     boolean start = false;
+    double air;
+    double kcal;
 
     SensorManager sm;
     Sensor sensor_step_detector;
     SharedPreferences sf;
     loadBoard loadBoard;
-    findAddress findAddress;
+
 
     calTime calTime;
     static final int REQ_ADD_CONTACT = 1;
@@ -168,8 +169,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     private Location lastKnownLocation;
     private location endpoint;
 
-    private searchAdapter adapter;
-    private int accMin;
+        private int accMin;
     private int sec;
     private String name;
     private int exp;
@@ -182,7 +182,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setGps();
         time1 = System.currentTimeMillis();
-        try {
+        try {// 산책로 정보 수신
             SharedPreferences prefs = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
             int size = prefs.getInt("Status_size", 0);
             String name = sf.getString("name", "");
@@ -194,6 +194,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
+
     }
 
     @Nullable
@@ -201,7 +203,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //XML, java 연결
         //XML이 메인에 직접 붙으면 true, 프래그먼트에 붙으면 false
-
 
         if (ContextCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {//센서 권한 요청
@@ -212,44 +213,20 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_2, container, false);
-
         LinearLayout linearLayoutTmap = (LinearLayout) v.findViewById(R.id.tmap);
-
-
         tmap = new TMapView(getActivity());
-
         tmap.setSKTMapApiKey(TMAP_API_KEY);
-        linearLayoutTmap.addView(tmap);
+        linearLayoutTmap.addView(tmap);//TMap 지도 화면 설정
 
-        tmap.setIconVisibility(true);//현재위치로 표시될 아이콘을 표시할지 여부를 설정합니다.
+        tmap.setIconVisibility(true);//현재위치로 표시될 아이콘을 표시
         tmap.setTrackingMode(true);
         tmap.setSightVisible(true);
-        location location = new location(getActivity());
-        //
-
-        TMapPolyLine polyline = new TMapPolyLine();
-        double lat = location.getLatitude();
-        double lon = location.getLongitude();
-        TMapPoint polypoint = new TMapPoint(lat, lon);
-        polyline.addLinePoint(polypoint);
-
-        SharedPreferences sf = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
-
-        initDatabase();
-        //칼로리계산
-
 
         dista = v.findViewById(R.id.distance);
         kcalView = v.findViewById(R.id.kcal);
         Log.d("이동거리", String.valueOf(totalDistance));
-
-        // 걸음 당 70cm
-        //코인은 2키로
-        //코인 증가량 보기
-
-
-        // 값 넘겨 받아오는 부분
-        startbutton = v.findViewById(R.id.startbutton);
+        location lc = new location(getActivity());
+        startbutton = v.findViewById(R.id.startbutton);//산책 시작 버튼
         startbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -260,9 +237,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 }
                 removeMarker = new removeMarker();
                 removeMarker.start();
-                // 여기서 화면 이동
-                Log.d("클릭여부", "stads");
-                Toast.makeText(getContext(),"산책을 시작합니다.",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "산책을 시작합니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), walkingActivity.class);
                 startActivityForResult(intent, 2);
                 start = true;
@@ -272,35 +247,27 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         coinView = v.findViewById(R.id.coin);
         coinView.setText("코인 수\n" + coin);
 
-        calTime = new calTime();
+        
+        calTime = new calTime();//실행 시간 측정
         calTime.start();
 
-        ballonEventThread = new ballonEvent();
+        ballonEventThread = new ballonEvent();// 풍선 뷰 이벤트 처리 쓰레드
         ballonEventThread.start();
-
-        dbLoad = new dbLoad();
+        mDatabase = FirebaseDatabase.getInstance();
+        dbLoad = new dbLoad();//공원, 병원, 상점 데이터베이스 로드
         dbLoad.start();
-        TMapData tMapData = new TMapData();
 
-
-
-        loadBoard = new loadBoard();
+        loadBoard = new loadBoard();//게시글 정보 로드
         loadBoard.start();
 
-        findAddress = new findAddress();
-        findAddress.start();
-
-
-
         tv_sensor = (TextView) v.findViewById(R.id.sensor);
-        sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
+        sm = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);//센서 매니저 호출
         sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        // 버튼 누르기 전까지 NULL 이였다가 누르면 0으로 셋팅
-        //센서 거기에 NULL 이면 동작 안하게끔 만듬
-        if (sensor_step_detector == null) {
+
+        if (sensor_step_detector == null) {//센서가 NULL이면 메시지 출력
             Toast.makeText(getContext(), "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
         }
-        goodboard = v.findViewById(R.id.goodboard);
+        goodboard = v.findViewById(R.id.goodboard);//좋아요 수 20개 이상의 게시물 위치 표시
         goodboard.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -335,7 +302,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         });
 
-        trailButton = v.findViewById(R.id.trailButton);
+        trailButton = v.findViewById(R.id.trailButton);//산책로 리스트 버튼
         trailButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
@@ -383,16 +350,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
 
         });
-        arrAllname.addAll(arrParkName);
-        arrAllname.addAll(arrShopName);
-        arrAllname.addAll(arrHospitalName);
-        Log.d("총길이 : ", String.valueOf(arrParkName.size()));
-        //  listView = (ListView) v.findViewById(R.id.listView);
+        
 
-        arrTempAllname.addAll(arrAllname);
-
-        adapter = new searchAdapter(arrAllname, getContext());
-        Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);
+        Spinner spiner = (Spinner) v.findViewById(R.id.select_distance);//스피너 설정 
         ArrayAdapter sAdapter = ArrayAdapter.createFromResource(getContext(), R.array.question, android.R.layout.simple_spinner_item);
         sAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spiner.setAdapter(sAdapter);
@@ -403,6 +363,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
 
                 if (selectDist.equals("거리 선택")) {
+                    // 모든 마커 삭제
                     if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
@@ -425,6 +386,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     tmap.removeAllMarkerItem();
                     tmap.removeAllTMapCircle();
                 } else if (selectDist.equals("1km (약 15분)")) {// 1km 선택시
+                    // 모든 마커 삭제
                     if (removeMarker.isAlive()) {
 
                         removeMarker.interrupt();
@@ -432,13 +394,14 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     }
                     removeMarker = new removeMarker();
                     removeMarker.start();
+                    
                     distTmapParkPoint.clear();
                     tmap.removeAllMarkerItem();
                     location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
                     point = new TMapPoint(lat, lon);
-                    TMapCircle tMapCircle = new TMapCircle();
+                    TMapCircle tMapCircle = new TMapCircle();//원 그리기
                     tMapCircle.setCenterPoint(point);
                     tMapCircle.setRadius(500);
                     tMapCircle.setCircleWidth(2);
@@ -449,8 +412,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     Location location2 = new Location("");//현재위치
                     location2.setLatitude(lat);
                     location2.setLongitude(lon);
-                    // 리스트 크기만큼 반복문
-
+                    
                     for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
                         Location parkDestination1Km = new Location("");
                         parkDestination1Km.setLatitude(arrParkLat.get(i));
@@ -458,7 +420,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                         double distance = location2.distanceTo(parkDestination1Km);
 
-                        //걸러진 어레이 리스트도 필요함
+                        // 범위에 따른 위치 선별
                         if (distance <= 500) {// 단위 (M)
                             TMapPoint dtpoint = new TMapPoint(parkDestination1Km.getLatitude(), parkDestination1Km.getLongitude());
                             String dtname = arrParkName.get(i);
@@ -474,7 +436,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                         hospitalDestination1Km.setLongitude(arrHospitalLon.get(j));
 
                         double distance = location2.distanceTo(hospitalDestination1Km);
-
+                        // 범위에 따른 위치 선별
                         if (distance <= 500) {
                             TMapPoint dtpoint = new TMapPoint(hospitalDestination1Km.getLatitude(), hospitalDestination1Km.getLongitude());
                             String dtname = arrHospitalName.get(j);
@@ -491,7 +453,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                         shopDestination1Km.setLongitude(arrShopLon.get(k));
 
                         double distance = location2.distanceTo(shopDestination1Km);
-
+                        // 범위에 따른 위치 선별
                         if (distance <= 500) {
                             TMapPoint dtpoint = new TMapPoint(shopDestination1Km.getLatitude(), shopDestination1Km.getLongitude());
                             String dtname = arrHospitalName.get(k);
@@ -513,6 +475,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     }
                     removeMarker = new removeMarker();
                     removeMarker.start();
+
                     location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
@@ -529,7 +492,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     Location CurrentLocation = new Location("");//현재위치
                     CurrentLocation.setLatitude(lat);
                     CurrentLocation.setLongitude(lon);
-                    // 리스트 크기만큼 반복문
+
 
                     for (int i = 0; i < arrTMapPointPark.size(); i++) {//공원
                         Location parkLocation = new Location("");
@@ -595,6 +558,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     distTmapParkPoint.clear();
                     distTmapHospitalPoint.clear();
                     distTmapShopPoint.clear();
+
                     location location = new location(getContext());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
@@ -622,8 +586,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                         //걸러진 어레이 리스트도 필요함
                         if (distance <= 1500) {
-                            Log.d("3KM 반경 거리", String.valueOf(distance));
-                            Log.d("3km 반경 포인트", String.valueOf(location3.getLatitude()) + "," + location3.getLongitude());
                             TMapPoint dtpoint = new TMapPoint(location3.getLatitude(), location3.getLongitude());
                             String dtname = arrParkName.get(i);
                             String dtaddr = arrParkAddr.get(i);
@@ -681,18 +643,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         });
 
-        // 리스트뷰에 아답터를 연결한다.
-
-
-        //주소로도 검색하고 이름으로도 검색할테니 둘다 필요하겠네 리스트가
-        // 필요한게 디비에서 주소 목록들 싹 불러와야 겠지 첨에 흠
-        // 띄어쓰기도 못할수도 있으니까 trim과 replace(" ")을 해주고 어레이 리스트에서 검색
-        // 디비에서 받아올 떄도 trim이랑 replace함
-        // 검색한 주소나 공원 이름을 받아 위치를 찾아줘야 겠지
-        //그럼 주소를 키값으로 경, 위도를 받아오고
-        // 공원을 키값으로 경, 위도로 받아온담에 마커를 찍어주면 된다
-
-        // 받은 값을 좌표를 이용해서 경로를 그려준다.
 
         try {
             SharedPreferences prefs = getContext().getSharedPreferences("trailInfo", getContext().MODE_PRIVATE);
@@ -705,12 +655,12 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         } catch (Exception exception) {
             exception.printStackTrace();
         }
-
-/*                for(int i=0;i<size;i++)
+/*
+                for(int i=0;i<size;i++)
                 {
                     trailInfo.add(prefs.getString("Status_" + i, null));
-                }*/
-/*                for(String e : trailInfo) {
+                }
+                for(String e : trailInfo) {
                     if(e.contains("km")){
                          name = e;
                     }else {
@@ -721,27 +671,27 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                     }
                 }*/
         TMapData tmapdata = new TMapData();
-        //        tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, passList, 0,
-        //                     new TMapData.FindPathDataListenerCallback() {
-        //                     @Override
-        //                    public void onFindPathData(final TMapPolyLine tMapPolyLine) {
-//
+/*                tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, passList, 0,
+                             new TMapData.FindPathDataListenerCallback() {
+                             @Override
+                            public void onFindPathData(final TMapPolyLine tMapPolyLine) {
 
-//
-        //                              tMapPolyLine.setLineWidth(5);
-        //                               tMapPolyLine.setLineColor(Color.BLUE);
-// Toast.makeText(getApplicationContext(), “” + Pick, Toast.LENGTH_SHORT).show();
 
-        //                            tmap.addTMapPath(tMapPolyLine);
-//
 
-        //                }
-        //             });
+                                      tMapPolyLine.setLineWidth(5);
+                                       tMapPolyLine.setLineColor(Color.BLUE);
+ Toast.makeText(getApplicationContext(), “” + Pick, Toast.LENGTH_SHORT).show();
+
+                                    tmap.addTMapPath(tMapPolyLine);
+
+
+                        }
+                     });*/
 
         return v;
     }
 
-    private class dbLoad extends Thread {
+    private class dbLoad extends Thread {// 공원, 병원, 상점 정보 가져오기
         public dbLoad() {
 
         }
@@ -840,15 +790,16 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         }
     }
-    private class loadBoard extends Thread{
-        public loadBoard(){
+
+    private class loadBoard extends Thread {//게시글 정보 가져오기
+        public loadBoard() {
 
         }
 
         @Override
         public void run() {
 
-            if(boardTopgPoint.isEmpty()){
+            if (boardTopgPoint.isEmpty()) {
                 mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -860,21 +811,19 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                             String db_gPoint = messageData.child("gPoint").getValue().toString();
                             String db_address = messageData.child("address").getValue().toString();
 
-                            if(Integer.valueOf(db_gPoint) > 20){
+                            if (Integer.valueOf(db_gPoint) > 20) {
 
 
-                            boardTopName.add(db_title);
-                            boardToplat.add(Double.valueOf(db_lat));
-                            boardToplon.add(Double.valueOf(db_lon));
-                            boardTopAddr.add(db_address);
-                            boardTopgPoint.add(db_gPoint);
+                                boardTopName.add(db_title);
+                                boardToplat.add(Double.valueOf(db_lat));
+                                boardToplon.add(Double.valueOf(db_lon));
+                                boardTopAddr.add(db_address);
+                                boardTopgPoint.add(db_gPoint);
 
-                            TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
-                            boardTopPoint.add(tMapPoint);
+                                TMapPoint tMapPoint = new TMapPoint(Double.valueOf(db_lat), Double.valueOf(db_lon));
+                                boardTopPoint.add(tMapPoint);
                                 Log.d("주소가 잘 나오나", String.valueOf(tMapPoint));
                             }
-
-
 
 
                         }
@@ -892,19 +841,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
         }
     }
-    private class findAddress extends Thread{
-        public findAddress(){
-
-        }
-
-        @Override
-        public void run() {
 
 
-        }
-    }
-
-    private class calTime extends Thread {
+    private class calTime extends Thread {//시간 계산 쓰레드
         public calTime() {
 
         }
@@ -916,7 +855,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
     }
 
-    private class removeMarker extends Thread {
+    private class removeMarker extends Thread {//마커 삭제 쓰레드
         public removeMarker() {
 
         }
@@ -936,10 +875,13 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
             for (int c = 0; c < arrParkName.size(); c++) {
                 tmap.removeMarkerItem2(arrParkName.get(c));
             }
+            for (int c = 0; c < boardTopName.size(); c++) {
+                tmap.removeMarkerItem2(boardTopName.get(c));
+            }
         }
     }
 
-    private class ballonEvent extends Thread {
+    private class ballonEvent extends Thread {//풍선뷰 이벤트 쓰레드
         private static final String TAG = "ballonEvent";
 
         public ballonEvent() {
@@ -953,7 +895,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 //마커 정보를 여기서 가져와서
 
                 @Override
-                public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {
+                public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {//마커 클릭 이벤트
                     tmap.removeAllTMapPolyLine();
                     if (arrHospitalName.contains(tMapMarkerItem2.getID())) {
                         Intent intent = new Intent(getActivity(), hospitalReview.class);
@@ -961,41 +903,24 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                         startActivity(intent);
 
-
                         Log.d("병원이름 : ", tMapMarkerItem2.getID());
-                    }else{
+                    } else {
                         Intent intent = new Intent(getActivity(), naviActivity.class);
                         intent.putExtra("naviName", String.valueOf(tMapMarkerItem2.getID()));
                         TMapPoint et = tmap.getMarkerItem2FromID(s).getTMapPoint();
                         intent.putExtra("eplt", tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude());
                         intent.putExtra("epln", tmap.getMarkerItem2FromID(s).getTMapPoint().getLongitude());
                         Log.d("뭘로 입력이 되냐", String.valueOf(tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude()));
-                        //c 출발 도착 위치랑 공원 이름정도
+
                         startActivity(intent);
-/*                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-                        builder.setTitle(tMapMarkerItem2.getID()+"로 이동하시겠습니까?");
-
-
-                        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-
-                            }
-                        });
-                        builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                            }
-                        });*/
 
                     }
-                    Log.d("아이템 확인 : ", s);
+                    Log.d("아이템 확인 : ", s);//선택한 풍선뷰 마커 까지의 폴리라인 생성
                     location location = new location(getActivity());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
                     TMapPoint st_point = new TMapPoint(lat, lon);
+                    // 보행자 폴리라인 생성
                     tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, st_point, tmap.getMarkerItem2FromID(s).getTMapPoint(), new TMapData.FindPathDataListenerCallback() {
                         @Override
                         public void onFindPathData(TMapPolyLine polyLine) {
@@ -1034,52 +959,76 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
     }
 
-    // 센서값이 변할때
+    
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(SensorEvent event) {// 센서값 변경시 호출되는 메소드
         sf = getContext().getSharedPreferences("info", getContext().MODE_PRIVATE);
         String weight = sf.getString("weight", "");
         String id = sf.getString("inputId", "");
-        if (start == true) {
+
+        if (start == true) {//산책 시작 시
+            if (count == 0) {
+                try {
+                    count++;
+                    SharedPreferences wsf = getContext().getSharedPreferences("walkinginfo", getContext().MODE_PRIVATE);
+                    SharedPreferences.Editor wsfwalking = wsf.edit();
+
+                    steps = steps + wsf.getInt("steps", 0);
+                    totalSteps = totalSteps + wsf.getInt("totalSteps", 0);
+                    kcal = Double.parseDouble(kcal + wsf.getString("kcal", ""));
+                    coin = Integer.parseInt(coin + wsf.getString("coin", ""));
+                    wsfwalking.remove("steps");
+                    wsfwalking.remove("totalsteps");
+                    wsfwalking.remove("kcal");
+                    wsfwalking.remove("coin");
+
+                    wsfwalking.commit();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
             long end = System.currentTimeMillis();
             min = (int) ((end - time1) / 1000) / 60 % 60;
             sec = (int) ((end - time1) / 1000) % 60;
             // air= 3.5*몸무게*분 kcal=air*5/1000
-            //min = (time1 / 60 % 60);
+            // min = (time1 / 60 % 60);
 
             Log.d("시간 : ", String.valueOf(min) + "분");
             Log.d("시간 : ", String.valueOf(sec) + "초");
 
-            double air = 3.5 * Integer.parseInt(weight) * min;
-            double kcal = air * 5 / 1000;
+            air = 3.5 * Integer.parseInt(weight) * min;
+            kcal = air * 5 / 1000;
             kcalView.setText("kcal\n" + (int) kcal);
 
             // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
             if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
+
                 steps++;
+                totalDistance = steps * 0.7; //m
+                accDistance = totalSteps * 0.7; //m
 
                 Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
-                totalDistance = steps * 0.7; //m
                 Log.d("현재 걸음 수 ", String.valueOf(steps));
+                Log.d("현재 거리 ", String.valueOf(accDistance));
 
-                if (totalDistance >= 20 ) {
+                if (totalDistance >= 2000) {//2km이상 걸을 시
 
-                    exp = exp+10;
-                    accDistance = totalDistance;
+                    exp = exp + 10;//경험치 10증가
+
                     totalDistance = totalDistance - 2000;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
-                    //여기서 코인수 늘려주면 됩니당
-                    //근데 넘 커찮아여
 
                     Log.d("코인 수 ", String.valueOf(coin));
                     Log.d("아이디확인 ", id);
-                    if(exp == 100) {
+                    if (exp == 100) {// 경험치 100 달성시 코인 + 1
+                        coinView.setText("코인 수\n" + coin);
                         coin++;
-                        coinView.setText("이동거리\n" + String.valueOf(coin));
+
                         mDatabase = FirebaseDatabase.getInstance();
-                        mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
+                        mReference = mDatabase.getReference("user"); // 코인 획득시 db 코인 값 업데이트
                         mReference.addListenerForSingleValueEvent(new ValueEventListener() {
                             String db_coin;
                             String db_id;
@@ -1090,9 +1039,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                                     db_coin = messageData.child("coin").getValue().toString();
                                     db_id = messageData.child("userId").getValue().toString();
-                                    Log.d("넘겨온 아디", id);
+
                                     if (id.equals(db_id)) {
-                                        mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
+                                        mReference = mDatabase.getReference().child("user");
                                         mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
                                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                     @Override
@@ -1110,9 +1059,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
 
                                 }
 
-
-                                // null값뜸
-
                             }
 
                             @Override
@@ -1121,20 +1067,19 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                             }
                         });
                     }
-                    exp=0;
-            } else {
-                dista.setText("이동거리\n" + (int) totalDistance + " M");
+                    exp = 0;
+                } else {
+                    dista.setText("이동거리\n" + (int) accDistance + " M");
+                }
             }
         }
-            //zzzzzz
-    }
 
-}
+    }
 
     private final LocationListener mLocationListener = new LocationListener() {
 
 
-        public void onLocationChanged(Location location) {
+        public void onLocationChanged(Location location) {//위치 정보 변경 시 호출
 
             if (location != null) {
 
@@ -1143,11 +1088,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
-
-
-
+                
             }
-
 
         }
 
@@ -1163,7 +1105,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     };
 
 
-    public void setGps() {
+    public void setGps() {//위치 권한 요청
         final LocationManager lm = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -1175,23 +1117,9 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                 5, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
+    
 
-    public void setNavi() {
-        TMapPoint tMapPointStart = new TMapPoint(37.570841, 126.985302); // SKT타워(출발지)
-        TMapPoint tMapPointEnd = new TMapPoint(37.551135, 126.988205); // N서울타워(목적지)
-
-        try {
-            TMapPolyLine tMapPolyLine = new TMapData().findPathData(tMapPointStart, tMapPointEnd);
-            tMapPolyLine.setLineColor(Color.BLUE);
-            tMapPolyLine.setLineWidth(2);
-            tmap.addTMapPolyLine("Line1", tMapPolyLine);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+    public void makeMarkerPark(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {//공원 마커 표시
 
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
@@ -1211,7 +1139,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
     }
 
-    public void makeMarkerBoard(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+    public void makeMarkerBoard(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {//좋아요 높은 게시글 마커 표시
 
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
@@ -1231,7 +1159,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
     }
 
-    public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+    public void makeMarkerShop(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {//관련 상점 마커 표시
         tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
@@ -1251,7 +1179,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         }
     }
 
-    public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {
+    public void makeMarkerHospital(ArrayList<TMapPoint> arrTMapPoint, ArrayList<String> arrName, ArrayList<String> arrAddr) {//병원 마커 표시
         tmap.removeAllMarkerItem();
         for (int i = 0; i < arrTMapPoint.size(); i++) {
             MarkerOverlay marker = new MarkerOverlay(getContext(), arrName.get(i), arrAddr.get(i));
@@ -1288,12 +1216,12 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
                         String trailEnd = intent.getStringExtra("end");
                         String[] tstart = trailStart.split(":");
                         String[] tsend = trailEnd.split(":");
-                        // passList.add(new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1])));
+
                         TMapPoint stpt = new TMapPoint(Double.valueOf(tstart[0]), Double.valueOf(tstart[1]));
                         TMapPoint edpt = new TMapPoint(Double.valueOf(tsend[0]), Double.valueOf(tsend[1]));
 
                         Log.d("이름 시작 도착 ", trailName + ", " + trailStart + ", " + trailEnd);
-                        TMapData tmapdata = new TMapData();
+                        TMapData tmapdata = new TMapData();//화면에 산책로 표시
                         tmapdata.findPathDataWithType(TMapData.TMapPathType.PEDESTRIAN_PATH, stpt, edpt, passList, 0, new TMapData.FindPathDataListenerCallback() {
                             @Override
                             public void onFindPathData(TMapPolyLine tMapPolyLine) {
@@ -1320,41 +1248,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
     }
 
 
-    private void setBalloonView(TMapMarkerItem2 marker, String title, String address, TMapPoint point) {
-        marker.setPosition(0.2f, 0.2f);
-        marker.getTMapPoint();
-        marker.setID(title);
-        marker.setIcon(BitmapFactory.decodeResource(getResources(), R.drawable.balloon_overlay_focused));
-        marker.setTMapPoint(point);
-
-        tmap.addMarkerItem2(title, marker);
-        tmap.showCallOutViewWithMarkerItemID(title);
-    }
-
-    public void search(String charText) {
-
-        // 문자 입력시마다 리스트를 지우고 새로 뿌려준다.
-        arrAllname.clear();
-
-        // 문자 입력이 없을때는 모든 데이터를 보여준다.
-        if (charText.length() == 0) {
-            arrAllname.addAll(arrTempAllname);
-        }
-        // 문자 입력을 할때..
-        else {
-            // 리스트의 모든 데이터를 검색한다.
-            for (int i = 0; i < arrTempAllname.size(); i++) {
-
-                // arraylist의 모든 데이터에 입력받은 단어(charText)가 포함되어 있으면 true를 반환한다.
-                if (arrTempAllname.get(i).toLowerCase().contains(charText)) {
-                    // 검색된 데이터를 리스트에 추가한다.
-                    arrAllname.add(arrTempAllname.get(i));
-                }
-            }
-        }
-        // 리스트 데이터가 변경되었으므로 아답터를 갱신하여 검색된 데이터를 화면에 보여준다.
-        adapter.notifyDataSetChanged();
-    }
 
     private void initDatabase() {
         mDatabase = FirebaseDatabase.getInstance();
@@ -1392,26 +1285,26 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {
         mReference.addChildEventListener(mChild);
     }
 
-public abstract class OnSingleClickListener implements View.OnClickListener {
+    public abstract class OnSingleClickListener implements View.OnClickListener {// 싱글 클릭 리스너
 
-    //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
-    private static final long MIN_CLICK_INTERVAL = 600;
-    private long mLastClickTime = 0;
+        //중복 클릭 방지 시간 설정 ( 해당 시간 이후에 다시 클릭 가능 )
+        private static final long MIN_CLICK_INTERVAL = 600;
+        private long mLastClickTime = 0;
 
-    public abstract void onSingleClick(View v);
+        public abstract void onSingleClick(View v);
 
-    @Override
-    public final void onClick(View v) {
-        long currentClickTime = SystemClock.uptimeMillis();
-        long elapsedTime = currentClickTime - mLastClickTime;
-        mLastClickTime = currentClickTime;
+        @Override
+        public final void onClick(View v) {
+            long currentClickTime = SystemClock.uptimeMillis();
+            long elapsedTime = currentClickTime - mLastClickTime;
+            mLastClickTime = currentClickTime;
 
-        // 중복클릭 아닌 경우
-        if (elapsedTime > MIN_CLICK_INTERVAL) {
-            onSingleClick(v);
+            // 중복클릭 아닌 경우
+            if (elapsedTime > MIN_CLICK_INTERVAL) {
+                onSingleClick(v);
+            }
         }
     }
-}
 
 
 }

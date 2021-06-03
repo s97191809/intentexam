@@ -120,9 +120,11 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                     public void onClick(DialogInterface dialog, int id) {
                         SharedPreferences wsf =getSharedPreferences("walkinginfo", MODE_PRIVATE);
                         SharedPreferences.Editor wsfwalking = wsf.edit();
-                        wsfwalking.putString("steps", String.valueOf(steps));
-                        wsfwalking.putString("totalSteps", String.valueOf(steps));
-                        wsfwalking.putString("steps", String.valueOf(steps));
+                        wsfwalking.putInt("steps", steps);
+                        wsfwalking.putInt("totalSteps", totalSteps);
+                        wsfwalking.putString("kcal", String.valueOf(kcal));
+                        wsfwalking.putString("coin", String.valueOf(coin));
+                        wsfwalking.commit();
                         finish();
                     }
                 });
@@ -274,14 +276,14 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
                 steps++;
 
-                Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
+                Log.d("산책 총 걸음 수 ", String.valueOf((int) totalSteps));
                 totalDistance = steps * 0.7; //m
-                Log.d("현재 걸음 수 ", String.valueOf(steps));
+                Log.d("산책 현재 걸음 수 ", String.valueOf(steps));
 
-                if (totalDistance >= 2000) {
+                if (totalDistance >= 20) {
                     coin++;
                     accDistance = totalDistance;
-                    totalDistance = totalDistance - 2000;
+                    totalDistance = totalDistance - 20;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
                     //여기서 코인수 늘려주면 됩니당
@@ -335,7 +337,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                     });
 
                 } else {
-                    dista.setText("이동거리\n" + (int) totalDistance + " M");
+                    dista.setText("산책 이동거리\n" + (int) totalDistance + " M");
                 }
             }
             //zzzzzz

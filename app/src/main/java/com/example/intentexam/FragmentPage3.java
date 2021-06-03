@@ -38,7 +38,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import static android.app.Activity.RESULT_OK;
 
-public class FragmentPage3 extends Fragment {
+public class FragmentPage3 extends Fragment { // 게시글 클래스
 
     private DatabaseReference mReference;
     private FirebaseDatabase mDatabase;
@@ -50,18 +50,11 @@ public class FragmentPage3 extends Fragment {
     final ArrayList<String> subContent = new ArrayList<>();
     final ArrayList<String> boardContent = new ArrayList<>();
     final ArrayList<ItemData> oData = new ArrayList<>();
-    TMapAddressInfo aressInfo;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-    }
-
-    @Override
-    public void onPause() {//리스트 초기화
-        super.onPause();
-
 
     }
 
@@ -71,7 +64,7 @@ public class FragmentPage3 extends Fragment {
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_page_3, container, false);
 
-        board_write_button = v.findViewById(R.id.board_write_button);
+        board_write_button = v.findViewById(R.id.board_write_button);//게시글 작성 버튼
         board_write_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -79,7 +72,7 @@ public class FragmentPage3 extends Fragment {
                 startActivity(intent);
             }
         });
-        new Runnable() {
+        new Runnable() {//리스트 갱신 쓰레드
             @Override
             public void run() {
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
@@ -87,8 +80,9 @@ public class FragmentPage3 extends Fragment {
             }
         };
         board_list = (ListView) v.findViewById(R.id.board_list);
+        
         mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
+        mReference = mDatabase.getReference("board"); // 게시글 정보 로드
         mReference.addValueEventListener(new ValueEventListener() {
 
             @Override
@@ -105,14 +99,14 @@ public class FragmentPage3 extends Fragment {
                     String gpoint = messageData.child("gPoint").getValue().toString();
 
 
-                    String subCon = db_writer + "        " + db_date+"      " + "좋아요 수 : " + gpoint;
+                    String subCon = db_writer + "        " + db_date + "      " + "좋아요 수 : " + gpoint;
                     if (boardTitle.contains(db_title) && subContent.contains(subCon)) {
                     } else {
                         boardTitle.add(db_title);
                         subContent.add(subCon);
                         boardContent.add(content);
                     }
-                    // 리스트뷰 참조 및 Adapter달기
+                    // 리스트뷰 참조 및 Adapter
                 }
                 if (oData.size() != boardTitle.size()) {
                     for (int i = 0; i < boardTitle.size(); i++) {
@@ -123,7 +117,7 @@ public class FragmentPage3 extends Fragment {
                         oData.add(oItem);
                     }
                 }
-// ListView, Adapter 생성 및 연결 ------------------------
+                // ListView, Adapter 생성 및 연결 ------------------------
 
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
                 board_list.setAdapter(oAdapter);
@@ -145,17 +139,10 @@ public class FragmentPage3 extends Fragment {
                 intent.putExtra("title", boardTitle.get(position));
                 intent.putExtra("content", boardContent.get(position));
 
-
-                Log.d("위치를 찾아봅시다 : ", boardTitle.get(position) + "," + boardContent.get(position));
-                Log.d("위치를 찾아봅시다2 : ", String.valueOf(position));
-
-
                 startActivity(intent);
-
 
             }
         });
-
 
         return v;
     }

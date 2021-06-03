@@ -33,13 +33,8 @@ public class CustomDialog extends AppCompatActivity {
     EditText a_content;
     SharedPreferences getloginInfo;
     SharedPreferences getDateInfo;
-    // EditText join_name = (EditText) findViewById(R.id.join_name);
-    //EditText join_weight = (EditText) findViewById(R.id.join_weight);
-    private CalendarMonthView MonthView;
-    private CalendarMonthAdapter MonthAdapter;
-    private MonthItem m;
     private Context context;
-    CalendarMonthAdapter monthViewAdapter;
+
 
     public CustomDialog(Context context) {
         this.context = context;

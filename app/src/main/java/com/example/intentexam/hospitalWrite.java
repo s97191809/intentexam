@@ -20,17 +20,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class hospitalWrite extends AppCompatActivity {
+public class hospitalWrite extends AppCompatActivity {//병원 리뷰 작성 클래스
 
     EditText r_content;
     Button review_Button;
     Button r_cancelButton;
     SharedPreferences sf;
-    Spinner select_hospital;
     private DatabaseReference mReference;
     private FirebaseDatabase mDatabase;
-    private searchAdapter adapter;
     final ArrayList<String> hpName = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,14 +37,14 @@ public class hospitalWrite extends AppCompatActivity {
         r_content = findViewById(R.id.r_content);
         r_cancelButton = findViewById(R.id.r_cancelButton);
 
-        SimpleDateFormat format1 = new SimpleDateFormat ( "yyyy-MM-dd");
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd");//날짜 계산
 
         Date time = new Date();
 
         String time1 = format1.format(time);
-        sf =getSharedPreferences("info", MODE_PRIVATE);
+        sf = getSharedPreferences("info", MODE_PRIVATE);
 
-        review_Button = findViewById(R.id.review_Button);
+        review_Button = findViewById(R.id.review_Button);//리뷰 작성 버튼
         review_Button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,11 +55,9 @@ public class hospitalWrite extends AppCompatActivity {
                 writeNewUser(content, writer, String.valueOf(time1));
 
 
-
-
             }
         });
-        r_cancelButton.setOnClickListener(new View.OnClickListener() {
+        r_cancelButton.setOnClickListener(new View.OnClickListener() {//리뷰 작성 취소 버튼
             @Override
             public void onClick(View v) {
                 finish();
@@ -69,8 +66,7 @@ public class hospitalWrite extends AppCompatActivity {
     }
 
 
-
-    private void writeNewUser(String content, String writer, String date) {
+    private void writeNewUser(String content, String writer, String date) {//디비 작성 메소드
         User user = new User(content, writer, date);
 
 
@@ -85,12 +81,8 @@ public class hospitalWrite extends AppCompatActivity {
 
                 toString();
 
-
                 finish();
-                // 리스트뷰 참조 및 Adapter달기
 
-
-                // 데이터 1000개 생성--------------------------------.
             }
         })
                 .addOnFailureListener(new OnFailureListener() {
@@ -104,7 +96,7 @@ public class hospitalWrite extends AppCompatActivity {
 
     }
 
-    public class User {
+    public class User {//디비 업로드를 위한 User클래스
         public String content;
         public String id;
         public String date;
@@ -144,7 +136,6 @@ public class hospitalWrite extends AppCompatActivity {
         public void setDate(String date) {
             this.date = date;
         }
-
 
 
         @Override
