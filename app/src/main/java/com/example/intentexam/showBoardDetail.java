@@ -58,14 +58,14 @@ public class showBoardDetail extends AppCompatActivity {
         address = findViewById(R.id.b_title);
         mDatabase = FirebaseDatabase.getInstance();
         mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
-        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        mReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
-                    String db_title = messageData.child("title").getValue().toString();
-                    String db_content = messageData.child("content").getValue().toString();
-                    String db_id = messageData.child("id").getValue().toString();
+                    String db_title = messageData.child("title").getValue().toString().trim();
+                    String db_content = messageData.child("content").getValue().toString().trim();
+                    String db_id = messageData.child("id").getValue().toString().trim();
                     Log.d("값 확인", title +","+content);
                     if(title.equals(db_title) && content.equals(db_content)){
                         String db_address = messageData.child("address").getValue().toString();
@@ -84,7 +84,7 @@ public class showBoardDetail extends AppCompatActivity {
                 storageRef.child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
                         Glide.with(getApplicationContext()).load(uri).into(imgview);
 
                     }
@@ -162,7 +162,7 @@ public class showBoardDetail extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 boardGpoint.setText("좋아요"+" "+gp);
-                                finish();
+
 
                             }
 

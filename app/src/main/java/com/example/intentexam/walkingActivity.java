@@ -61,6 +61,8 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
     int totalSteps = 0;
     private int sec;
     double accDistance = 0;
+    double kcal;
+    double air;
     calTime calTime;
     SharedPreferences sf;
     TMapPoint st_point;
@@ -116,6 +118,11 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 builder.setPositiveButton("종료", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
+                        SharedPreferences wsf =getSharedPreferences("walkinginfo", MODE_PRIVATE);
+                        SharedPreferences.Editor wsfwalking = wsf.edit();
+                        wsfwalking.putString("steps", String.valueOf(steps));
+                        wsfwalking.putString("totalSteps", String.valueOf(steps));
+                        wsfwalking.putString("steps", String.valueOf(steps));
                         finish();
                     }
                 });
@@ -258,8 +265,8 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
             Log.d("시간 : ", String.valueOf(min) + "분");
             Log.d("시간 : ", String.valueOf(sec) + "초");
 
-            double air = 3.5 * Integer.parseInt(weight) * min;
-            double kcal = air * 5 / 1000;
+            air = 3.5 * Integer.parseInt(weight) * min;
+            kcal = air * 5 / 1000;
             kcalView.setText("kcal\n" + (int) kcal);
 
             // 센서 유형이 스텝감지 센서인 경우 걸음수 +1

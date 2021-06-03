@@ -68,7 +68,9 @@ public class myListActivity extends AppCompatActivity {
         rvListButton.setOnClickListener(new OnSingleClickListener() {
             @Override
             public void onSingleClick(View v) {
-
+                boardContent.clear();
+                boardSubContent.clear();
+                boardTitle.clear();
                 oData.clear();
                 mReference = mDatabase.getReference("hospitalreview"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
@@ -165,7 +167,7 @@ public class myListActivity extends AppCompatActivity {
                         oAdapter.notifyDataSetChanged();
                         String data = oData.get(position).toString();
 
-                        if (reviewContent != null) {
+                        if (!reviewContent.isEmpty()) {
 
 
                             // 게시판 경우도 추가
@@ -195,7 +197,7 @@ public class myListActivity extends AppCompatActivity {
 
                                 }
                             });
-                        } else {
+                        } else if(!boardContent.isEmpty()){
                             oData.remove(position);
                             //위치가 같으니 해당 위치에 있는 놈을 찾아서 해당하는 리뷰를 삭제하면 되겠습니다.
 
@@ -209,8 +211,10 @@ public class myListActivity extends AppCompatActivity {
                                             boardTitle.clear();
                                             boardSubContent.clear();
                                             oData.clear();*/
+                                            boardTitle.remove(boardTitle.indexOf(boardTitle.get(position)));
                                             boardContent.remove(boardContent.indexOf(boardContent.get(position)));
                                             boardSubContent.remove(boardSubContent.indexOf(boardSubContent.get(position)));
+                                            oData.remove(oData.remove(position));
                                             oAdapter.notifyDataSetChanged();
                                         }
 
@@ -246,6 +250,8 @@ public class myListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
               /*  reviewContent.clear();*/
+                reviewContent.clear();
+                reviewSubContent.clear();
                 oData.clear();
                 mReference = mDatabase.getReference("board"); // 변경값을 확인할 child 이름
                 mReference.addValueEventListener(new ValueEventListener() {
@@ -275,7 +281,7 @@ public class myListActivity extends AppCompatActivity {
 
                                                 boardTitle.set(boardTitle.indexOf(db_title),db_title);
                                                 boardContent.set(boardContent.indexOf(db_content),db_content);
-                                                boardSubContent.set(boardSubContent.indexOf(subCon),subCon);
+                                                boardSubContent.add(/*boardSubContent.indexOf(subCon),*/subCon);
 
                                                 // 같은 내용도 생각하기
                                                 // 같은날 같은제목 일수도
@@ -300,17 +306,18 @@ public class myListActivity extends AppCompatActivity {
                             });
                         }
                         Log.d("리스트 길이 : ", String.valueOf(boardTitle.size()));
+                        if(!boardContent.isEmpty()) {
+                            for (int i = 0; i < boardTitle.size(); i++) {
+                                ItemData oItem = new ItemData();
+                                if (oData.size() != boardTitle.size()) {
+                                    oItem.strTitle = boardTitle.get(i);
+                                    oItem.strDate = boardSubContent.get(i);
+                                    Log.d("작성자 확인:", boardSubContent.get(i));
+                                    oData.add(oItem);
+                                }
 
-                        for (int i = 0; i < boardTitle.size(); i++) {
-                            ItemData oItem = new ItemData();
-                            if (oData.size() != boardTitle.size()) {
-                                oItem.strTitle = boardTitle.get(i);
-                                oItem.strDate = boardSubContent.get(i);
-                                Log.d("작성자 확인:", boardSubContent.get(i));
-                                oData.add(oItem);
+
                             }
-
-
                         }
 // ListView, Adapter 생성 및 연결 ------------------------
 
