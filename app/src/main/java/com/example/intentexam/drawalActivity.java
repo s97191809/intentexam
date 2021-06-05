@@ -25,7 +25,6 @@ import java.util.ArrayList;
 public class drawalActivity extends AppCompatActivity {
     Button withdrawal_ok_Button;
     Button withdrawal_cancelButton;
-    final ArrayList<String> reviewList = new ArrayList<>();
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     SharedPreferences sf;

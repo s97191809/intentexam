@@ -267,6 +267,7 @@ public class myListActivity extends AppCompatActivity {// 작성한 글 목록 �
                                         }
                                     }
                                 }
+
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError error) {
                                 }
@@ -293,6 +294,7 @@ public class myListActivity extends AppCompatActivity {// 작성한 글 목록 �
                         myList.setAdapter(oAdapter);
 
                     }
+
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                     }

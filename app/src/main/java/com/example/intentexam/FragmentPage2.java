@@ -1033,7 +1033,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
                 
