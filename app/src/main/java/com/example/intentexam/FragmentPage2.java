@@ -138,6 +138,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
     private TMapGpsManager tmapgps = null;
     private TMapPoint point = null;
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
+    //private final String TMAP_API_KEY = "l7xx3d93d0f710544a94a72def7ba2555d16";
     private TMapView tmap;
     private ballonEvent ballonEventThread;
     private dbLoad dbLoad;
@@ -164,18 +165,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
     calTime calTime;
     static final int REQ_ADD_CONTACT = 1;
-
-
-    private Location lastKnownLocation;
-    private location endpoint;
-
-        private int accMin;
     private int sec;
-    private String name;
-    private int exp;
-    TMapAddressInfo aressInfo;
-    TMapPoint st_point;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -237,6 +227,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
                 }
                 removeMarker = new removeMarker();
                 removeMarker.start();
+                count=0;
                 Toast.makeText(getContext(), "산책을 시작합니다.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getContext(), walkingActivity.class);
                 startActivityForResult(intent, 2);
@@ -627,7 +618,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
                             distTmapShopAddr.add(dtaddr);
                         }
                     }
-                    // 위치정보를 가져오는건 좋았으나 ㅇ위치에 대한 이름과 주소는 잘 가지고오지 못한거 같다.
+
                     makeMarkerShop(distTmapShopPoint, distTmapShopName, distTmapShopAddr);
                     makeMarkerHospital(distTmapHospitalPoint, distTmapHospitalName, distTmapHospitalAddr);
                     makeMarkerPark(distTmapParkPoint, distTmapParkName, distTmapParkAddr);
@@ -892,7 +883,6 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
             TMapData tmapdata = new TMapData();
             tmap.setOnMarkerClickEvent(new TMapView.OnCalloutMarker2ClickCallback() {
-                //마커 정보를 여기서 가져와서
 
                 @Override
                 public void onCalloutMarker2ClickEvent(String s, TMapMarkerItem2 tMapMarkerItem2) {//마커 클릭 이벤트
@@ -903,19 +893,17 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
                         startActivity(intent);
 
-                        Log.d("병원이름 : ", tMapMarkerItem2.getID());
                     } else {
                         Intent intent = new Intent(getActivity(), naviActivity.class);
                         intent.putExtra("naviName", String.valueOf(tMapMarkerItem2.getID()));
                         TMapPoint et = tmap.getMarkerItem2FromID(s).getTMapPoint();
                         intent.putExtra("eplt", tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude());
                         intent.putExtra("epln", tmap.getMarkerItem2FromID(s).getTMapPoint().getLongitude());
-                        Log.d("뭘로 입력이 되냐", String.valueOf(tmap.getMarkerItem2FromID(s).getTMapPoint().getLatitude()));
 
                         startActivity(intent);
 
                     }
-                    Log.d("아이템 확인 : ", s);//선택한 풍선뷰 마커 까지의 폴리라인 생성
+
                     location location = new location(getActivity());
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
@@ -973,15 +961,16 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
                     SharedPreferences wsf = getContext().getSharedPreferences("walkinginfo", getContext().MODE_PRIVATE);
                     SharedPreferences.Editor wsfwalking = wsf.edit();
 
-                    steps = steps + wsf.getInt("steps", 0);
-                    totalSteps = totalSteps + wsf.getInt("totalSteps", 0);
-                    kcal = Double.parseDouble(kcal + wsf.getString("kcal", ""));
-                    coin = Integer.parseInt(coin + wsf.getString("coin", ""));
+                    steps = steps + wsf.getInt("steps", 0)-1;
+                    totalSteps = totalSteps + wsf.getInt("totalSteps", 0)-1;
+                    coin = coin + wsf.getInt("coin", 0);
+                    kcal = kcal + wsf.getInt("kcal",0);
+
+
                     wsfwalking.remove("steps");
-                    wsfwalking.remove("totalsteps");
+                    wsfwalking.remove("totalSteps");
                     wsfwalking.remove("kcal");
                     wsfwalking.remove("coin");
-
                     wsfwalking.commit();
 
                 } catch (Exception e) {
@@ -997,13 +986,13 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
             Log.d("시간 : ", String.valueOf(min) + "분");
             Log.d("시간 : ", String.valueOf(sec) + "초");
 
-            air = 3.5 * Integer.parseInt(weight) * min;
-            kcal = air * 5 / 1000;
+    /*        air = 3.5 * Integer.parseInt(weight) * min;
+            kcal = air * 5 / 1000;*/
             kcalView.setText("kcal\n" + (int) kcal);
-
+            coinView.setText("코인 수\n" + coin);
             // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
             if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
+                tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps));
 
                 steps++;
                 totalDistance = steps * 0.7; //m
@@ -1015,7 +1004,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
                 if (totalDistance >= 2000) {//2km이상 걸을 시
 
-                    exp = exp + 10;//경험치 10증가
+
 
                     totalDistance = totalDistance - 2000;
                     steps = 0;
@@ -1023,51 +1012,10 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
 
                     Log.d("코인 수 ", String.valueOf(coin));
                     Log.d("아이디확인 ", id);
-                    if (exp == 100) {// 경험치 100 달성시 코인 + 1
+
                         coinView.setText("코인 수\n" + coin);
-                        coin++;
 
-                        mDatabase = FirebaseDatabase.getInstance();
-                        mReference = mDatabase.getReference("user"); // 코인 획득시 db 코인 값 업데이트
-                        mReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            String db_coin;
-                            String db_id;
 
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-
-                                    db_coin = messageData.child("coin").getValue().toString();
-                                    db_id = messageData.child("userId").getValue().toString();
-
-                                    if (id.equals(db_id)) {
-                                        mReference = mDatabase.getReference().child("user");
-                                        mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
-                                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                    @Override
-                                                    public void onSuccess(Void unused) {
-
-                                                    }
-
-                                                }).addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-
-                                            }
-                                        });
-                                    }
-
-                                }
-
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-                    exp = 0;
                 } else {
                     dista.setText("이동거리\n" + (int) accDistance + " M");
                 }
@@ -1113,8 +1061,8 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
         }
 
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
-                500000, // 통지사이의 최소 시간간격 (miliSecond)
-                5, // 통지사이의 최소 변경거리 (m)
+                100, // 통지사이의 최소 시간간격 (miliSecond)
+                0, // 통지사이의 최소 변경거리 (m)
                 mLocationListener);
     }
     

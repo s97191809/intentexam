@@ -67,7 +67,7 @@ public class drawalActivity extends AppCompatActivity {
 
                     String db_content = messageData.child("content").getValue().toString();
                     String db_id = messageData.child("id").getValue().toString();
-                    Log.d("내용 : ", db_content);
+
                     if (db_id.equals(id)) {
                         mReference = mDatabase.getReference().child("calender");
                         mReference.child(db_content).setValue(null)
@@ -114,7 +114,6 @@ public class drawalActivity extends AppCompatActivity {
                                 String db_content = messageData.child("content").getValue().toString();
                                 String db_id = messageData.child("id").getValue().toString();
                                 if (db_id.equals(id)) {
-                                    Log.d("이계정이 가진 글목록", db_content);
 
                                     mReference = mDatabase.getReference().child("hospitalreview").child(dbHosList);
                                     mReference.child(db_content).setValue(null)
@@ -153,7 +152,6 @@ public class drawalActivity extends AppCompatActivity {
 
     public void delUser(String id) {//회원 정보 삭제
         mReference = mDatabase.getReference().child("user");
-        // user는 그냥 id로 바로하면 되는데 캘린더랑 병원 리뷰는 한번 더 내려가서 포함하는 값을 찾아야함ㅋㅋ
         mReference.child(id).setValue(null)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

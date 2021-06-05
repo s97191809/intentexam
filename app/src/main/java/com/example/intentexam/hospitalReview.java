@@ -71,7 +71,7 @@ public class hospitalReview extends AppCompatActivity {//병원 리뷰 클래스
                     oData.add(oItem);
 
                 }
-// ListView, Adapter 생성 및 연결 ------------------------
+        // ListView, Adapter 생성 및 연결
                 review_list = (ListView)findViewById(R.id.review_list);//병원 리뷰 리스트 생성
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
                 review_list.setAdapter(oAdapter);

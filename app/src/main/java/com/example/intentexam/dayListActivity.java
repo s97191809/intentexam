@@ -135,8 +135,6 @@ public class dayListActivity extends AppCompatActivity {//일정 목록 클래�
                             }
                         });
                     }
-                    // listview 갱신.
-
 
                 });
                 builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {

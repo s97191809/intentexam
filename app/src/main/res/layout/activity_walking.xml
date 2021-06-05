@@ -32,62 +32,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
 
-        >
-
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="59dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginLeft="2dp"
-            android:background="@drawable/button"
-            android:text="공원"
-            android:textColor="#ffffff"
-            app:layout_constraintStart_toEndOf="@+id/button4"
-            tools:layout_editor_absoluteY="0dp"
-            tools:ignore="MissingConstraints" />
-
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="59dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginLeft="2dp"
-            android:background="@drawable/button"
-            android:text="병원"
-            android:textColor="#ffffff"
-            app:layout_constraintStart_toEndOf="@+id/button5"
-            tools:layout_editor_absoluteY="0dp"
-            tools:ignore="MissingConstraints" />
-
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="59dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/button"
-            android:text="상점"
-            android:textColor="#ffffff"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:ignore="MissingConstraints" />
-
-
-        <Spinner
-            android:id="@+id/select_distance"
-            android:layout_width="100dp"
-            android:layout_height="38dp"
-
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/background_round_blue"
-            android:gravity="right"
-            android:spinnerMode="dropdown"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="MissingConstraints" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        />
     <LinearLayout
 
 
@@ -180,21 +125,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:gravity="right"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/trailButton"
-            android:layout_width="80dp"
-            android:layout_height="39dp"
-            android:background="@drawable/button"
-            android:text="산책로"
-            android:textColor="#ffffff"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            >
-
-        </Button>
-
-    </LinearLayout>
+        android:orientation="horizontal"/>
 
 </LinearLayout>

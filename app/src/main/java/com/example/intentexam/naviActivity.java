@@ -42,30 +42,17 @@ import com.skt.Tmap.TMapPoint;
 import com.skt.Tmap.TMapPolyLine;
 import com.skt.Tmap.TMapView;
 
-public class naviActivity extends AppCompatActivity implements SensorEventListener {//공원, 상점 경로 안내 클래스
+public class naviActivity extends AppCompatActivity {//공원, 상점 경로 안내 클래스
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
+    //private final String TMAP_API_KEY = "l7xx38321a7abbc144b28f1e1a6165ea3b58";
+
     private TMapView tmap;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
     boolean start = false;
     Button startButton;
-    private TextView tv_sensor;
-    private TextView dista;
-    private TextView kcalView;
-    double totalDistance = 0;
-    private TextView coinView;
-    private int coin;
     long time1;
-    int min;
-    int steps = 0;
-    int totalSteps = 0;
-    private int sec;
-    double accDistance = 0;
-    calTime calTime;
-    SharedPreferences sf;
 
-    SensorManager sm;
-    Sensor sensor_step_detector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,24 +149,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
 
         });
 
-        dista = findViewById(R.id.distance);
-        kcalView = findViewById(R.id.kcal);
-        Log.d("이동거리", String.valueOf(totalDistance));
 
-        coinView = findViewById(R.id.coin);
-        coinView.setText("코인 수\n" + coin);
-
-        calTime = new calTime();
-        calTime.start();
-
-
-        tv_sensor = (TextView) findViewById(R.id.sensor);
-        sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-
-        if (sensor_step_detector == null) {
-            Toast.makeText(this, "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
-        }
 
 
     }
@@ -192,7 +162,6 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
 
@@ -229,106 +198,7 @@ public class naviActivity extends AppCompatActivity implements SensorEventListen
                 mLocationListener);
     }
 
-    private class calTime extends Thread {
-        public calTime() {//시간 계산 쓰레드
 
-        }
 
-        @Override
-        public void run() {
-            min = (int) (time1 / 60 % 60);
-            Log.d("시간 : ", String.valueOf(min));
-        }
-    }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {//센서 감지시 호출
-        sf = getSharedPreferences("info", MODE_PRIVATE);
-        String weight = sf.getString("weight", "");
-        String id = sf.getString("inputId", "");
-        if (start == true) {
-            long end = System.currentTimeMillis();
-            min = (int) ((end - time1) / 1000) / 60 % 60;
-            sec = (int) ((end - time1) / 1000) % 60;
-            // air= 3.5*몸무게*분 kcal=air*5/1000
-            //min = (time1 / 60 % 60);
-
-            Log.d("시간 : ", String.valueOf(min) + "분");
-            Log.d("시간 : ", String.valueOf(sec) + "초");
-
-            double air = 3.5 * Integer.parseInt(weight) * min;
-            double kcal = air * 5 / 1000;
-            kcalView.setText("kcal\n" + (int) kcal);
-
-            // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
-            if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-                tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
-                steps++;
-
-                Log.d("총 걸음 수 ", String.valueOf((int) totalSteps));
-                totalDistance = steps * 0.7; //m
-                accDistance = steps * 0.7; //m
-                Log.d("현재 걸음 수 ", String.valueOf(steps));
-
-                if (totalDistance >= 2000) {
-                    coin++;
-                    totalDistance = totalDistance - 2000;
-                    steps = 0;
-                    dista.setText("이동거리\n" + (int) accDistance + " M");
-
-                    Log.d("코인 수 ", String.valueOf(coin));
-                    Log.d("아이디확인 ", id);
-
-                    coinView.setText("이동거리\n" + String.valueOf(coin));
-                    mDatabase = FirebaseDatabase.getInstance();
-                    mReference = mDatabase.getReference("user");
-                    mReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        String db_coin;
-                        String db_id;
-
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-
-                                db_coin = messageData.child("coin").getValue().toString();
-                                db_id = messageData.child("userId").getValue().toString();
-                                Log.d("넘겨온 아디", id);
-                                if (id.equals(db_id)) {
-                                    mReference = mDatabase.getReference().child("user");
-                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
-                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-
-                                                }
-
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-                                }
-
-                            }
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-
-                } else {
-                    dista.setText("이동거리\n" + (int) accDistance + " M");
-                }
-            }
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
 }

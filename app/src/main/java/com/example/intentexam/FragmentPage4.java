@@ -68,7 +68,9 @@ public class FragmentPage4 extends Fragment {//내정보 페이지 클래스
                 for (DataSnapshot messageData : snapshot.getChildren()) {
                     String db_id = messageData.child("userId").getValue().toString();
                     if (db_id.equals(id)) {
-                        coinView.setText("레벨 : " + messageData.child("coin").getValue().toString());
+                        String coin = messageData.child("coin").getValue().toString();
+                        int level  = Integer.parseInt(coin)/100;
+                        coinView.setText("레벨 : " +level);
                     }
 
 

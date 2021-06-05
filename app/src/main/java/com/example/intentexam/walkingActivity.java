@@ -44,6 +44,7 @@ import com.skt.Tmap.TMapView;
 
 public class walkingActivity extends AppCompatActivity implements SensorEventListener {
     private final String TMAP_API_KEY = "l7xx5450926a109d4b33a7f3f0b5c89a2f0c";
+//    private final String TMAP_API_KEY = "l7xx38321a7abbc144b28f1e1a6165ea3b58";
     private TMapView tmap;
     private FirebaseDatabase mDatabase;
     private DatabaseReference mReference;
@@ -122,8 +123,8 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                         SharedPreferences.Editor wsfwalking = wsf.edit();
                         wsfwalking.putInt("steps", steps);
                         wsfwalking.putInt("totalSteps", totalSteps);
-                        wsfwalking.putString("kcal", String.valueOf(kcal));
-                        wsfwalking.putString("coin", String.valueOf(coin));
+                        wsfwalking.putInt("kcal", (int) kcal);
+                        wsfwalking.putInt("coin", coin);
                         wsfwalking.commit();
                         finish();
                     }
@@ -158,8 +159,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
 
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor_step_detector = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        // 버튼 누르기 전까지 NULL 이였다가 누르면 0으로 셋팅
-        //센서 거기에 NULL 이면 동작 안하게끔 만듬
+
         if (sensor_step_detector == null) {
             Toast.makeText(this, "No Step Detect Sensor", Toast.LENGTH_SHORT).show();
         }
@@ -181,7 +181,6 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
             if (location != null) {
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
-                //여기 고치면 위치이동 될듯
                 tmap.setCenterPoint(longitude, latitude);
                 tmap.setLocationPoint(longitude, latitude);
                 TMapData tmapdata = new TMapData();
@@ -229,11 +228,11 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
-
+/*
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 100, // 통지사이의 최소 시간간격 (miliSecond)
                 0, // 통지사이의 최소 변경거리 (m)
-                mLocationListener);
+                mLocationListener);*/
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 100, // 통지사이의 최소 시간간격 (miliSecond)
                 0, // 통지사이의 최소 변경거리 (m)
@@ -262,37 +261,37 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
             min = (int) ((end - time1) / 1000) / 60 % 60;
             sec = (int) ((end - time1) / 1000) % 60;
             // air= 3.5*몸무게*분 kcal=air*5/1000
-            //min = (time1 / 60 % 60);
+            //min = (int) (time1 / 60 % 60);
 
             Log.d("시간 : ", String.valueOf(min) + "분");
             Log.d("시간 : ", String.valueOf(sec) + "초");
 
             air = 3.5 * Integer.parseInt(weight) * min;
-            kcal = air * 5 / 1000;
+            kcal = air * 5 / 1000;//원래값 1000
             kcalView.setText("kcal\n" + (int) kcal);
 
             // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
             if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
                 tv_sensor.setText("걸음 수\n" + String.valueOf(totalSteps++));
                 steps++;
-
+                kcalView.setText("kcal\n" + (int) kcal);
                 Log.d("산책 총 걸음 수 ", String.valueOf((int) totalSteps));
                 totalDistance = steps * 0.7; //m
+                accDistance = totalSteps * 0.7; //m
                 Log.d("산책 현재 걸음 수 ", String.valueOf(steps));
 
-                if (totalDistance >= 20) {
-                    coin++;
-                    accDistance = totalDistance;
-                    totalDistance = totalDistance - 20;
+                if (totalDistance >= 2000) {
+                    coin = coin + 10;
+
+                    totalDistance = totalDistance - 2000;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
-                    //여기서 코인수 늘려주면 됩니당
-                    //근데 넘 커찮아여
+
 
                     Log.d("코인 수 ", String.valueOf(coin));
                     Log.d("아이디확인 ", id);
 
-                    coinView.setText("이동거리\n" + String.valueOf(coin));
+                    coinView.setText("코인 수\n" + String.valueOf(coin));
                     mDatabase = FirebaseDatabase.getInstance();
                     mReference = mDatabase.getReference("user"); // 변경값을 확인할 child 이름
                     mReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -308,7 +307,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                                 Log.d("넘겨온 아디", id);
                                 if (id.equals(db_id)) {
                                     mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
-                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 1))
+                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 100))
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {
@@ -326,8 +325,6 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                             }
 
 
-                            // null값뜸
-
                         }
 
                         @Override
@@ -337,10 +334,9 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                     });
 
                 } else {
-                    dista.setText("산책 이동거리\n" + (int) totalDistance + " M");
+                    dista.setText("산책 이동거리\n" + (int) accDistance + " M");
                 }
             }
-            //zzzzzz
 
     }
 
@@ -348,4 +344,19 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SharedPreferences wsf =getSharedPreferences("walkinginfo", MODE_PRIVATE);
+        SharedPreferences.Editor wsfwalking = wsf.edit();
+        wsfwalking.putInt("steps", steps);
+        wsfwalking.putInt("totalSteps", totalSteps);
+        wsfwalking.putString("kcal", String.valueOf(kcal));
+        wsfwalking.putInt("coin", coin);
+        wsfwalking.commit();
+        finish();
+
+    }
+
+
 }

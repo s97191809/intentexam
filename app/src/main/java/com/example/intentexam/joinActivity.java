@@ -151,7 +151,7 @@ public class joinActivity extends AppCompatActivity {//회원가입 클래스
         public String coin;
 
         public User() {
-            // Default constructor required for calls to DataSnapshot.getValue(User.class)
+
         }
 
         public User(String userId, String userName, String password, String weight, String coin) {
