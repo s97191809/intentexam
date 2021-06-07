@@ -1002,11 +1002,11 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// �
                 Log.d("현재 걸음 수 ", String.valueOf(steps));
                 Log.d("현재 거리 ", String.valueOf(accDistance));
 
-                if (totalDistance >= 2000) {//2km이상 걸을 시
+                if (totalDistance >= 20) {//2km이상 걸을 시
 
 
 
-                    totalDistance = totalDistance - 2000;
+                    totalDistance = totalDistance - 20;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
 

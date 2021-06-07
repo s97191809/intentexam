@@ -53,7 +53,7 @@ public class joinActivity extends AppCompatActivity {//회원가입 클래스
         btn_save = findViewById(R.id.join_button);
         btn_check = findViewById(R.id.check_button);
         btn_cancel = findViewById(R.id.cancel);
-
+        mDatabase = FirebaseDatabase.getInstance();
         mReference = mDatabase.getReference("user");
         if (arrId.isEmpty()) {// 회원 정보 가져오기
             mReference.addValueEventListener(new ValueEventListener() {

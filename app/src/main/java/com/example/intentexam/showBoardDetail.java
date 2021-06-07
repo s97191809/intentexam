@@ -71,25 +71,45 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
                         address.setText(db_address);
                         filename = title + "_" + db_id;
                         Log.d("파일이름  ", filename);
+                        imgview = findViewById(R.id.imgview);
+                        FirebaseStorage storage = FirebaseStorage.getInstance();//생성된 이름으로 디비에서 이미지 불러오기
+                        StorageReference storageRef = storage.getReference().child("board_img/");
+                        storageRef.child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                //Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
+                                Glide.with(getApplicationContext()).load(uri).into(imgview);
+
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
                     }
                 }
-                imgview = findViewById(R.id.imgview);
-                FirebaseStorage storage = FirebaseStorage.getInstance();//생성된 이름으로 디비에서 이미지 불러오기
-                StorageReference storageRef = storage.getReference().child("board_img/");
-                storageRef.child(filename).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        //Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
-                        Glide.with(getApplicationContext()).load(uri).into(imgview);
+                if(!filename.isEmpty()){
+                    String fn =secondIntent.getStringExtra("filename");
+                    imgview = findViewById(R.id.imgview);
+                    FirebaseStorage storage = FirebaseStorage.getInstance();//생성된 이름으로 디비에서 이미지 불러오기
+                    StorageReference storageRef = storage.getReference().child("board_img/");
+                    storageRef.child(fn).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            //Toast.makeText(getApplicationContext(), "다운로드 성공 : "+ uri, Toast.LENGTH_SHORT).show();
+                            Glide.with(getApplicationContext()).load(uri).into(imgview);
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
             }
 
 

@@ -49,6 +49,7 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
     final ArrayList<String> boardTitle = new ArrayList<>();
     final ArrayList<String> subContent = new ArrayList<>();
     final ArrayList<String> boardContent = new ArrayList<>();
+    final ArrayList<String> filename = new ArrayList<>();
     final ArrayList<ItemData> oData = new ArrayList<>();
 
 
@@ -102,6 +103,7 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
                     String subCon = db_writer + "        " + db_date + "      " + "좋아요 수 : " + gpoint;
                     if (boardTitle.contains(db_title) && subContent.contains(subCon)) {
                     } else {
+                        filename.add(db_title+db_writer);
                         boardTitle.add(db_title);
                         subContent.add(subCon);
                         boardContent.add(content);
@@ -138,6 +140,7 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
 
                 intent.putExtra("title", boardTitle.get(position));
                 intent.putExtra("content", boardContent.get(position));
+                intent.putExtra("filename", filename.get(position));
 
                 startActivity(intent);
 
