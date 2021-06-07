@@ -802,7 +802,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// ì
                             String db_gPoint = messageData.child("gPoint").getValue().toString();
                             String db_address = messageData.child("address").getValue().toString();
 
-                            if (Integer.valueOf(db_gPoint) > 20) {
+                            if (Integer.valueOf(db_gPoint) >= 20) {
 
 
                                 boardTopName.add(db_title);
