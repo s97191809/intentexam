@@ -307,7 +307,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                                 Log.d("넘겨온 아디", id);
                                 if (id.equals(db_id)) {
                                     mReference = mDatabase.getReference().child("user"); // 지워야할 내용에 해당되는 부분 지우기
-                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 100))
+                                    mReference.child(db_id).child("coin").setValue(String.valueOf(Integer.parseInt(db_coin) + 10))
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void unused) {
