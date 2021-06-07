@@ -71,7 +71,6 @@ public class CustomDialog extends AppCompatActivity {
 
         mDatabase = FirebaseDatabase.getInstance();
         getloginInfo = context.getSharedPreferences("info", context.MODE_PRIVATE);
-
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -94,14 +93,14 @@ public class CustomDialog extends AppCompatActivity {
 
 
                 //------------------일정추가:제목,내용/캘린더에서 년,월,일/로그인 정보에서 아이디 db에 추가, 제목은 달력에 보여주기
-                Toast.makeText(context, "일정 작성 성공", Toast.LENGTH_SHORT).show();
+
                 if(title.isEmpty()){
-                    Toast.makeText(getApplicationContext(), "제목을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "제목을 입력해 주세요.", Toast.LENGTH_SHORT).show();
                 }else if(content.isEmpty()){
-                    Toast.makeText(getApplicationContext(), "내용을 입력해 주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "내용을 입력해 주세요.", Toast.LENGTH_SHORT).show();
                 }
                 else{
-
+                    Toast.makeText(context, "일정 작성 성공", Toast.LENGTH_SHORT).show();
                     writeMemo(title, content, id, curYear, curMonth, day);
                     finish();
                 }
