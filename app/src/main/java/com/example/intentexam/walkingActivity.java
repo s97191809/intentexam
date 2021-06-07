@@ -267,7 +267,7 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
             Log.d("시간 : ", String.valueOf(sec) + "초");
 
             air = 3.5 * Integer.parseInt(weight) * min;
-            kcal = air * 5 / 100;//원래값 1000
+            kcal = air * 5 / 1000;//원래값 1000
             kcalView.setText("kcal\n" + (int) kcal);
 
             // 센서 유형이 스텝감지 센서인 경우 걸음수 +1
@@ -280,10 +280,10 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 accDistance = totalSteps * 0.7; //m
                 Log.d("산책 현재 걸음 수 ", String.valueOf(steps));
 
-                if (totalDistance >= 20) {
-                    coin = coin + 100;
+                if (totalDistance >= 2000) {
+                    coin = coin + 10;
 
-                    totalDistance = totalDistance - 20;
+                    totalDistance = totalDistance - 2000;
                     steps = 0;
                     dista.setText("이동거리\n" + (int) accDistance + " M");
 
