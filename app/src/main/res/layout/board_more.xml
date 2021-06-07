@@ -108,6 +108,7 @@
             android:layout_height="40dp"
             android:background="@drawable/background_round_blue"
             android:textColor="#707070"
+            android:text="좋아요"
             android:textSize="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

@@ -45,6 +45,7 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
     Button boardGpoint;
     String filename;
     String gp;
+    String content;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +54,8 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
 
         Intent secondIntent = getIntent();
         String title = secondIntent.getStringExtra("title");
-        String content = secondIntent.getStringExtra("content");
+         content= secondIntent.getStringExtra("content");
+        String content_last= secondIntent.getStringExtra("content_last");
         address = findViewById(R.id.b_title);
         mDatabase = FirebaseDatabase.getInstance();
         mReference = mDatabase.getReference("board");//게시글에 맞는 이미지 이름 생성
@@ -66,7 +68,9 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
                     String db_content = messageData.child("content").getValue().toString().trim();
                     String db_id = messageData.child("id").getValue().toString().trim();
                     Log.d("값 확인", title + "," + content);
-                    if (title.equals(db_title) && content.equals(db_content)) {
+                    if (title.equals(db_title)) {
+
+                        content = db_content;
                         String db_address = messageData.child("address").getValue().toString();
                         address.setText(db_address);
                         filename = title + "_" + db_id;
@@ -90,9 +94,10 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
 
                     }
                 }
-                if(!filename.isEmpty()){
+
                     String fn =secondIntent.getStringExtra("filename");
                     imgview = findViewById(R.id.imgview);
+
                     FirebaseStorage storage = FirebaseStorage.getInstance();//생성된 이름으로 디비에서 이미지 불러오기
                     StorageReference storageRef = storage.getReference().child("board_img/");
                     storageRef.child(fn).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -105,10 +110,10 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
                     }).addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
+                     //       Toast.makeText(getApplicationContext(), "다운로드 실패", Toast.LENGTH_SHORT).show();
                         }
                     });
-                }
+
 
             }
 
@@ -124,43 +129,21 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
         boardTitleView.setText(title);
 
         boardDetailView = findViewById(R.id.board_content);
-        boardDetailView.setText(content);
+
+            boardDetailView.setText(content);
+
+
 
         boardGpoint = findViewById(R.id.board_good);
 
-        mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("board"); //좋아요 눌릴시 디비 갱신 및 출력
-        mReference.addValueEventListener(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
-                    String db_title = messageData.child("title").getValue().toString().trim();
-                    String db_content = messageData.child("content").getValue().toString().trim();
-
-                    if (title.equals(db_title) && content.equals(db_content)) {
-                        gp = messageData.child("gPoint").getValue().toString();
-                        boardGpoint.setText("좋아요 " + gp);
-                        Log.d("받은 좋아요 수 : ", gp);
-                    }
-
-
-                }
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
         boardGpoint.setOnClickListener(new OnSingleClickListener() {
 
             @Override
             public void onSingleClick(View v) {//좋아요 버튼
-
-                mReference = mDatabase.getReference().child("board"); // 지워야할 내용에 해당되는 부분 지우기
-                mReference.child(content).child("gPoint").setValue(String.valueOf(Integer.parseInt(gp) + 1))
+                mDatabase = FirebaseDatabase.getInstance();
+                mReference = mDatabase.getReference().child("board");
+                mReference.child(content).child("gPoint").setValue(Integer.parseInt(gp) + 1)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
@@ -177,7 +160,34 @@ public class showBoardDetail extends AppCompatActivity {//게시글 상세보기
                 });
             }
         });
-        
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("board"); //좋아요 눌릴시 디비 갱신 및 출력
+        mReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+                    String db_title = messageData.child("title").getValue().toString().trim();
+                    String db_content = messageData.child("content").getValue().toString().trim();
+
+                    if (title.equals(db_title) && content.equals(db_content)) {
+                        gp = messageData.child("gPoint").getValue().toString();
+                        boardGpoint.setText("좋아요 " + gp);
+                        Log.d("받은 좋아요 수 : ", String.valueOf(gp));
+                    }
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
     public abstract class OnSingleClickListener implements View.OnClickListener {

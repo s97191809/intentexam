@@ -56,7 +56,55 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("board"); // 게시글 정보 로드
+        mReference.addValueEventListener(new ValueEventListener() {
 
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                boardTitle.clear();
+                subContent.clear();
+                oData.clear();
+                for (DataSnapshot messageData : dataSnapshot.getChildren()) {
+
+                    String db_title = messageData.child("title").getValue().toString();
+                    String db_writer = messageData.child("id").getValue().toString();
+                    String db_date = messageData.child("date").getValue().toString();
+                    String content = messageData.child("content").getValue().toString();
+                    String gpoint = messageData.child("gPoint").getValue().toString();
+
+
+                    String subCon = db_writer + "        " + db_date + "      " + "좋아요 수 : " + gpoint;
+                    if (boardTitle.contains(db_title) && subContent.contains(subCon)) {
+                    } else {
+                        filename.add(db_title+db_writer);
+                        boardTitle.add(db_title);
+                        subContent.add(subCon);
+                        boardContent.add(content);
+                    }
+                    // 리스트뷰 참조 및 Adapter
+                }
+                if (oData.size() != boardTitle.size()) {
+                    for (int i = 0; i < boardTitle.size(); i++) {
+                        ItemData oItem = new ItemData();
+                        oItem.strTitle = boardTitle.get(i);
+                        oItem.strDate = subContent.get(i);
+                        Log.d("작성자 확인:", subContent.get(i));
+                        oData.add(oItem);
+                    }
+                }
+                // ListView, Adapter 생성 및 연결 ------------------------
+
+                ListViewAdapter oAdapter = new ListViewAdapter(oData);
+                board_list.setAdapter(oAdapter);
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Nullable
@@ -136,11 +184,14 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), showBoardDetail.class);
                 ListViewAdapter oAdapter = new ListViewAdapter(oData);
-                String data = oData.get(position).toString();
+
+
+
 
                 intent.putExtra("title", boardTitle.get(position));
                 intent.putExtra("content", boardContent.get(position));
                 intent.putExtra("filename", filename.get(position));
+                intent.putExtra("content_last", boardContent.get(boardContent.size()-1));
 
                 startActivity(intent);
 
