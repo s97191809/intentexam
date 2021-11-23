@@ -228,11 +228,10 @@ public class walkingActivity extends AppCompatActivity implements SensorEventLis
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
-/*
         lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 100, // 통지사이의 최소 시간간격 (miliSecond)
                 0, // 통지사이의 최소 변경거리 (m)
-                mLocationListener);*/
+                mLocationListener);
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, // 등록할 위치제공자(실내에선 NETWORK_PROVIDER 권장)
                 100, // 통지사이의 최소 시간간격 (miliSecond)
                 0, // 통지사이의 최소 변경거리 (m)
