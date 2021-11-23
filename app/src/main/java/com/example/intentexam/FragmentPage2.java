@@ -1091,7 +1091,7 @@ public class FragmentPage2 extends Fragment implements SensorEventListener {// ì
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.good);
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
-            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / (width / 100), true);
+            bitmap = bitmap.createScaledBitmap(bitmap, 100, height / 2, true);
             marker.setPosition(0.0f, 0.0f);
             marker.getTMapPoint();
 

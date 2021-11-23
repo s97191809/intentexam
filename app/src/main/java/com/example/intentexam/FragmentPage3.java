@@ -138,6 +138,7 @@ public class FragmentPage3 extends Fragment { // 게시글 클래스
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 boardTitle.clear();
                 subContent.clear();
+                boardContent.clear();
                 oData.clear();
                 for (DataSnapshot messageData : dataSnapshot.getChildren()) {
 
